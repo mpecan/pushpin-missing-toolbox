@@ -1,6 +1,6 @@
 package io.github.mpecan.pmt.controller
 
-import io.github.mpecan.pmt.model.PushpinMessage
+import io.github.mpecan.pmt.model.Message
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.service.PushpinService
 import org.springframework.http.HttpStatus
@@ -20,7 +20,7 @@ class PushpinController(private val pushpinService: PushpinService) {
      * Publishes a message to a channel.
      */
     @PostMapping("/publish")
-    fun publishMessage(@RequestBody message: PushpinMessage): Mono<ResponseEntity<Map<String, Any>>> {
+    fun publishMessage(@RequestBody message: Message): Mono<ResponseEntity<Map<String, Any>>> {
         return pushpinService.publishMessage(message)
             .map { success ->
                 if (success) {
@@ -49,9 +49,9 @@ class PushpinController(private val pushpinService: PushpinService) {
         @RequestBody data: Any
     ): Mono<ResponseEntity<Map<String, Any>>> {
         val message = if (event != null) {
-            PushpinMessage.event(channel, event, data)
+            Message.event(channel, event, data)
         } else {
-            PushpinMessage.simple(channel, data)
+            Message.simple(channel, data)
         }
         
         return publishMessage(message)

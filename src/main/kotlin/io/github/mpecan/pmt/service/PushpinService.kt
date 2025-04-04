@@ -1,8 +1,7 @@
 package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
-import io.github.mpecan.pmt.model.PushpinMessage
-import io.github.mpecan.pmt.model.PushpinServer
+import io.github.mpecan.pmt.model.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Scheduled
@@ -11,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import java.time.Duration
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -110,13 +110,13 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
     /**
      * Publishes a message to a Pushpin server.
      */
-    fun publishMessage(message: PushpinMessage): Mono<Boolean> {
+    fun publishMessage(message: Message): Mono<Boolean> {
         val server = getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
-        
+        val httpMessage = PushpinHttpMessage(listOf(message.toPushPin()))
         return webClient.post()
             .uri("${server.getControlUrl()}/publish")
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(message)
+            .bodyValue(httpMessage)
             .retrieve()
             .bodyToMono<String>()
             .map { true }
@@ -148,3 +148,16 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
         return servers[id]
     }
 }
+
+private fun Message.toPushPin()= PushpinMessage(
+        id = UUID.randomUUID().toString(),
+        channel = this.channel,
+        formats = listOf(
+            "websocket" to PushpinFormat(
+                content = this.data.toString()
+            ),
+            "http-stream" to PushpinFormat(
+                content = this.data.toString()
+            )
+        ).toMap()
+    )

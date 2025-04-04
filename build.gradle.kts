@@ -33,6 +33,9 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    testImplementation("javax.servlet:javax.servlet-api:4.0.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

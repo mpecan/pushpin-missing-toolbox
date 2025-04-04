@@ -1,0 +1,15 @@
+# Routes file for Pushpin integration tests
+
+# Format: <domain>[/<path>] <target>
+
+# Default route for all requests
+* http://host.testcontainers.internal:8080
+
+# Route for realtime endpoints
+/api/realtime/* http://host.testcontainers.internal:8080/api/realtime/
+
+# Route for SSE endpoints
+/api/events/* http://host.testcontainers.internal:8080/api/events/
+
+# Route for WebSocket endpoints
+/api/ws/* http://host.testcontainers.internal:8080/api/ws/
