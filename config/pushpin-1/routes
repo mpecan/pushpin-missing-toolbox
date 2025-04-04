@@ -1,0 +1,16 @@
+# Routes file for pushpin-1
+
+# Format: <domain>[/<path>] <target>
+# Example: example.com/api http://localhost:8000/api
+
+# Default route for all requests
+* http://app:8080
+
+# Route for realtime endpoints
+/api/realtime/* http://app:8080/api/realtime/
+
+# Route for SSE endpoints
+/api/events/* http://app:8080/api/events/
+
+# Route for WebSocket endpoints
+/api/ws/* http://app:8080/api/ws/

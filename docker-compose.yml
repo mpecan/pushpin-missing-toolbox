@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  pushpin-1:
+    image: fanout/pushpin:latest
+    ports:
+      - "7999:7999"  # HTTP port
+      - "5560:5560"  # ZMQ publish socket
+      - "5561:5561"  # ZMQ XPUB socket
+      - "5562:5562"  # ZMQ ROUTER socket
+      - "5563:5563"  # ZMQ SUB socket
+    volumes:
+      - ./config/pushpin-1:/etc/pushpin
+    environment:
+      - GRIP_URL=http://app:8080/api/pushpin
+    networks:
+      - pushpin-network
+
+  pushpin-2:
+    image: fanout/pushpin:latest
+    ports:
+      - "7998:7999"  # HTTP port
+      - "6560:5560"  # ZMQ publish socket
+      - "6561:5561"  # ZMQ XPUB socket
+      - "6562:5562"  # ZMQ ROUTER socket
+      - "6563:5563"  # ZMQ SUB socket
+    volumes:
+      - ./config/pushpin-2:/etc/pushpin
+    environment:
+      - GRIP_URL=http://app:8080/api/pushpin
+    networks:
+      - pushpin-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - pushpin-1
+      - pushpin-2
+    networks:
+      - pushpin-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - PUSHPIN_SERVERS=pushpin-1:7999,pushpin-2:7999
+
+networks:
+  pushpin-network:
+    driver: bridge
