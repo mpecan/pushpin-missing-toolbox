@@ -10,8 +10,8 @@ object TestcontainersUtils {
     /**
      * Creates a new Pushpin container.
      */
-    fun createPushpinContainer(): PushpinContainer {
-        return PushpinContainer()
+    fun createPushpinContainer(hostPort: Int): PushpinContainer {
+        return PushpinContainer().withHostPort(hostPort)
     }
 
     /**

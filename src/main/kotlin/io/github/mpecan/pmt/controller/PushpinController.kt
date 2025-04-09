@@ -21,6 +21,7 @@ class PushpinController(private val pushpinService: PushpinService) {
      */
     @PostMapping("/publish")
     fun publishMessage(@RequestBody message: Message): Mono<ResponseEntity<Map<String, Any>>> {
+        println("publishing message: $message")
         return pushpinService.publishMessage(message)
             .map { success ->
                 if (success) {

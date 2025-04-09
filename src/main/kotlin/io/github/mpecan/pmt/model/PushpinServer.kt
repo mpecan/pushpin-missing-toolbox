@@ -22,7 +22,7 @@ data class PushpinServer(
     val publishPort: Int = 5560,
     val active: Boolean = true,
     val weight: Int = 100,
-    val healthCheckPath: String = "/status"
+    val healthCheckPath: String = "/api/health/check",
 ) {
     /**
      * Returns the base URL for the server.

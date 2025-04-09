@@ -43,7 +43,7 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
                 logger.info("Loaded Pushpin server: ${server.id} at ${server.getBaseUrl()}")
             }
         }
-        
+
         if (servers.isEmpty()) {
             logger.warn("No active Pushpin servers configured")
         }
@@ -57,7 +57,7 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
         if (!pushpinProperties.healthCheckEnabled) {
             return
         }
-        
+
         servers.values.forEach { server ->
             checkHealth(server)
                 .doOnSuccess { healthy ->
@@ -85,6 +85,12 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
             .uri(server.getHealthCheckUrl())
             .retrieve()
             .bodyToMono<String>()
+            .doOnSuccess { response ->
+                logger.debug("Health check response from server ${server.id}: $response")
+            }
+            .doOnError{
+                logger.error("Error checking health of server ${server.id}: ${it.message}")
+            }
             .map { true }
             .onErrorReturn(false)
             .timeout(Duration.ofMillis(pushpinProperties.defaultTimeout))
@@ -97,12 +103,12 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
         if (healthyServers.isEmpty()) {
             return servers.values.firstOrNull()
         }
-        
+
         val serverList = healthyServers.values.toList()
         if (serverList.isEmpty()) {
             return null
         }
-        
+
         val index = counter.getAndIncrement() % serverList.size
         return serverList[index]
     }
@@ -112,14 +118,30 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
      */
     fun publishMessage(message: Message): Mono<Boolean> {
         val server = getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
+        logger.info("Publishing message to server: ${server.id}")
         val httpMessage = PushpinHttpMessage(listOf(message.toPushPin()))
         return webClient.post()
             .uri("${server.getControlUrl()}/publish")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(httpMessage)
             .retrieve()
+            .onStatus(
+                { status ->
+                    logger.info("Publishing message to server: ${server.id} at ${server.getBaseUrl()} - status: $status")
+                    status.isError
+                },
+                { clientResponse ->
+                    logger.error("Failed to publish message to server: ${server.id} at ${server.getBaseUrl()}")
+                    Mono.error(RuntimeException("Failed to publish message: ${clientResponse.statusCode()}"))
+                }
+            )
             .bodyToMono<String>()
-            .map { true }
+            .doOnSuccess{
+                logger.info("Message published to Pushpin server ${server.id}: $it")
+            }
+            .map {
+                true
+            }
             .onErrorResume { error ->
                 logger.error("Error publishing message to Pushpin server ${server.id}: ${error.message}")
                 Mono.just(false)
@@ -154,10 +176,15 @@ private fun Message.toPushPin()= PushpinMessage(
         channel = this.channel,
         formats = listOf(
             "websocket" to PushpinFormat(
-                content = this.data.toString()
+                content = this.data.toString(),
+                action = "send"
             ),
             "http-stream" to PushpinFormat(
-                content = this.data.toString()
+                content = "data:"+this.data.toString()+"\n\n",
+                action = "send",
+            ),
+            "http-response" to PushpinFormat(
+                body = this.data.toString()
             )
         ).toMap()
     )

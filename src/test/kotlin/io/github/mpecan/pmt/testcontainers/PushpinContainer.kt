@@ -1,6 +1,8 @@
 package io.github.mpecan.pmt.testcontainers
 
 import org.slf4j.LoggerFactory
+import org.testcontainers.Testcontainers
+import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.wait.strategy.Wait
@@ -22,7 +24,6 @@ class PushpinContainer(
         private const val XPUB_PORT = 5561
         private const val ROUTER_PORT = 5562
         private const val SUB_PORT = 5563
-        private const val CONTROL_PORT = 5564
         private val logger = LoggerFactory.getLogger(PushpinContainer::class.java)
     }
 
@@ -43,9 +44,9 @@ class PushpinContainer(
 
     override fun start() {
         // Set environment variables dynamically right before container starts
-        withEnv("GRIP_URL", "http://host.testcontainers.internal:$hostPort/api/pushpin")
         withEnv("HTTP_PORT", HTTP_PORT.toString())
-
+        withFileSystemBind("logs", "/var/log/pushpin", BindMode.READ_WRITE)
+        Testcontainers.exposeHostPorts(hostPort)
         // Create configuration with dynamic port
         withCommand(
             "sh", "-c",
@@ -57,6 +58,7 @@ class PushpinContainer(
                     "sed -i 's/push_in_http_port=.*/push_in_http_port=$XPUB_PORT/' /etc/pushpin/pushpin.conf && " +
                     "sed -i 's/push_in_sub_spec=.*/push_in_sub_spec=tcp:\\/\\/*:$SUB_PORT/' /etc/pushpin/pushpin.conf && " +
                     "sed -i 's/command_spec=.*/command_spec=tcp:\\/\\/*:$ROUTER_PORT/' /etc/pushpin/pushpin.conf && " +
+                    "sed -i 's/log_level=.*/log_level=10/' /etc/pushpin/pushpin.conf && " +
 
                     // Start Pushpin with verbose logging
                     "cat /etc/pushpin/pushpin.conf && " +

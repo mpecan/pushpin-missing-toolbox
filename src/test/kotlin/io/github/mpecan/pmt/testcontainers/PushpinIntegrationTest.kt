@@ -9,6 +9,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * This class provides the base annotations for Spring Boot and Testcontainers.
  * Each subclass should define its own companion object with the container configuration.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Testcontainers
 abstract class PushpinIntegrationTest

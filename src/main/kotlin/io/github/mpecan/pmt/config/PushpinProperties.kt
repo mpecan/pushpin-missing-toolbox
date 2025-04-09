@@ -33,7 +33,7 @@ data class PushpinProperties(
         val publishPort: Int = 5560,
         val active: Boolean = true,
         val weight: Int = 100,
-        val healthCheckPath: String = "/status"
+        val healthCheckPath: String =  "/api/health/check"
     ) {
         /**
          * Converts to a PushpinServer model.

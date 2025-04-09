@@ -1,13 +1,19 @@
 package io.github.mpecan.pmt.model
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PushpinFormat(
-    val content: String,
+    val content: String? = null,
     val action: String? = null,
     val code: Int? = null,
-    val reason: String? = null
+    val reason: String? = null,
+    val body: String? = null,
+    @get:JsonProperty("body-bin")
+    val bodyBin: String? = null,
+    @get:JsonProperty("body-patch")
+    val bodyPatch: String? = null
 )
 
 /**
