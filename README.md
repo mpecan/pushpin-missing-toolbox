@@ -10,6 +10,7 @@ A Spring Boot application for managing multiple Pushpin servers and allowing sys
 - Authentication mechanism for secure communication
 - RESTful API for publishing messages
 - Server-Sent Events (SSE) support for realtime updates
+- Extensible server discovery system (configuration-based, AWS, Kubernetes, etc.)
 
 ## Getting Started
 
@@ -61,7 +62,21 @@ pushpin.defaultTimeout=5000
 # Pushpin authentication configuration
 pushpin.authEnabled=false
 pushpin.authSecret=changeme
+
+# Pushpin discovery configuration
+pushpin.discovery.enabled=true
+pushpin.discovery.refreshInterval=60s
+pushpin.discovery.configuration.enabled=true
+pushpin.discovery.aws.enabled=false
+pushpin.discovery.aws.region=us-east-1
+pushpin.discovery.aws.tagKey=service
+pushpin.discovery.aws.tagValue=pushpin
+pushpin.discovery.kubernetes.enabled=false
+pushpin.discovery.kubernetes.namespace=default
+pushpin.discovery.kubernetes.labelSelector=app=pushpin
 ```
+
+For more details on the discovery system, see the [Discovery System Documentation](src/main/kotlin/io/github/mpecan/pmt/discovery/README.md).
 
 ## Usage
 
@@ -154,6 +169,7 @@ curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
 - `src/main/kotlin/io/github/mpecan/pmt/config` - Configuration classes
 - `src/main/kotlin/io/github/mpecan/pmt/service` - Services for managing Pushpin servers
 - `src/main/kotlin/io/github/mpecan/pmt/controller` - REST controllers
+- `src/main/kotlin/io/github/mpecan/pmt/discovery` - Extensible server discovery system
 
 ### Building
 

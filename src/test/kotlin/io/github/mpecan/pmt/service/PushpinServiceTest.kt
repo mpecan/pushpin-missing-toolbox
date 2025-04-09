@@ -1,6 +1,7 @@
 package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
+import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
 import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
 import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.web.reactive.function.client.WebClient
 import java.util.concurrent.ConcurrentHashMap
@@ -32,6 +35,9 @@ class PushpinServiceTest {
 
     @Mock
     private lateinit var httpResponseFormatter: HttpResponseMessageFormatter
+
+    @Mock
+    private lateinit var discoveryManager: PushpinDiscoveryManager
 
     private lateinit var pushpinProperties: PushpinProperties
     private lateinit var pushpinService: PushpinService
@@ -61,6 +67,7 @@ class PushpinServiceTest {
         // Create service with mocked dependencies
         pushpinService = PushpinService(
             pushpinProperties,
+            discoveryManager,
             webSocketFormatter,
             httpStreamFormatter,
             httpResponseFormatter
@@ -74,6 +81,11 @@ class PushpinServiceTest {
 
     @Test
     fun `getAllServers should return all configured servers`() {
+        `when`(discoveryManager.getAllServers()).thenReturn(
+            pushpinProperties.servers.map {
+                it.toPushpinServer()
+            }
+        )
         val servers = pushpinService.getAllServers()
 
         assertEquals(2, servers.size)
@@ -83,6 +95,7 @@ class PushpinServiceTest {
 
     @Test
     fun `getServerById should return the correct server`() {
+        `when`(discoveryManager.getServerById("test-server-1")).thenReturn(pushpinProperties.servers[0].toPushpinServer())
         val server = pushpinService.getServerById("test-server-1")
 
         assertTrue(server != null)
@@ -96,13 +109,5 @@ class PushpinServiceTest {
         val server = pushpinService.getServerById("non-existent")
 
         assertTrue(server == null)
-    }
-
-    // Skip this test for now as it requires complex mocking of WebClient
-    @Test
-    fun `publishMessage should return true on success`() {
-        // This test is skipped because it requires complex mocking of WebClient
-        // and the bodyToMono extension function which is difficult to mock correctly
-        assertTrue(true)
     }
 }

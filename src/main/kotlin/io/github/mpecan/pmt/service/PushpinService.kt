@@ -1,6 +1,7 @@
 package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
+import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
 import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
 import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
@@ -22,42 +23,21 @@ import java.util.concurrent.atomic.AtomicInteger
 @Service
 class PushpinService(
     private val pushpinProperties: PushpinProperties,
+    private val discoveryManager: PushpinDiscoveryManager,
     private val webSocketFormatter: WebSocketMessageFormatter,
     private val httpStreamFormatter: HttpStreamMessageFormatter,
     private val httpResponseFormatter: HttpResponseMessageFormatter
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
-    private val servers = ConcurrentHashMap<String, PushpinServer>()
     private val counter = AtomicInteger(0)
-
-    init {
-        loadServers()
-    }
-
-    /**
-     * Loads server configurations from properties.
-     */
-    private fun loadServers() {
-        pushpinProperties.servers.forEach { serverProps ->
-            val server = serverProps.toPushpinServer()
-            if (server.active) {
-                servers[server.id] = server
-                logger.info("Loaded Pushpin server: ${server.id} at ${server.getBaseUrl()}")
-            }
-        }
-
-        if (servers.isEmpty()) {
-            logger.warn("No active Pushpin servers configured")
-        }
-    }
 
     /**
      * Gets a server using round-robin load balancing.
      */
     private fun getServer(): PushpinServer? {
         // We no longer check health here, just return a server using round-robin
-        val serverList = servers.values.toList()
+        val serverList = discoveryManager.getAllServers()
         if (serverList.isEmpty()) {
             return null
         }
@@ -106,7 +86,7 @@ class PushpinService(
      * Gets all configured servers.
      */
     fun getAllServers(): List<PushpinServer> {
-        return servers.values.toList()
+        return discoveryManager.getAllServers()
     }
 
 
@@ -114,7 +94,7 @@ class PushpinService(
      * Gets a server by ID.
      */
     fun getServerById(id: String): PushpinServer? {
-        return servers[id]
+        return discoveryManager.getServerById(id)
     }
 
     /**

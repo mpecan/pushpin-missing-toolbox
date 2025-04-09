@@ -35,7 +35,7 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send"), result)
+        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 
     @Test
@@ -50,7 +50,7 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send"), result)
+        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 
     @Test
@@ -64,7 +64,7 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send"), result)
+        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 
     @Test
@@ -79,6 +79,6 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send"), result)
+        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 }
