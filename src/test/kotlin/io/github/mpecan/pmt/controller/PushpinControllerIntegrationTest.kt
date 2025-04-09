@@ -157,63 +157,8 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
             .jsonPath("$.message").isEqualTo("Message published successfully")
     }
 
-    @Test
-    fun `should receive message via SSE`() {
-        // Given
-        val channel = "test-channel-${UUID.randomUUID()}"
-        val messageText = "\"Hello from SSE test!\""
-
-        // Create an SSE client that connects to the events endpoint through Pushpin
-        // We need to connect to the Spring Boot application, which will be proxied through Pushpin
-
-        val pushpinPort = pushpinProperties.servers[0].port
-
-        val sseClient = SseClient("http://localhost:$pushpinPort")
-        // Subscribe to the SSE stream
-        val sseFlux = sseClient.consumeEvents("/api/events/$channel")
-
-        // Use StepVerifier to test the SSE stream
-        val stepVerifier = StepVerifier.create(sseFlux)
-            .expectNext(
-                ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
-            )
-            .expectNext(
-                ServerSentEvent.builder(messageText.replace("\"","")).build()
-            )
-            .thenCancel()
-            .verifyLater()
-
-        // Wait a bit to ensure the connection is established
-        Thread.sleep(1000)
-
-        // When: Publish a message to the channel
-        webTestClient.post()
-            .uri("/api/pushpin/publish/$channel")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(messageText)
-            .exchange()
-            .expectStatus().isOk
-
-        // Then: Verify that the message was received via SSE
-        stepVerifier.verify(Duration.ofSeconds(10))
-    }
+    // SSE tests have been moved to SseIntegrationTest
 }
 
 
-class SseClient(baseUrl: String) {
-    private val webClient = WebClient.builder()
-        .baseUrl(baseUrl)
-        .build()
-
-    fun consumeEvents(endpoint: String): Flux<ServerSentEvent<String>> {
-
-        val flux = webClient.get()
-            .uri(endpoint)
-            .retrieve()
-            .bodyToFlux(object : ParameterizedTypeReference<ServerSentEvent<String>>() {})
-            .doOnError { t -> println(t.message) }
-        return flux.timeout(Duration.ofSeconds(10))
-    }
-}
+// SseClient has been moved to a separate file

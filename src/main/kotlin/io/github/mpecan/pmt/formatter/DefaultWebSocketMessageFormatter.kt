@@ -15,6 +15,7 @@ class DefaultWebSocketMessageFormatter(
     override fun format(message: Message): PushpinFormat {
         return PushpinFormat(
             content = serializationService.serialize(message),
+            type="text",
             action = "send"
         )
     }

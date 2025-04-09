@@ -121,10 +121,9 @@ class PushpinService(
      * Converts a Message to a PushpinMessage using the configured formatters.
      */
     private fun Message.toPushPin() = PushpinMessage(
-        id = UUID.randomUUID().toString(),
         channel = this.channel,
         formats = mapOf(
-            "websocket" to webSocketFormatter.format(this),
+            "ws-message" to webSocketFormatter.format(this),
             "http-stream" to httpStreamFormatter.format(this),
             "http-response" to httpResponseFormatter.format(this)
         )

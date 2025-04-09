@@ -51,7 +51,7 @@ class PushpinContainer(
         withCommand(
             "sh", "-c",
             // Create routes file pointing to the host application
-            "echo '* host.testcontainers.internal:$hostPort' > /etc/pushpin/routes && " +
+            "echo '* host.testcontainers.internal:$hostPort,over_http' > /etc/pushpin/routes && " +
                     // Start modifying the config file by ensuring these port sections are set correctly
                     "sed -i 's/http_port=.*/http_port=$HTTP_PORT/' /etc/pushpin/pushpin.conf && " +
                     "sed -i 's/push_in_spec=.*/push_in_spec=tcp:\\/\\/*:$PUBLISH_PORT/' /etc/pushpin/pushpin.conf && " +

@@ -9,6 +9,7 @@ data class PushpinFormat(
     val action: String? = null,
     val code: Int? = null,
     val reason: String? = null,
+    val type: String? = null,
     val body: String? = null,
     @get:JsonProperty("body-bin")
     val bodyBin: String? = null,
@@ -21,8 +22,9 @@ data class PushpinFormat(
  * Represents a message to be sent to a Pushpin server.
  * valid formats are
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class PushpinMessage(
     val channel: String,
-    val id: String,
+    val id: String? = null,
     val formats: Map<String, PushpinFormat>
 )
