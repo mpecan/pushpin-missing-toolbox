@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.controller
 
+import io.github.mpecan.pmt.health.PushpinHealthChecker
 import io.github.mpecan.pmt.model.Message
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.service.PushpinService
@@ -14,7 +15,10 @@ import java.util.*
  */
 @RestController
 @RequestMapping("/api/pushpin")
-class PushpinController(private val pushpinService: PushpinService) {
+class PushpinController(
+    private val pushpinService: PushpinService,
+    private val pushpinHealthChecker: PushpinHealthChecker
+) {
 
     /**
      * Publishes a message to a channel.
@@ -54,7 +58,7 @@ class PushpinController(private val pushpinService: PushpinService) {
         } else {
             Message.simple(channel, data)
         }
-        
+
         return publishMessage(message)
     }
 
@@ -71,7 +75,7 @@ class PushpinController(private val pushpinService: PushpinService) {
      */
     @GetMapping("/servers/healthy")
     fun getHealthyServers(): ResponseEntity<List<PushpinServer>> {
-        return ResponseEntity.ok(pushpinService.getHealthyServers())
+        return ResponseEntity.ok(pushpinHealthChecker.getHealthyServers().values.toList())
     }
 
     /**

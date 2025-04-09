@@ -1,12 +1,19 @@
 package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
+import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
+import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
+import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
+import io.github.mpecan.pmt.model.Message
+import io.github.mpecan.pmt.model.PushpinFormat
+import io.github.mpecan.pmt.model.PushpinServer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.web.reactive.function.client.WebClient
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -16,6 +23,16 @@ class PushpinServiceTest {
 
     @Mock
     private lateinit var webClient: WebClient
+
+    @Mock
+    private lateinit var webSocketFormatter: WebSocketMessageFormatter
+
+    @Mock
+    private lateinit var httpStreamFormatter: HttpStreamMessageFormatter
+
+    @Mock
+    private lateinit var httpResponseFormatter: HttpResponseMessageFormatter
+
     private lateinit var pushpinProperties: PushpinProperties
     private lateinit var pushpinService: PushpinService
 
@@ -42,7 +59,12 @@ class PushpinServiceTest {
         )
 
         // Create service with mocked dependencies
-        pushpinService = PushpinService(pushpinProperties)
+        pushpinService = PushpinService(
+            pushpinProperties,
+            webSocketFormatter,
+            httpStreamFormatter,
+            httpResponseFormatter
+        )
 
         // Use reflection to replace the webClient with our mock
         val webClientField = PushpinService::class.java.getDeclaredField("webClient")

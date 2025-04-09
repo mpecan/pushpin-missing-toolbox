@@ -1,10 +1,12 @@
 package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
+import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
+import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
+import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
 import io.github.mpecan.pmt.model.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -18,18 +20,19 @@ import java.util.concurrent.atomic.AtomicInteger
  * Service for managing Pushpin servers and publishing messages.
  */
 @Service
-class PushpinService(private val pushpinProperties: PushpinProperties) {
+class PushpinService(
+    private val pushpinProperties: PushpinProperties,
+    private val webSocketFormatter: WebSocketMessageFormatter,
+    private val httpStreamFormatter: HttpStreamMessageFormatter,
+    private val httpResponseFormatter: HttpResponseMessageFormatter
+) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
     private val servers = ConcurrentHashMap<String, PushpinServer>()
-    private val healthyServers = ConcurrentHashMap<String, PushpinServer>()
     private val counter = AtomicInteger(0)
 
     init {
         loadServers()
-        if (pushpinProperties.healthCheckEnabled) {
-            checkServerHealth()
-        }
     }
 
     /**
@@ -50,61 +53,11 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
     }
 
     /**
-     * Performs health checks on all servers.
-     */
-    @Scheduled(fixedDelayString = "\${pushpin.health-check-interval:60000}")
-    fun checkServerHealth() {
-        if (!pushpinProperties.healthCheckEnabled) {
-            return
-        }
-
-        servers.values.forEach { server ->
-            checkHealth(server)
-                .doOnSuccess { healthy ->
-                    if (healthy) {
-                        healthyServers[server.id] = server
-                        logger.debug("Pushpin server ${server.id} is healthy")
-                    } else {
-                        healthyServers.remove(server.id)
-                        logger.warn("Pushpin server ${server.id} is unhealthy")
-                    }
-                }
-                .doOnError { error ->
-                    healthyServers.remove(server.id)
-                    logger.error("Error checking health of Pushpin server ${server.id}: ${error.message}")
-                }
-                .subscribe()
-        }
-    }
-
-    /**
-     * Checks the health of a single server.
-     */
-    private fun checkHealth(server: PushpinServer): Mono<Boolean> {
-        return webClient.get()
-            .uri(server.getHealthCheckUrl())
-            .retrieve()
-            .bodyToMono<String>()
-            .doOnSuccess { response ->
-                logger.debug("Health check response from server ${server.id}: $response")
-            }
-            .doOnError{
-                logger.error("Error checking health of server ${server.id}: ${it.message}")
-            }
-            .map { true }
-            .onErrorReturn(false)
-            .timeout(Duration.ofMillis(pushpinProperties.defaultTimeout))
-    }
-
-    /**
      * Gets a server using round-robin load balancing.
      */
     private fun getServer(): PushpinServer? {
-        if (healthyServers.isEmpty()) {
-            return servers.values.firstOrNull()
-        }
-
-        val serverList = healthyServers.values.toList()
+        // We no longer check health here, just return a server using round-robin
+        val serverList = servers.values.toList()
         if (serverList.isEmpty()) {
             return null
         }
@@ -156,12 +109,6 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
         return servers.values.toList()
     }
 
-    /**
-     * Gets all healthy servers.
-     */
-    fun getHealthyServers(): List<PushpinServer> {
-        return healthyServers.values.toList()
-    }
 
     /**
      * Gets a server by ID.
@@ -169,22 +116,17 @@ class PushpinService(private val pushpinProperties: PushpinProperties) {
     fun getServerById(id: String): PushpinServer? {
         return servers[id]
     }
-}
 
-private fun Message.toPushPin()= PushpinMessage(
+    /**
+     * Converts a Message to a PushpinMessage using the configured formatters.
+     */
+    private fun Message.toPushPin() = PushpinMessage(
         id = UUID.randomUUID().toString(),
         channel = this.channel,
-        formats = listOf(
-            "websocket" to PushpinFormat(
-                content = this.data.toString(),
-                action = "send"
-            ),
-            "http-stream" to PushpinFormat(
-                content = "data:"+this.data.toString()+"\n\n",
-                action = "send",
-            ),
-            "http-response" to PushpinFormat(
-                body = this.data.toString()
-            )
-        ).toMap()
+        formats = mapOf(
+            "websocket" to webSocketFormatter.format(this),
+            "http-stream" to httpStreamFormatter.format(this),
+            "http-response" to httpResponseFormatter.format(this)
+        )
     )
+}
