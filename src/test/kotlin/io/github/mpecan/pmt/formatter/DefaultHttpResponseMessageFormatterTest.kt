@@ -5,17 +5,13 @@ import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
 class DefaultHttpResponseMessageFormatterTest {
 
-    @Mock
-    private lateinit var serializationService: MessageSerializationService
+    private val serializationService: MessageSerializationService = mock()
 
     private lateinit var formatter: DefaultHttpResponseMessageFormatter
 
@@ -29,7 +25,7 @@ class DefaultHttpResponseMessageFormatterTest {
         // Given
         val message = Message.simple("test-channel", "Hello, World!")
         val serializedData = "\"Hello, World!\""
-        `when`(serializationService.serialize(message.data)).thenReturn(serializedData)
+        whenever(serializationService.serialize(message.data)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -44,7 +40,7 @@ class DefaultHttpResponseMessageFormatterTest {
         val complexData = mapOf("key1" to "value1", "key2" to 42, "key3" to listOf(1, 2, 3))
         val message = Message.simple("test-channel", complexData)
         val serializedData = """{"key1":"value1","key2":42,"key3":[1,2,3]}"""
-        `when`(serializationService.serialize(complexData)).thenReturn(serializedData)
+        whenever(serializationService.serialize(complexData)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -58,7 +54,7 @@ class DefaultHttpResponseMessageFormatterTest {
         // Given
         val message = Message.simple("test-channel", 42)
         val serializedData = "42"
-        `when`(serializationService.serialize(42)).thenReturn(serializedData)
+        whenever(serializationService.serialize(42)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -72,7 +68,7 @@ class DefaultHttpResponseMessageFormatterTest {
         // Given
         val message = Message.simple("test-channel", true)
         val serializedData = "true"
-        `when`(serializationService.serialize(true)).thenReturn(serializedData)
+        whenever(serializationService.serialize(true)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -86,7 +82,7 @@ class DefaultHttpResponseMessageFormatterTest {
         // Given
         val message = Message.event("test-channel", "test-event", "Hello, World!")
         val serializedData = "\"Hello, World!\""
-        `when`(serializationService.serialize(message.data)).thenReturn(serializedData)
+        whenever(serializationService.serialize(message.data)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)

@@ -2,17 +2,13 @@ package io.github.mpecan.pmt.discovery
 
 import io.github.mpecan.pmt.config.PushpinProperties
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import reactor.test.StepVerifier
 
-@ExtendWith(MockitoExtension::class)
 class ConfigurationBasedDiscoveryTest {
 
-    @Mock
-    private lateinit var pushpinProperties: PushpinProperties
+    private val pushpinProperties: PushpinProperties = mock()
 
     @Test
     fun `should discover servers from configuration`() {
@@ -36,14 +32,14 @@ class ConfigurationBasedDiscoveryTest {
             port = 8001,
             active = false
         )
-        
-        `when`(pushpinProperties.servers).thenReturn(listOf(serverProps1, serverProps2, inactiveServerProps))
-        
+
+        whenever(pushpinProperties.servers).thenReturn(listOf(serverProps1, serverProps2, inactiveServerProps))
+
         val discovery = ConfigurationBasedDiscovery(configDiscoveryProps, pushpinProperties)
-        
+
         // When
         val serversFlux = discovery.discoverServers()
-        
+
         // Then
         StepVerifier.create(serversFlux)
             .expectNextMatches { server -> server.id == "server1" && server.port == 7999 }
@@ -61,14 +57,14 @@ class ConfigurationBasedDiscoveryTest {
             port = 8001,
             active = false
         )
-        
-        `when`(pushpinProperties.servers).thenReturn(listOf(inactiveServerProps))
-        
+
+        whenever(pushpinProperties.servers).thenReturn(listOf(inactiveServerProps))
+
         val discovery = ConfigurationBasedDiscovery(configDiscoveryProps, pushpinProperties)
-        
+
         // When
         val serversFlux = discovery.discoverServers()
-        
+
         // Then
         StepVerifier.create(serversFlux)
             .verifyComplete()
@@ -78,14 +74,14 @@ class ConfigurationBasedDiscoveryTest {
     fun `should return empty flux when no servers configured`() {
         // Given
         val configDiscoveryProps = ConfigurationDiscoveryProperties(enabled = true)
-        
-        `when`(pushpinProperties.servers).thenReturn(emptyList())
-        
+
+        whenever(pushpinProperties.servers).thenReturn(emptyList())
+
         val discovery = ConfigurationBasedDiscovery(configDiscoveryProps, pushpinProperties)
-        
+
         // When
         val serversFlux = discovery.discoverServers()
-        
+
         // Then
         StepVerifier.create(serversFlux)
             .verifyComplete()
@@ -96,10 +92,10 @@ class ConfigurationBasedDiscoveryTest {
         // Given
         val enabledProps = ConfigurationDiscoveryProperties(enabled = true)
         val disabledProps = ConfigurationDiscoveryProperties(enabled = false)
-        
+
         val enabledDiscovery = ConfigurationBasedDiscovery(enabledProps, pushpinProperties)
         val disabledDiscovery = ConfigurationBasedDiscovery(disabledProps, pushpinProperties)
-        
+
         // Then
         assert(enabledDiscovery.isEnabled())
         assert(!disabledDiscovery.isEnabled())

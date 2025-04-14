@@ -5,17 +5,13 @@ import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
 class DefaultLongPollingMessageFormatterTest {
 
-    @Mock
-    private lateinit var serializationService: MessageSerializationService
+    private val serializationService: MessageSerializationService = mock()
 
     private lateinit var formatter: DefaultLongPollingMessageFormatter
 
@@ -33,7 +29,7 @@ class DefaultLongPollingMessageFormatterTest {
             "message" to "Hello, World!"
         )
         val serializedData = """{"channel":"test-channel","message":"Hello, World!"}"""
-        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+        whenever(serializationService.serialize(responseData)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -52,7 +48,7 @@ class DefaultLongPollingMessageFormatterTest {
             "message" to "{key1=value1, key2=42}"
         )
         val serializedData = """{"channel":"test-channel","message":"{key1=value1, key2=42}"}"""
-        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+        whenever(serializationService.serialize(responseData)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -70,7 +66,7 @@ class DefaultLongPollingMessageFormatterTest {
             "message" to "42"
         )
         val serializedData = """{"channel":"test-channel","message":"42"}"""
-        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+        whenever(serializationService.serialize(responseData)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
@@ -88,7 +84,7 @@ class DefaultLongPollingMessageFormatterTest {
             "message" to "Hello, World!"
         )
         val serializedData = """{"channel":"test-channel","message":"Hello, World!"}"""
-        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+        whenever(serializationService.serialize(responseData)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
