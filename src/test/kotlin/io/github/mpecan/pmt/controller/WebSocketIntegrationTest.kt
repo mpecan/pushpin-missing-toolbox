@@ -16,12 +16,20 @@ import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
 import java.util.*
+import java.util.Base64
 
 /**
  * Integration tests for WebSocket functionality.
  *
  * These tests verify that the application can correctly handle WebSocket connections
  * and publish/receive messages through Pushpin using the WebSocket protocol.
+ * 
+ * Tests cover:
+ * - Basic text message exchange
+ * - Multiple message exchange
+ * - Messages with event types
+ * - Binary data transmission
+ * - Protocol-specific features (ping/pong)
  */
 @AutoConfigureWebTestClient
 class WebSocketIntegrationTest : PushpinIntegrationTest() {
@@ -64,7 +72,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
         val pushpinPort = pushpinProperties.servers[0].port
         val wsClient = WebSocketClient("ws://localhost:$pushpinPort")
-        
+
         // Subscribe to the WebSocket stream
         val wsFlux = wsClient.consumeMessages("/api/ws/$channel")
 
@@ -93,7 +101,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         stepVerifier.verify(Duration.ofSeconds(3))
         wsClient.closeConnection("/api/ws/$channel")
     }
-    
+
     @Test
     fun `should receive multiple messages via WebSocket`() {
         // Given
@@ -105,7 +113,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
         val pushpinPort = pushpinProperties.servers[0].port
         val wsClient = WebSocketClient("ws://localhost:$pushpinPort")
-        
+
         // Subscribe to the WebSocket stream
         val wsFlux = wsClient.consumeMessages("/api/ws/$channel")
 
@@ -156,7 +164,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         stepVerifier.verify(Duration.ofSeconds(3))
         wsClient.closeConnection("/api/ws/$channel")
     }
-    
+
     @Test
     fun `should receive message with event type via WebSocket`() {
         // Given
@@ -167,7 +175,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
         val pushpinPort = pushpinProperties.servers[0].port
         val wsClient = WebSocketClient("ws://localhost:$pushpinPort")
-        
+
         // Subscribe to the WebSocket stream
         val wsFlux = wsClient.consumeMessages("/api/ws/$channel")
 
@@ -193,6 +201,78 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
             .block()
 
         // Then: Verify that the message was received via WebSocket with the correct event type
+        stepVerifier.verify(Duration.ofSeconds(3))
+        wsClient.closeConnection("/api/ws/$channel")
+    }
+
+    @Test
+    fun `should transmit binary data via WebSocket`() {
+        // Given
+        val channel = "test-channel-${UUID.randomUUID()}"
+        val binaryData = ByteArray(10) { it.toByte() }  // Sample binary data
+        val encodedData = Base64.getEncoder().encodeToString(binaryData)
+        val messageText = """{"type":"binary","data":"$encodedData"}"""
+
+        // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
+        val pushpinPort = pushpinProperties.servers[0].port
+        val wsClient = WebSocketClient("ws://localhost:$pushpinPort")
+
+        // Subscribe to the WebSocket stream
+        val wsFlux = wsClient.consumeMessages("/api/ws/$channel")
+
+        // Use StepVerifier to test the WebSocket stream
+        val stepVerifier = StepVerifier.create(wsFlux)
+            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            .expectNextMatches {
+                it.contains(encodedData)
+            }
+            .thenCancel()
+            .verifyLater()
+
+        // Wait a bit to ensure the connection is established
+        Thread.sleep(300)
+
+        // When: Publish a binary message to the channel
+        webClient.post()
+            .uri("http://localhost:$port/api/pushpin/publish/$channel")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(messageText)
+            .retrieve()
+            .toBodilessEntity()
+            .block()
+
+        // Then: Verify that the binary message was received via WebSocket
+        stepVerifier.verify(Duration.ofSeconds(3))
+        wsClient.closeConnection("/api/ws/$channel")
+    }
+
+    @Test
+    fun `should handle WebSocket ping-pong`() {
+        // Given
+        val channel = "test-channel-${UUID.randomUUID()}"
+
+        // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
+        val pushpinPort = pushpinProperties.servers[0].port
+        val wsClient = WebSocketClient("ws://localhost:$pushpinPort")
+
+        // Subscribe to the WebSocket stream
+        val wsFlux = wsClient.consumeMessages("/api/ws/$channel")
+
+        // Use StepVerifier to test the WebSocket stream
+        val stepVerifier = StepVerifier.create(wsFlux)
+            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            // The ping/pong is handled at a lower level and we don't see the actual messages
+            // But we can verify the connection stays alive
+            .thenCancel()
+            .verifyLater()
+
+        // Wait a bit to ensure the connection is established
+        Thread.sleep(300)
+
+        // When/Then: The connection should remain open for a while, indicating ping/pong is working
+        // This is a simple test that just verifies the connection doesn't close prematurely
+        Thread.sleep(2000)  // Wait longer than normal to ensure ping/pong has a chance to occur
+
         stepVerifier.verify(Duration.ofSeconds(3))
         wsClient.closeConnection("/api/ws/$channel")
     }

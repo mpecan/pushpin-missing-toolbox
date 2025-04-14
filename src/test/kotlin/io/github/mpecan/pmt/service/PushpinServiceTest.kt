@@ -4,19 +4,16 @@ import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
 import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
+import io.github.mpecan.pmt.formatter.LongPollingMessageFormatter
+import io.github.mpecan.pmt.formatter.SSEStreamMessageFormatter
 import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
-import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
-import io.github.mpecan.pmt.model.PushpinServer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -31,10 +28,16 @@ class PushpinServiceTest {
     private lateinit var webSocketFormatter: WebSocketMessageFormatter
 
     @Mock
+    private lateinit var httpSseStreamFormatter: SSEStreamMessageFormatter
+
+    @Mock
     private lateinit var httpStreamFormatter: HttpStreamMessageFormatter
 
     @Mock
     private lateinit var httpResponseFormatter: HttpResponseMessageFormatter
+
+    @Mock
+    private lateinit var longPollingFormatter: LongPollingMessageFormatter
 
     @Mock
     private lateinit var discoveryManager: PushpinDiscoveryManager
@@ -69,8 +72,10 @@ class PushpinServiceTest {
             pushpinProperties,
             discoveryManager,
             webSocketFormatter,
+            httpSseStreamFormatter,
             httpStreamFormatter,
-            httpResponseFormatter
+            httpResponseFormatter,
+            longPollingFormatter
         )
 
         // Use reflection to replace the webClient with our mock

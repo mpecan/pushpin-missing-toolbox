@@ -12,16 +12,16 @@ import org.mockito.junit.jupiter.MockitoExtension
 import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
-class SseHttpStreamMessageFormatterTest {
+class HttpSSEStreamMessageFormatterTest {
 
     @Mock
     private lateinit var serializationService: MessageSerializationService
 
-    private lateinit var formatter: SseHttpStreamMessageFormatter
+    private lateinit var formatter: HttpSSEStreamMessageFormatter
 
     @BeforeEach
     fun setUp() {
-        formatter = SseHttpStreamMessageFormatter(serializationService)
+        formatter = HttpSSEStreamMessageFormatter(serializationService)
     }
 
     @Test
