@@ -15,7 +15,7 @@ class HttpSSEStreamMessageFormatter(
     override fun format(message: Message): PushpinFormat {
         // Handle string data differently to avoid extra quotes
         val data = when (message.data) {
-            is String -> message.data as String
+            is String -> message.data
             else -> serializationService.serialize(message.data)
         }
 

@@ -99,16 +99,4 @@ class PushpinController(
             ResponseEntity.notFound().build()
         }
     }
-
-    /**
-     * Endpoint for Pushpin authentication.
-     */
-    @GetMapping("/auth")
-    fun authenticate(): ResponseEntity<Map<String, Any>> {
-        return ResponseEntity.ok(mapOf(
-            "success" to true,
-            "message" to "Authentication successful",
-            "timestamp" to Date()
-        ))
-    }
 }

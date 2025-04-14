@@ -26,6 +26,9 @@ interface WebSocketMessageFormatter : MessageFormatter
  */
 interface SSEStreamMessageFormatter : MessageFormatter
 
+/**
+ * Interface for formatting messages for HTTP stream protocol (SSE) with a specific implementation.
+ */
 interface HttpStreamMessageFormatter : MessageFormatter
 
 /**

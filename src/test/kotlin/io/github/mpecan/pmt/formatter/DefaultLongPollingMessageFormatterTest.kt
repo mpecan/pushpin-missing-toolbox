@@ -1,0 +1,100 @@
+package io.github.mpecan.pmt.formatter
+
+import io.github.mpecan.pmt.model.Message
+import io.github.mpecan.pmt.model.PushpinFormat
+import io.github.mpecan.pmt.serialization.MessageSerializationService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.junit.jupiter.MockitoExtension
+import kotlin.test.assertEquals
+
+@ExtendWith(MockitoExtension::class)
+class DefaultLongPollingMessageFormatterTest {
+
+    @Mock
+    private lateinit var serializationService: MessageSerializationService
+
+    private lateinit var formatter: DefaultLongPollingMessageFormatter
+
+    @BeforeEach
+    fun setUp() {
+        formatter = DefaultLongPollingMessageFormatter(serializationService)
+    }
+
+    @Test
+    fun `format should include channel and message in response`() {
+        // Given
+        val message = Message.simple("test-channel", "Hello, World!")
+        val responseData = mapOf(
+            "channel" to "test-channel",
+            "message" to "Hello, World!"
+        )
+        val serializedData = """{"channel":"test-channel","message":"Hello, World!"}"""
+        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+
+        // When
+        val result = formatter.format(message)
+
+        // Then
+        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+    }
+
+    @Test
+    fun `format should handle complex data`() {
+        // Given
+        val complexData = mapOf("key1" to "value1", "key2" to 42)
+        val message = Message.simple("test-channel", complexData)
+        val responseData = mapOf(
+            "channel" to "test-channel",
+            "message" to "{key1=value1, key2=42}"
+        )
+        val serializedData = """{"channel":"test-channel","message":"{key1=value1, key2=42}"}"""
+        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+
+        // When
+        val result = formatter.format(message)
+
+        // Then
+        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+    }
+
+    @Test
+    fun `format should handle numeric data`() {
+        // Given
+        val message = Message.simple("test-channel", 42)
+        val responseData = mapOf(
+            "channel" to "test-channel",
+            "message" to "42"
+        )
+        val serializedData = """{"channel":"test-channel","message":"42"}"""
+        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+
+        // When
+        val result = formatter.format(message)
+
+        // Then
+        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+    }
+
+    @Test
+    fun `format should handle message with event type`() {
+        // Given
+        val message = Message.event("test-channel", "test-event", "Hello, World!")
+        val responseData = mapOf(
+            "channel" to "test-channel",
+            "message" to "Hello, World!"
+        )
+        val serializedData = """{"channel":"test-channel","message":"Hello, World!"}"""
+        `when`(serializationService.serialize(responseData)).thenReturn(serializedData)
+
+        // When
+        val result = formatter.format(message)
+
+        // Then
+        // Event type should not be included in the response for long polling
+        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+    }
+}
