@@ -2,8 +2,6 @@ package io.github.mpecan.pmt.model
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.awt.TrayIcon
-
 /**
  * Represents a message to be published to Pushpin.
  *
