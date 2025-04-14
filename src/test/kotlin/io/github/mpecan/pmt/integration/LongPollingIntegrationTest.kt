@@ -1,17 +1,12 @@
-package io.github.mpecan.pmt.controller
+package io.github.mpecan.pmt.integration
 
 import io.github.mpecan.pmt.client.LongPollingClient
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
-import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.MediaType
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.web.reactive.function.client.WebClient
 import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
@@ -23,11 +18,9 @@ import java.util.*
  * These tests verify that the application can correctly handle HTTP Long-Polling connections
  * and publish/receive messages through Pushpin using the Long-Polling protocol.
  */
-@AutoConfigureWebTestClient
 class LongPollingIntegrationTest : PushpinIntegrationTest() {
-
     companion object {
-        val definedPort = Random().nextInt(9000, 12000)
+        val definedPort = Random().nextInt(10000, 12000)
 
         /**
          * Create and start a Pushpin container
@@ -41,19 +34,12 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
          */
         @DynamicPropertySource
         @JvmStatic
+        @Suppress("unused")
         fun configureProperties(registry: DynamicPropertyRegistry) {
             TestcontainersUtils.configurePushpinProperties(registry, pushpinContainer)
             registry.add("server.port") { definedPort }
         }
     }
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    private val webClient = WebClient.builder().build()
-
-    @Autowired
-    private lateinit var pushpinProperties: PushpinProperties
 
     @Test
     fun `should receive message via Long-Polling`() {
@@ -80,19 +66,12 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
             .thenCancel()
             .verifyLater()
         // Wait a bit to ensure the connection is established
-        Thread.sleep(1000)
+        waitForConnection(1000)
 
         // When: Publish a message to the channel
-        webClient.post()
-            .uri("http://localhost:$port/api/pushpin/publish/$channel")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(mapOf("message" to messageText))
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        publishMessage(channel, mapOf("message" to messageText), contentType = MediaType.APPLICATION_JSON)
 
         // Then: Verify that the message was received via Long-Polling
-
         stepVerifier.verify(Duration.ofSeconds(30))
     }
 
@@ -125,16 +104,10 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
                 .thenCancel()
                 .verifyLater()
         // Wait a bit to ensure the connection is established
-        Thread.sleep(1000 )
+        waitForConnection(1000)
 
         // Publish the first message
-        webClient.post()
-            .uri("http://localhost:$port/api/pushpin/publish/$channel")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(message1)
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        publishMessage(channel, message1, contentType = MediaType.APPLICATION_JSON)
 
         // Then: Verify that the message was received via Long-Polling
         stepVerifier1.verify(Duration.ofSeconds(30))
@@ -157,15 +130,9 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
                 .thenCancel()
                 .verifyLater()
 
-        Thread.sleep(1000 )
+        waitForConnection(1000)
         // Publish the second message
-        webClient.post()
-            .uri("http://localhost:$port/api/pushpin/publish/$channel")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(message2)
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        publishMessage(channel, message2, contentType = MediaType.APPLICATION_JSON)
 
         stepVerifier2.verify(Duration.ofSeconds(30))
 
@@ -186,15 +153,9 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
                 .thenCancel()
                 .verifyLater()
 
-        Thread.sleep(1000 )
+        waitForConnection(1000)
         // Publish the third message
-        webClient.post()
-            .uri("http://localhost:$port/api/pushpin/publish/$channel")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(message3)
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        publishMessage(channel, message3, contentType = MediaType.APPLICATION_JSON)
 
         // Verify the third message
         stepVerifier3

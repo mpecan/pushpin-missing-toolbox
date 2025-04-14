@@ -1,16 +1,12 @@
-package io.github.mpecan.pmt.controller
+package io.github.mpecan.pmt.integration
 
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
-import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.MediaType
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.web.reactive.function.client.WebClient
 import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
@@ -26,7 +22,7 @@ import java.util.*
 class HttpResponseIntegrationTest : PushpinIntegrationTest() {
 
     companion object {
-        val definedPort = Random().nextInt(9000, 12000)
+        val definedPort = Random().nextInt(10000, 12000)
 
         /**
          * Create and start a Pushpin container
@@ -40,19 +36,12 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
          */
         @DynamicPropertySource
         @JvmStatic
+        @Suppress("unused")
         fun configureProperties(registry: DynamicPropertyRegistry) {
             TestcontainersUtils.configurePushpinProperties(registry, pushpinContainer)
             registry.add("server.port") { definedPort }
         }
     }
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    private val webClient = WebClient.builder().build()
-
-    @Autowired
-    private lateinit var pushpinProperties: PushpinProperties
 
     @Test
     fun `should receive HTTP response through Pushpin`() {
@@ -71,8 +60,8 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
         StepVerifier.create(responseFlux)
             .expectNextMatches { response ->
                 response["success"] == true &&
-                response["message"] == "This is a non-streaming HTTP response" &&
-                response["channel"] == channel
+                        response["message"] == "This is a non-streaming HTTP response" &&
+                        response["channel"] == channel
             }
             .expectComplete()
             .verify(Duration.ofSeconds(10))
@@ -82,7 +71,7 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
     fun `should publish to client after HTTP response`() {
         // Given
         val channel = "test-channel-${UUID.randomUUID()}"
-        val messageText = "\"Hello after HTTP response!\""
+        val messageText = "Hello after HTTP response!"
 
         // First, make a request to establish the channel
         val pushpinPort = pushpinProperties.servers[0].port
@@ -95,7 +84,7 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
         // When: Publish a message to the channel
         webClient.post()
             .uri("http://localhost:$port/api/pushpin/publish/$channel")
-            .contentType(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.TEXT_PLAIN)
             .bodyValue(messageText)
             .retrieve()
             .toBodilessEntity()

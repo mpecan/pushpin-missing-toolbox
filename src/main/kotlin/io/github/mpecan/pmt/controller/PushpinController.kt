@@ -47,7 +47,7 @@ class PushpinController(
     /**
      * Publishes a message to a specific channel.
      */
-    @PostMapping("/publish/{channel}")
+    @PostMapping("/publish/{channel}", consumes = ["application/json"])
     fun publishToChannel(
         @PathVariable channel: String,
         @RequestParam(required = false) event: String?,
@@ -60,6 +60,15 @@ class PushpinController(
         }
 
         return publishMessage(message)
+    }
+
+    @PostMapping("/publish/{channel}", consumes = ["text/plain"])
+    fun publishToChannelText(
+        @PathVariable channel: String,
+        @RequestParam(required = false) event: String?,
+        @RequestBody data: String
+    ): Mono<ResponseEntity<Map<String, Any>>> {
+        return publishToChannel(channel, event, data)
     }
 
     /**
