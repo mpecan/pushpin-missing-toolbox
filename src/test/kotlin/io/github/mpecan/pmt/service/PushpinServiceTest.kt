@@ -4,40 +4,26 @@ import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
 import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
+import io.github.mpecan.pmt.formatter.LongPollingMessageFormatter
+import io.github.mpecan.pmt.formatter.SSEStreamMessageFormatter
 import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
-import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
-import io.github.mpecan.pmt.model.PushpinServer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
 class PushpinServiceTest {
 
-
-    @Mock
-    private lateinit var webClient: WebClient
-
-    @Mock
-    private lateinit var webSocketFormatter: WebSocketMessageFormatter
-
-    @Mock
-    private lateinit var httpStreamFormatter: HttpStreamMessageFormatter
-
-    @Mock
-    private lateinit var httpResponseFormatter: HttpResponseMessageFormatter
-
-    @Mock
-    private lateinit var discoveryManager: PushpinDiscoveryManager
+    private val webClient: WebClient = mock()
+    private val webSocketFormatter: WebSocketMessageFormatter = mock()
+    private val httpSseStreamFormatter: SSEStreamMessageFormatter = mock()
+    private val httpStreamFormatter: HttpStreamMessageFormatter = mock()
+    private val httpResponseFormatter: HttpResponseMessageFormatter = mock()
+    private val longPollingFormatter: LongPollingMessageFormatter = mock()
+    private val discoveryManager: PushpinDiscoveryManager = mock()
 
     private lateinit var pushpinProperties: PushpinProperties
     private lateinit var pushpinService: PushpinService
@@ -69,8 +55,10 @@ class PushpinServiceTest {
             pushpinProperties,
             discoveryManager,
             webSocketFormatter,
+            httpSseStreamFormatter,
             httpStreamFormatter,
-            httpResponseFormatter
+            httpResponseFormatter,
+            longPollingFormatter
         )
 
         // Use reflection to replace the webClient with our mock
@@ -81,7 +69,7 @@ class PushpinServiceTest {
 
     @Test
     fun `getAllServers should return all configured servers`() {
-        `when`(discoveryManager.getAllServers()).thenReturn(
+        whenever(discoveryManager.getAllServers()).thenReturn(
             pushpinProperties.servers.map {
                 it.toPushpinServer()
             }
@@ -95,13 +83,13 @@ class PushpinServiceTest {
 
     @Test
     fun `getServerById should return the correct server`() {
-        `when`(discoveryManager.getServerById("test-server-1")).thenReturn(pushpinProperties.servers[0].toPushpinServer())
+        whenever(discoveryManager.getServerById("test-server-1")).thenReturn(pushpinProperties.servers[0].toPushpinServer())
         val server = pushpinService.getServerById("test-server-1")
 
         assertTrue(server != null)
-        assertEquals("test-server-1", server?.id)
-        assertEquals("localhost", server?.host)
-        assertEquals(7999, server?.port)
+        assertEquals("test-server-1", server.id)
+        assertEquals("localhost", server.host)
+        assertEquals(7999, server.port)
     }
 
     @Test

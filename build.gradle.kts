@@ -35,8 +35,10 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("org.apache.commons:commons-compress:1.26.0")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
     testImplementation("javax.servlet:javax.servlet-api:4.0.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

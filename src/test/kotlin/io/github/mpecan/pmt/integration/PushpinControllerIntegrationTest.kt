@@ -1,29 +1,17 @@
-package io.github.mpecan.pmt.controller
+package io.github.mpecan.pmt.integration
 
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinServer
-import io.github.mpecan.pmt.service.PushpinService
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
-import org.springframework.http.codec.ServerSentEvent
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.reactive.function.client.WebClient
 import org.testcontainers.junit.jupiter.Container
-import reactor.core.publisher.Flux
-import reactor.test.StepVerifier
-import java.time.Duration
 import java.util.*
-
 
 /**
  * Integration tests for PushpinController.
@@ -33,9 +21,8 @@ import java.util.*
  */
 @AutoConfigureWebTestClient
 class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
-
     companion object {
-        val definedPort = Random().nextInt(9000, 12000)
+        val definedPort = Random().nextInt(10000, 12000)
 
         /**
          * Create and start a Pushpin container
@@ -49,20 +36,15 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
          */
         @DynamicPropertySource
         @JvmStatic
+        @Suppress("unused")
         fun configureProperties(registry: DynamicPropertyRegistry) {
             TestcontainersUtils.configurePushpinProperties(registry, pushpinContainer)
             registry.add("server.port") { definedPort }
         }
     }
 
-    @LocalServerPort
-    private var port: Int = 0
-
     @Autowired
     private lateinit var webTestClient: WebTestClient
-
-    @Autowired
-    private lateinit var pushpinProperties: PushpinProperties
 
     @Test
     fun `should get all servers`() {
@@ -159,6 +141,3 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
 
     // SSE tests have been moved to SseIntegrationTest
 }
-
-
-// SseClient has been moved to a separate file

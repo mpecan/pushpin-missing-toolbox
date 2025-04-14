@@ -4,6 +4,8 @@ import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
 import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
+import io.github.mpecan.pmt.formatter.LongPollingMessageFormatter
+import io.github.mpecan.pmt.formatter.SSEStreamMessageFormatter
 import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
 import io.github.mpecan.pmt.model.*
 import org.slf4j.LoggerFactory
@@ -13,8 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import java.time.Duration
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -25,8 +25,10 @@ class PushpinService(
     private val pushpinProperties: PushpinProperties,
     private val discoveryManager: PushpinDiscoveryManager,
     private val webSocketFormatter: WebSocketMessageFormatter,
-    private val httpStreamFormatter: HttpStreamMessageFormatter,
-    private val httpResponseFormatter: HttpResponseMessageFormatter
+    private val httpSseStreamFormatter: SSEStreamMessageFormatter,
+    private val httpStreamMessageFormatter: HttpStreamMessageFormatter,
+    private val httpResponseFormatter: HttpResponseMessageFormatter,
+    private val longPollingFormatter: LongPollingMessageFormatter
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
@@ -50,7 +52,8 @@ class PushpinService(
      * Publishes a message to a Pushpin server.
      */
     fun publishMessage(message: Message): Mono<Boolean> {
-        val server = getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
+        val server =
+            getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
         logger.info("Publishing message to server: ${server.id}")
         val httpMessage = PushpinHttpMessage(listOf(message.toPushPin()))
         return webClient.post()
@@ -69,7 +72,7 @@ class PushpinService(
                 }
             )
             .bodyToMono<String>()
-            .doOnSuccess{
+            .doOnSuccess {
                 logger.info("Message published to Pushpin server ${server.id}: $it")
             }
             .map {
@@ -104,8 +107,20 @@ class PushpinService(
         channel = this.channel,
         formats = mapOf(
             "ws-message" to webSocketFormatter.format(this),
-            "http-stream" to httpStreamFormatter.format(this),
-            "http-response" to httpResponseFormatter.format(this)
+            "http-stream" to when {
+                this.transports.contains(Transport.HttpStream) -> httpStreamMessageFormatter.format(
+                    this
+                )
+
+                else -> httpSseStreamFormatter.format(this)
+            },
+            "http-response" to when {
+                this.transports.contains(Transport.LongPolling) -> longPollingFormatter.format(
+                    this
+                )
+
+                else -> httpResponseFormatter.format(this)
+            }
         )
     )
 }

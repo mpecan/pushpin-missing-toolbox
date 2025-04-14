@@ -1,12 +1,7 @@
 package io.github.mpecan.pmt.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.github.mpecan.pmt.formatter.DefaultHttpResponseMessageFormatter
-import io.github.mpecan.pmt.formatter.DefaultWebSocketMessageFormatter
-import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
-import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
-import io.github.mpecan.pmt.formatter.SseHttpStreamMessageFormatter
-import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
+import io.github.mpecan.pmt.formatter.*
 import io.github.mpecan.pmt.serialization.JacksonMessageSerializationService
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -42,8 +37,8 @@ class MessageFormatterConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    fun httpStreamMessageFormatter(serializationService: MessageSerializationService): HttpStreamMessageFormatter {
-        return SseHttpStreamMessageFormatter(serializationService)
+    fun httpSseStreamMessageFormatter(serializationService: MessageSerializationService): SSEStreamMessageFormatter {
+        return HttpSSEStreamMessageFormatter(serializationService)
     }
     
     /**
@@ -53,5 +48,14 @@ class MessageFormatterConfig {
     @ConditionalOnMissingBean
     fun httpResponseMessageFormatter(serializationService: MessageSerializationService): HttpResponseMessageFormatter {
         return DefaultHttpResponseMessageFormatter(serializationService)
+    }
+
+    /**
+     * Creates an HTTP stream message formatter bean if none is provided.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    fun httpStreamMessageFormatter(serializationService: MessageSerializationService): HttpStreamMessageFormatter {
+        return SimpleHttpStreamMessageFormatter(serializationService)
     }
 }

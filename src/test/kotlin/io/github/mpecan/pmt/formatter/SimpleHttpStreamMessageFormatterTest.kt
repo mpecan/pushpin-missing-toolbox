@@ -5,90 +5,91 @@ import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.junit.jupiter.MockitoExtension
 import kotlin.test.assertEquals
 
-class DefaultHttpResponseMessageFormatterTest {
+@ExtendWith(MockitoExtension::class)
+class SimpleHttpStreamMessageFormatterTest {
 
-    private val serializationService: MessageSerializationService = mock()
+    @Mock
+    private lateinit var serializationService: MessageSerializationService
 
-    private lateinit var formatter: DefaultHttpResponseMessageFormatter
+    private lateinit var formatter: SimpleHttpStreamMessageFormatter
 
     @BeforeEach
     fun setUp() {
-        formatter = DefaultHttpResponseMessageFormatter(serializationService)
+        formatter = SimpleHttpStreamMessageFormatter(serializationService)
     }
 
     @Test
-    fun `format should serialize data as body`() {
+    fun `format should use string data directly`() {
         // Given
         val message = Message.simple("test-channel", "Hello, World!")
-        val serializedData = "\"Hello, World!\""
-        whenever(serializationService.serialize(message.data)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData), result)
+        // String data should be used directly without serialization
+        assertEquals(PushpinFormat(content = "Hello, World!\n", action = "send"), result)
     }
 
     @Test
-    fun `format should handle complex data`() {
+    fun `format should serialize complex data`() {
         // Given
         val complexData = mapOf("key1" to "value1", "key2" to 42, "key3" to listOf(1, 2, 3))
         val message = Message.simple("test-channel", complexData)
         val serializedData = """{"key1":"value1","key2":42,"key3":[1,2,3]}"""
-        whenever(serializationService.serialize(complexData)).thenReturn(serializedData)
+        `when`(serializationService.serialize(complexData)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData), result)
+        assertEquals(PushpinFormat(content = serializedData + "\n", action = "send"), result)
     }
 
     @Test
-    fun `format should handle numeric data`() {
+    fun `format should serialize numeric data`() {
         // Given
         val message = Message.simple("test-channel", 42)
         val serializedData = "42"
-        whenever(serializationService.serialize(42)).thenReturn(serializedData)
+        `when`(serializationService.serialize(42)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData), result)
+        assertEquals(PushpinFormat(content = serializedData + "\n", action = "send"), result)
     }
 
     @Test
-    fun `format should handle boolean data`() {
+    fun `format should serialize boolean data`() {
         // Given
         val message = Message.simple("test-channel", true)
         val serializedData = "true"
-        whenever(serializationService.serialize(true)).thenReturn(serializedData)
+        `when`(serializationService.serialize(true)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData), result)
+        assertEquals(PushpinFormat(content = serializedData + "\n", action = "send"), result)
     }
 
     @Test
     fun `format should handle message with event type`() {
         // Given
         val message = Message.event("test-channel", "test-event", "Hello, World!")
-        val serializedData = "\"Hello, World!\""
-        whenever(serializationService.serialize(message.data)).thenReturn(serializedData)
 
         // When
         val result = formatter.format(message)
 
         // Then
-        // Event type should be ignored for HTTP response format
-        assertEquals(PushpinFormat(body = serializedData), result)
+        // Event type should be ignored for HTTP stream format
+        assertEquals(PushpinFormat(content = "Hello, World!\n", action = "send"), result)
     }
 }
