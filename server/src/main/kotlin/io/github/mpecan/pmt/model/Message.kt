@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @property eventType The type of event (optional)
  * @property data The message data
  * @property meta Additional metadata (optional)
+ * @property transports List of transports to be used (default: WebSocket, HttpStreamSSE, HttpResponseSSE, LongPolling)
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class Message(
