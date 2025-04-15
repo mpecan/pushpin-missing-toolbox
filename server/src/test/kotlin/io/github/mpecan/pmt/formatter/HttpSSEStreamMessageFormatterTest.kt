@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.formatter
 
+import io.github.mpecan.pmt.model.HttpStreamFormat
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +34,7 @@ class HttpSSEStreamMessageFormatterTest {
 
         // Then
         val expectedContent = "data: Hello, World!\n\n"
-        assertEquals(PushpinFormat(content = expectedContent, action = "send"), result)
+        assertEquals(HttpStreamFormat(content = expectedContent, action = "send"), result)
     }
 
     @Test
@@ -47,7 +47,7 @@ class HttpSSEStreamMessageFormatterTest {
 
         // Then
         val expectedContent = "event: test-event\ndata: Hello, World!\n\n"
-        assertEquals(PushpinFormat(content = expectedContent, action = "send"), result)
+        assertEquals(HttpStreamFormat(content = expectedContent, action = "send"), result)
     }
 
     @Test
@@ -63,7 +63,7 @@ class HttpSSEStreamMessageFormatterTest {
 
         // Then
         val expectedContent = "data: ${serializedData}\n\n"
-        assertEquals(PushpinFormat(content = expectedContent, action = "send"), result)
+        assertEquals(HttpStreamFormat(content = expectedContent, action = "send"), result)
     }
 
     @Test
@@ -79,7 +79,7 @@ class HttpSSEStreamMessageFormatterTest {
 
         // Then
         val expectedContent = "event: test-event\ndata: ${serializedData}\n\n"
-        assertEquals(PushpinFormat(content = expectedContent, action = "send"), result)
+        assertEquals(HttpStreamFormat(content = expectedContent, action = "send"), result)
     }
 
     @Test
@@ -93,7 +93,7 @@ class HttpSSEStreamMessageFormatterTest {
 
         // Then
         val expectedContent = "data: 42\n\n"
-        assertEquals(PushpinFormat(content = expectedContent, action = "send"), result)
+        assertEquals(HttpStreamFormat(content = expectedContent, action = "send"), result)
     }
 
     @Test
@@ -107,6 +107,6 @@ class HttpSSEStreamMessageFormatterTest {
 
         // Then
         val expectedContent = "event: test-event\ndata: true\n\n"
-        assertEquals(PushpinFormat(content = expectedContent, action = "send"), result)
+        assertEquals(HttpStreamFormat(content = expectedContent, action = "send"), result)
     }
 }

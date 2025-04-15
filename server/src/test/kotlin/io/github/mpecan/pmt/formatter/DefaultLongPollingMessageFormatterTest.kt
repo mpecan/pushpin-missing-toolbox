@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.formatter
 
+import io.github.mpecan.pmt.model.HttpResponseFormat
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,7 +35,7 @@ class DefaultLongPollingMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+        assertEquals(HttpResponseFormat(body = serializedData + "\n"), result)
     }
 
     @Test
@@ -54,7 +54,7 @@ class DefaultLongPollingMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+        assertEquals(HttpResponseFormat(body = serializedData + "\n"), result)
     }
 
     @Test
@@ -72,7 +72,7 @@ class DefaultLongPollingMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+        assertEquals(HttpResponseFormat(body = serializedData + "\n"), result)
     }
 
     @Test
@@ -91,6 +91,6 @@ class DefaultLongPollingMessageFormatterTest {
 
         // Then
         // Event type should not be included in the response for long polling
-        assertEquals(PushpinFormat(body = serializedData + "\n"), result)
+        assertEquals(HttpResponseFormat(body = serializedData + "\n"), result)
     }
 }

@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.formatter
 
+import io.github.mpecan.pmt.model.HttpStreamFormat
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.springframework.stereotype.Component
 
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class HttpSSEStreamMessageFormatter(
     private val serializationService: MessageSerializationService
 ) : SSEStreamMessageFormatter {
-    override fun format(message: Message): PushpinFormat {
+    override fun format(message: Message): HttpStreamFormat {
         // Handle string data differently to avoid extra quotes
         val data = when (message.data) {
             is String -> message.data
@@ -24,7 +24,7 @@ class HttpSSEStreamMessageFormatter(
         } else {
             "data: $data\n\n"
         }
-        return PushpinFormat(
+        return HttpStreamFormat(
             content = content,
             action = "send"
         )

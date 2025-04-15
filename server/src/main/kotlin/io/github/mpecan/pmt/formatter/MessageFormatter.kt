@@ -1,7 +1,6 @@
 package io.github.mpecan.pmt.formatter
 
-import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
+import io.github.mpecan.pmt.model.*
 
 /**
  * Interface for formatting messages to Pushpin format.
@@ -19,24 +18,34 @@ interface MessageFormatter {
 /**
  * Interface for formatting messages for WebSocket protocol.
  */
-interface WebSocketMessageFormatter : MessageFormatter
+interface WebSocketMessageFormatter : MessageFormatter {
+    override fun format(message: Message): WebSocketFormat
+}
 
 /**
  * Interface for formatting messages for HTTP stream protocol (SSE).
  */
-interface SSEStreamMessageFormatter : MessageFormatter
+interface SSEStreamMessageFormatter : MessageFormatter {
+    override fun format(message: Message): HttpStreamFormat
+}
 
 /**
  * Interface for formatting messages for HTTP stream protocol (SSE) with a specific implementation.
  */
-interface HttpStreamMessageFormatter : MessageFormatter
+interface HttpStreamMessageFormatter : MessageFormatter {
+    override fun format(message: Message): HttpStreamFormat
+}
 
 /**
  * Interface for formatting messages for HTTP response protocol.
  */
-interface HttpResponseMessageFormatter : MessageFormatter
+interface HttpResponseMessageFormatter : MessageFormatter {
+    override fun format(message: Message): HttpResponseFormat
+}
 
 /**
  * Interface for formatting messages for HTTP long-polling protocol.
  */
-interface LongPollingMessageFormatter : MessageFormatter
+interface LongPollingMessageFormatter : MessageFormatter {
+    override fun format(message: Message): HttpResponseFormat
+}

@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.formatter
 
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
+import io.github.mpecan.pmt.model.WebSocketFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,7 +35,7 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
+        assertEquals(WebSocketFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 
     @Test
@@ -50,7 +50,7 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
+        assertEquals(WebSocketFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 
     @Test
@@ -64,7 +64,7 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
+        assertEquals(WebSocketFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 
     @Test
@@ -79,6 +79,6 @@ class DefaultWebSocketMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedMessage, action = "send", type = "text"), result)
+        assertEquals(WebSocketFormat(content = serializedMessage, action = "send", type = "text"), result)
     }
 }

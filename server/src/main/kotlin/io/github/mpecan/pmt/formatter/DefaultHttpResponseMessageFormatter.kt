@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.formatter
 
+import io.github.mpecan.pmt.model.HttpResponseFormat
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.springframework.stereotype.Component
 
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component
 class DefaultHttpResponseMessageFormatter(
     private val serializationService: MessageSerializationService
 ) : HttpResponseMessageFormatter {
-    override fun format(message: Message): PushpinFormat {
-        return PushpinFormat(
+    override fun format(message: Message): HttpResponseFormat {
+        return HttpResponseFormat(
             body = serializationService.serialize(message.data)
         )
     }

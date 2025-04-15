@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.formatter
 
+import io.github.mpecan.pmt.model.HttpStreamFormat
 import io.github.mpecan.pmt.model.Message
-import io.github.mpecan.pmt.model.PushpinFormat
 import io.github.mpecan.pmt.serialization.MessageSerializationService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +34,7 @@ class SimpleHttpStreamMessageFormatterTest {
 
         // Then
         // String data should be used directly without serialization
-        assertEquals(PushpinFormat(content = "Hello, World!\n", action = "send"), result)
+        assertEquals(HttpStreamFormat(content = "Hello, World!\n", action = "send"), result)
     }
 
     @Test
@@ -49,7 +49,7 @@ class SimpleHttpStreamMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedData + "\n", action = "send"), result)
+        assertEquals(HttpStreamFormat(content = serializedData + "\n", action = "send"), result)
     }
 
     @Test
@@ -63,7 +63,7 @@ class SimpleHttpStreamMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedData + "\n", action = "send"), result)
+        assertEquals(HttpStreamFormat(content = serializedData + "\n", action = "send"), result)
     }
 
     @Test
@@ -77,7 +77,7 @@ class SimpleHttpStreamMessageFormatterTest {
         val result = formatter.format(message)
 
         // Then
-        assertEquals(PushpinFormat(content = serializedData + "\n", action = "send"), result)
+        assertEquals(HttpStreamFormat(content = serializedData + "\n", action = "send"), result)
     }
 
     @Test
@@ -90,6 +90,6 @@ class SimpleHttpStreamMessageFormatterTest {
 
         // Then
         // Event type should be ignored for HTTP stream format
-        assertEquals(PushpinFormat(content = "Hello, World!\n", action = "send"), result)
+        assertEquals(HttpStreamFormat(content = "Hello, World!\n", action = "send"), result)
     }
 }
