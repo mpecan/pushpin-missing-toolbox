@@ -2,11 +2,7 @@ package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
-import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
-import io.github.mpecan.pmt.formatter.LongPollingMessageFormatter
-import io.github.mpecan.pmt.formatter.SSEStreamMessageFormatter
-import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
+import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -18,11 +14,7 @@ import kotlin.test.assertTrue
 class PushpinServiceTest {
 
     private val webClient: WebClient = mock()
-    private val webSocketFormatter: WebSocketMessageFormatter = mock()
-    private val httpSseStreamFormatter: SSEStreamMessageFormatter = mock()
-    private val httpStreamFormatter: HttpStreamMessageFormatter = mock()
-    private val httpResponseFormatter: HttpResponseMessageFormatter = mock()
-    private val longPollingFormatter: LongPollingMessageFormatter = mock()
+    private val messageSerializer: MessageSerializer = mock()
     private val discoveryManager: PushpinDiscoveryManager = mock()
 
     private lateinit var pushpinProperties: PushpinProperties
@@ -54,11 +46,7 @@ class PushpinServiceTest {
         pushpinService = PushpinService(
             pushpinProperties,
             discoveryManager,
-            webSocketFormatter,
-            httpSseStreamFormatter,
-            httpStreamFormatter,
-            httpResponseFormatter,
-            longPollingFormatter
+            messageSerializer
         )
 
         // Use reflection to replace the webClient with our mock

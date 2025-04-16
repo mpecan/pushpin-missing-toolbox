@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.controller
 
+import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.health.PushpinHealthChecker
-import io.github.mpecan.pmt.model.Message
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.service.PushpinService
 import org.springframework.http.HttpStatus

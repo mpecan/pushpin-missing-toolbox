@@ -1,6 +1,6 @@
 package io.github.mpecan.pmt.integration
 
-import io.github.mpecan.pmt.model.Message
+import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test

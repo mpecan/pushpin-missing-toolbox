@@ -1,12 +1,9 @@
 package io.github.mpecan.pmt.service
 
+import io.github.mpecan.pmt.client.model.Message
+import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.formatter.HttpResponseMessageFormatter
-import io.github.mpecan.pmt.formatter.HttpStreamMessageFormatter
-import io.github.mpecan.pmt.formatter.LongPollingMessageFormatter
-import io.github.mpecan.pmt.formatter.SSEStreamMessageFormatter
-import io.github.mpecan.pmt.formatter.WebSocketMessageFormatter
 import io.github.mpecan.pmt.model.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
@@ -24,11 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class PushpinService(
     private val pushpinProperties: PushpinProperties,
     private val discoveryManager: PushpinDiscoveryManager,
-    private val webSocketFormatter: WebSocketMessageFormatter,
-    private val httpSseStreamFormatter: SSEStreamMessageFormatter,
-    private val httpStreamMessageFormatter: HttpStreamMessageFormatter,
-    private val httpResponseFormatter: HttpResponseMessageFormatter,
-    private val longPollingFormatter: LongPollingMessageFormatter
+    private val messageSerializer: MessageSerializer
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
@@ -55,7 +48,8 @@ class PushpinService(
         val server =
             getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
         logger.info("Publishing message to server: ${server.id}")
-        val httpMessage = PushpinHttpMessage(listOf(message.toPushPin()))
+        val pushpinMessage = messageSerializer.serialize(message)
+        val httpMessage = PushpinHttpMessage(listOf(pushpinMessage))
         return webClient.post()
             .uri("${server.getControlUrl()}/publish")
             .contentType(MediaType.APPLICATION_JSON)
@@ -100,27 +94,4 @@ class PushpinService(
         return discoveryManager.getServerById(id)
     }
 
-    /**
-     * Converts a Message to a PushpinMessage using the configured formatters.
-     */
-    private fun Message.toPushPin() = PushpinMessage(
-        channel = this.channel,
-        formats = mapOf(
-            "ws-message" to webSocketFormatter.format(this),
-            "http-stream" to when {
-                this.transports.contains(Transport.HttpStream) -> httpStreamMessageFormatter.format(
-                    this
-                )
-
-                else -> httpSseStreamFormatter.format(this)
-            },
-            "http-response" to when {
-                this.transports.contains(Transport.LongPolling) -> longPollingFormatter.format(
-                    this
-                )
-
-                else -> httpResponseFormatter.format(this)
-            }
-        )
-    )
 }
