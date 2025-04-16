@@ -1,12 +1,10 @@
 package io.github.mpecan.pmt.discovery
 
 import io.github.mpecan.pmt.model.PushpinServer
-import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.scheduling.annotation.Scheduled
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.util.concurrent.ConcurrentHashMap
 
 /**

@@ -15,7 +15,7 @@ class SimpleHttpStreamMessageFormatter(
         }
 
         return HttpStreamFormat(
-            content = data+"\n",
+            content = data.toString() + "\n",
             action = "send"
         )
     }

@@ -12,6 +12,7 @@ repositories {
     mavenCentral()
 }
 
+
 dependencies {
     testImplementation(kotlin("test"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -19,6 +20,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.bootJar{
+    enabled = false
 }
 kotlin {
     jvmToolchain(21)

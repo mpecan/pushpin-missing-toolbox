@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "io.github.mpecan"
@@ -9,7 +10,14 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.4.4")
+    }
+}
+
 dependencies {
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation(kotlin("test"))
 
 }

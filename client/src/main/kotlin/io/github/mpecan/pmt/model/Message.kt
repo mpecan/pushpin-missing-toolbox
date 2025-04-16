@@ -54,12 +54,5 @@ data class Message(
         fun withMeta(channel: String, data: Any, meta: Map<String, Any>): Message {
             return Message(channel = channel, data = data, meta = meta)
         }
-
-        /**
-         * Creates a complete message with all properties.
-         */
-        fun complete(channel: String, eventType: String, data: Any, meta: Map<String, Any>): Message {
-            return Message(channel = channel, eventType = eventType, data = data, meta = meta)
-        }
     }
 }
