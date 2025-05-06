@@ -8,6 +8,7 @@ import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 
 /**
@@ -15,7 +16,10 @@ import org.springframework.context.annotation.Bean
  * Provides default implementations of message formatters and serializers.
  */
 @AutoConfiguration
-class PushpinClientAutoConfiguration {
+@EnableConfigurationProperties(PushpinClientProperties::class)
+class PushpinClientAutoConfiguration(
+    private val properties: PushpinClientProperties
+) {
 
     /**
      * Creates a message serialization service bean if none is provided.
@@ -32,7 +36,12 @@ class PushpinClientAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     fun webSocketMessageFormatter(serializationService: MessageSerializationService): WebSocketMessageFormatter {
-        return DefaultWebSocketMessageFormatter(serializationService)
+        // Create formatter options from properties
+        val options = FormatterOptions()
+            .let { if (properties.webSocket.type != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_TYPE, properties.webSocket.type!!) else it }
+            .let { if (properties.webSocket.action != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_ACTION, properties.webSocket.action!!) else it }
+        
+        return DefaultWebSocketMessageFormatter(serializationService, options)
     }
 
     /**
@@ -90,5 +99,14 @@ class PushpinClientAutoConfiguration {
             httpResponseFormatter,
             longPollingFormatter
         )
+    }
+    
+    /**
+     * Creates customized message formatter factories.
+     * These factories can be used to create customized formatters.
+     */
+    @Bean
+    fun formatterFactory(serializationService: MessageSerializationService): FormatterFactory {
+        return DefaultFormatterFactory(serializationService)
     }
 }

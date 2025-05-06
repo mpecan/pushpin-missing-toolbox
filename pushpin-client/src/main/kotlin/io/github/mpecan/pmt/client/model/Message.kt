@@ -54,5 +54,82 @@ data class Message(
         fun withMeta(channel: String, data: Any, meta: Map<String, Any>): Message {
             return Message(channel = channel, data = data, meta = meta)
         }
+        
+        /**
+         * Creates a message with specific transports.
+         */
+        fun withTransports(channel: String, data: Any, transports: List<Transport>): Message {
+            return Message(channel = channel, data = data, transports = transports)
+        }
+        
+        /**
+         * Creates a WebSocket-only message.
+         */
+        fun webSocketOnly(channel: String, data: Any): Message {
+            return Message(channel = channel, data = data, transports = listOf(Transport.WebSocket))
+        }
+        
+        /**
+         * Creates an HTTP-stream-only message.
+         */
+        fun httpStreamOnly(channel: String, data: Any): Message {
+            return Message(channel = channel, data = data, transports = listOf(Transport.HttpStream))
+        }
+        
+        /**
+         * Creates an SSE-only message.
+         */
+        fun sseOnly(channel: String, data: Any): Message {
+            return Message(channel = channel, data = data, transports = listOf(Transport.HttpStreamSSE))
+        }
+        
+        /**
+         * Creates a fully customized message with all properties.
+         */
+        fun custom(
+            channel: String, 
+            data: Any, 
+            eventType: String? = null, 
+            meta: Map<String, Any>? = null, 
+            transports: List<Transport>? = null
+        ): Message {
+            return Message(
+                channel = channel, 
+                data = data, 
+                eventType = eventType, 
+                meta = meta, 
+                transports = transports ?: listOf(
+                    Transport.WebSocket,
+                    Transport.HttpStreamSSE,
+                    Transport.HttpResponseSSE,
+                    Transport.LongPolling
+                )
+            )
+        }
+    }
+    
+    /**
+     * Creates a copy of this message with additional metadata.
+     */
+    fun addMeta(additionalMeta: Map<String, Any>): Message {
+        val newMeta = when {
+            meta != null -> meta + additionalMeta
+            else -> additionalMeta
+        }
+        return copy(meta = newMeta)
+    }
+    
+    /**
+     * Creates a copy of this message with a different event type.
+     */
+    fun withEventType(newEventType: String): Message {
+        return copy(eventType = newEventType)
+    }
+    
+    /**
+     * Creates a copy of this message with different transports.
+     */
+    fun withTransports(newTransports: List<Transport>): Message {
+        return copy(transports = newTransports)
     }
 }

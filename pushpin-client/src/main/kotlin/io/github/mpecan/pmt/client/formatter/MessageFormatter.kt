@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.client.formatter
 
+import io.github.mpecan.pmt.client.exception.MessageFormattingException
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.model.*
 
@@ -12,7 +13,9 @@ interface MessageFormatter {
      *
      * @param message The message to format
      * @return The formatted message in Pushpin format
+     * @throws MessageFormattingException If there is an error during formatting
      */
+    @Throws(MessageFormattingException::class)
     fun format(message: Message): PushpinFormat
 }
 
@@ -20,6 +23,7 @@ interface MessageFormatter {
  * Interface for formatting messages for WebSocket protocol.
  */
 interface WebSocketMessageFormatter : MessageFormatter {
+    @Throws(MessageFormattingException::class)
     override fun format(message: Message): WebSocketFormat
 }
 
@@ -27,6 +31,7 @@ interface WebSocketMessageFormatter : MessageFormatter {
  * Interface for formatting messages for HTTP stream protocol (SSE).
  */
 interface SSEStreamMessageFormatter : MessageFormatter {
+    @Throws(MessageFormattingException::class)
     override fun format(message: Message): HttpStreamFormat
 }
 
@@ -34,6 +39,7 @@ interface SSEStreamMessageFormatter : MessageFormatter {
  * Interface for formatting messages for HTTP stream protocol (SSE) with a specific implementation.
  */
 interface HttpStreamMessageFormatter : MessageFormatter {
+    @Throws(MessageFormattingException::class)
     override fun format(message: Message): HttpStreamFormat
 }
 
@@ -41,6 +47,7 @@ interface HttpStreamMessageFormatter : MessageFormatter {
  * Interface for formatting messages for HTTP response protocol.
  */
 interface HttpResponseMessageFormatter : MessageFormatter {
+    @Throws(MessageFormattingException::class)
     override fun format(message: Message): HttpResponseFormat
 }
 
@@ -48,5 +55,6 @@ interface HttpResponseMessageFormatter : MessageFormatter {
  * Interface for formatting messages for HTTP long-polling protocol.
  */
 interface LongPollingMessageFormatter : MessageFormatter {
+    @Throws(MessageFormattingException::class)
     override fun format(message: Message): HttpResponseFormat
 }
