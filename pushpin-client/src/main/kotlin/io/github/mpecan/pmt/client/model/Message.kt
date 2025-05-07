@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @property eventType The type of event (optional)
  * @property data The message data
  * @property meta Additional metadata (optional)
+ * @property id Optional message identifier for tracking
+ * @property prevId Optional identifier of the previous message in sequence
  * @property transports List of transports to be used (default: WebSocket, HttpStreamSSE, HttpResponseSSE, LongPolling)
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,6 +26,12 @@ data class Message(
 
     @JsonProperty("meta")
     val meta: Map<String, Any>? = null,
+    
+    @JsonProperty("id")
+    val id: String? = null,
+    
+    @JsonProperty("prev-id")
+    val prevId: String? = null,
 
     @JsonProperty("transports")
     val transports: List<Transport> = listOf(
@@ -54,5 +62,100 @@ data class Message(
         fun withMeta(channel: String, data: Any, meta: Map<String, Any>): Message {
             return Message(channel = channel, data = data, meta = meta)
         }
+        
+        /**
+         * Creates a message with specific transports.
+         */
+        fun withTransports(channel: String, data: Any, transports: List<Transport>): Message {
+            return Message(channel = channel, data = data, transports = transports)
+        }
+        
+        /**
+         * Creates a WebSocket-only message.
+         */
+        fun webSocketOnly(channel: String, data: Any): Message {
+            return Message(channel = channel, data = data, transports = listOf(Transport.WebSocket))
+        }
+        
+        /**
+         * Creates an HTTP-stream-only message.
+         */
+        fun httpStreamOnly(channel: String, data: Any): Message {
+            return Message(channel = channel, data = data, transports = listOf(Transport.HttpStream))
+        }
+        
+        /**
+         * Creates an SSE-only message.
+         */
+        fun sseOnly(channel: String, data: Any): Message {
+            return Message(channel = channel, data = data, transports = listOf(Transport.HttpStreamSSE))
+        }
+        
+        /**
+         * Creates a message with tracking IDs.
+         */
+        fun withIds(channel: String, data: Any, id: String, prevId: String? = null): Message {
+            return Message(channel = channel, data = data, id = id, prevId = prevId)
+        }
+        
+        /**
+         * Creates a fully customized message with all properties.
+         */
+        fun custom(
+            channel: String, 
+            data: Any, 
+            eventType: String? = null, 
+            meta: Map<String, Any>? = null,
+            id: String? = null,
+            prevId: String? = null,
+            transports: List<Transport>? = null
+        ): Message {
+            return Message(
+                channel = channel, 
+                data = data, 
+                eventType = eventType, 
+                meta = meta,
+                id = id,
+                prevId = prevId,
+                transports = transports ?: listOf(
+                    Transport.WebSocket,
+                    Transport.HttpStreamSSE,
+                    Transport.HttpResponseSSE,
+                    Transport.LongPolling
+                )
+            )
+        }
+    }
+    
+    /**
+     * Creates a copy of this message with additional metadata.
+     */
+    fun addMeta(additionalMeta: Map<String, Any>): Message {
+        val newMeta = when {
+            meta != null -> meta + additionalMeta
+            else -> additionalMeta
+        }
+        return copy(meta = newMeta)
+    }
+    
+    /**
+     * Creates a copy of this message with a different event type.
+     */
+    fun withEventType(newEventType: String): Message {
+        return copy(eventType = newEventType)
+    }
+    
+    /**
+     * Creates a copy of this message with different transports.
+     */
+    fun withTransports(newTransports: List<Transport>): Message {
+        return copy(transports = newTransports)
+    }
+    
+    /**
+     * Creates a copy of this message with message tracking IDs.
+     */
+    fun withIds(id: String, prevId: String? = null): Message {
+        return copy(id = id, prevId = prevId)
     }
 }
