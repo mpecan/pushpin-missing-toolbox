@@ -206,6 +206,25 @@ val httpStreamFormat = HttpStreamFormat.send("Hello, stream clients!")
 val closeFormat = HttpStreamFormat.close()
 ```
 
+## Creating Custom Message Serializers
+
+You can create custom message serializers using the `MessageSerializerBuilder`:
+
+```kotlin
+// Create a serializer with the default formatters from a factory
+val defaultSerializer = MessageSerializerBuilder.defaultSerializer(formatterFactory)
+
+// Create a serializer with custom formatters
+val customSerializer = MessageSerializerBuilder.builder()
+    .withFormatterFactory(formatterFactory)  // Optional, for any unspecified formatters
+    .withWebSocketFormatter(customWebSocketFormatter)
+    .withHttpSseStreamFormatter(customSSEFormatter)
+    .withHttpStreamFormatter(customHttpStreamFormatter)
+    .withHttpResponseFormatter(customHttpResponseFormatter)
+    .withLongPollingFormatter(customLongPollingFormatter)
+    .build()
+```
+
 ## Customizing Message Formatting
 
 ### Using FormatterOptions

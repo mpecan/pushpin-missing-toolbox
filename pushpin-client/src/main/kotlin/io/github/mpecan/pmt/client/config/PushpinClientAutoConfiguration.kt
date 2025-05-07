@@ -6,6 +6,7 @@ import io.github.mpecan.pmt.client.serialization.DefaultMessageSerializer
 import io.github.mpecan.pmt.client.serialization.JacksonMessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
+import io.github.mpecan.pmt.client.serialization.MessageSerializerBuilder
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -86,19 +87,9 @@ class PushpinClientAutoConfiguration(
     @Bean
     @ConditionalOnMissingBean
     fun messageSerializer(
-        webSocketFormatter: WebSocketMessageFormatter,
-        httpSseStreamFormatter: SSEStreamMessageFormatter,
-        httpStreamMessageFormatter: HttpStreamMessageFormatter,
-        httpResponseFormatter: HttpResponseMessageFormatter,
-        longPollingFormatter: LongPollingMessageFormatter
+        formatterFactory: FormatterFactory
     ): MessageSerializer {
-        return DefaultMessageSerializer(
-            webSocketFormatter,
-            httpSseStreamFormatter,
-            httpStreamMessageFormatter,
-            httpResponseFormatter,
-            longPollingFormatter
-        )
+        return MessageSerializerBuilder.defaultSerializer(formatterFactory)
     }
     
     /**
