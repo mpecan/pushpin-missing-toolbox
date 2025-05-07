@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @property eventType The type of event (optional)
  * @property data The message data
  * @property meta Additional metadata (optional)
+ * @property id Optional message identifier for tracking
+ * @property prevId Optional identifier of the previous message in sequence
  * @property transports List of transports to be used (default: WebSocket, HttpStreamSSE, HttpResponseSSE, LongPolling)
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,6 +26,12 @@ data class Message(
 
     @JsonProperty("meta")
     val meta: Map<String, Any>? = null,
+    
+    @JsonProperty("id")
+    val id: String? = null,
+    
+    @JsonProperty("prev-id")
+    val prevId: String? = null,
 
     @JsonProperty("transports")
     val transports: List<Transport> = listOf(
@@ -84,20 +92,31 @@ data class Message(
         }
         
         /**
+         * Creates a message with tracking IDs.
+         */
+        fun withIds(channel: String, data: Any, id: String, prevId: String? = null): Message {
+            return Message(channel = channel, data = data, id = id, prevId = prevId)
+        }
+        
+        /**
          * Creates a fully customized message with all properties.
          */
         fun custom(
             channel: String, 
             data: Any, 
             eventType: String? = null, 
-            meta: Map<String, Any>? = null, 
+            meta: Map<String, Any>? = null,
+            id: String? = null,
+            prevId: String? = null,
             transports: List<Transport>? = null
         ): Message {
             return Message(
                 channel = channel, 
                 data = data, 
                 eventType = eventType, 
-                meta = meta, 
+                meta = meta,
+                id = id,
+                prevId = prevId,
                 transports = transports ?: listOf(
                     Transport.WebSocket,
                     Transport.HttpStreamSSE,
@@ -131,5 +150,12 @@ data class Message(
      */
     fun withTransports(newTransports: List<Transport>): Message {
         return copy(transports = newTransports)
+    }
+    
+    /**
+     * Creates a copy of this message with message tracking IDs.
+     */
+    fun withIds(id: String, prevId: String? = null): Message {
+        return copy(id = id, prevId = prevId)
     }
 }

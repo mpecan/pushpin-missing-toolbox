@@ -15,6 +15,8 @@ class MessageTest {
         assertEquals("Hello, World!", message.data)
         assertNull(message.eventType)
         assertNull(message.meta)
+        assertNull(message.id)
+        assertNull(message.prevId)
         assertTrue(message.transports.contains(Transport.WebSocket))
         assertTrue(message.transports.contains(Transport.HttpStreamSSE))
         assertTrue(message.transports.contains(Transport.HttpResponseSSE))
@@ -29,6 +31,8 @@ class MessageTest {
         assertEquals("Hello, World!", message.data)
         assertEquals("test-event", message.eventType)
         assertNull(message.meta)
+        assertNull(message.id)
+        assertNull(message.prevId)
     }
     
     @Test
@@ -40,6 +44,8 @@ class MessageTest {
         assertEquals("Hello, World!", message.data)
         assertNull(message.eventType)
         assertEquals(meta, message.meta)
+        assertNull(message.id)
+        assertNull(message.prevId)
     }
     
     @Test
@@ -51,6 +57,8 @@ class MessageTest {
         assertEquals("Hello, World!", message.data)
         assertNull(message.eventType)
         assertNull(message.meta)
+        assertNull(message.id)
+        assertNull(message.prevId)
         assertEquals(transports, message.transports)
     }
     
@@ -82,6 +90,26 @@ class MessageTest {
     }
     
     @Test
+    fun `withIds creates message with tracking IDs`() {
+        val message = Message.withIds("test-channel", "Hello, World!", "msg-123", "msg-122")
+        
+        assertEquals("test-channel", message.channel)
+        assertEquals("Hello, World!", message.data)
+        assertEquals("msg-123", message.id)
+        assertEquals("msg-122", message.prevId)
+    }
+    
+    @Test
+    fun `withIds creates message with id only`() {
+        val message = Message.withIds("test-channel", "Hello, World!", "msg-123")
+        
+        assertEquals("test-channel", message.channel)
+        assertEquals("Hello, World!", message.data)
+        assertEquals("msg-123", message.id)
+        assertNull(message.prevId)
+    }
+    
+    @Test
     fun `custom creates fully customized message`() {
         val meta = mapOf("key" to "value")
         val transports = listOf(Transport.WebSocket, Transport.HttpStream)
@@ -90,6 +118,8 @@ class MessageTest {
             data = "Hello, World!",
             eventType = "test-event",
             meta = meta,
+            id = "msg-123",
+            prevId = "msg-122",
             transports = transports
         )
         
@@ -97,6 +127,8 @@ class MessageTest {
         assertEquals("Hello, World!", message.data)
         assertEquals("test-event", message.eventType)
         assertEquals(meta, message.meta)
+        assertEquals("msg-123", message.id)
+        assertEquals("msg-122", message.prevId)
         assertEquals(transports, message.transports)
     }
     
@@ -153,5 +185,25 @@ class MessageTest {
         val updatedMessage = message.withTransports(newTransports)
         
         assertEquals(newTransports, updatedMessage.transports)
+    }
+    
+    @Test
+    fun `withIds method sets message tracking IDs`() {
+        val message = Message.simple("test-channel", "Hello, World!")
+        
+        val updatedMessage = message.withIds("msg-123", "msg-122")
+        
+        assertEquals("msg-123", updatedMessage.id)
+        assertEquals("msg-122", updatedMessage.prevId)
+    }
+    
+    @Test
+    fun `withIds method with id only sets id and keeps prevId null`() {
+        val message = Message.simple("test-channel", "Hello, World!")
+        
+        val updatedMessage = message.withIds("msg-123")
+        
+        assertEquals("msg-123", updatedMessage.id)
+        assertNull(updatedMessage.prevId)
     }
 }
