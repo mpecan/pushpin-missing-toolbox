@@ -14,36 +14,45 @@ repositories {
 
 dependencies {
     implementation(project(":pushpin-api"))
-    implementation(project(":pushpin-client"))
     implementation(project(":discovery"))
-    implementation(project(":discovery-aws"))
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
+    
+    implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    
+    // AWS SDK dependencies
+    implementation(platform("software.amazon.awssdk:bom:2.25.13")) // Use the BOM for AWS SDK version management
+    implementation("software.amazon.awssdk:ec2")                   // EC2 client
+    implementation("software.amazon.awssdk:autoscaling")           // Auto Scaling client
+    implementation("software.amazon.awssdk:sts")                   // STS for IAM role support
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.testcontainers:testcontainers:1.19.3")
-    testImplementation("org.apache.commons:commons-compress:1.26.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
-    testImplementation("javax.servlet:javax.servlet-api:4.0.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
+    
+    // AWS testing dependencies
+    testImplementation("org.testcontainers:localstack:1.19.8")
 }
 
-tasks.withType<Test> {
+tasks.bootJar{
+    enabled = false
+}
+
+tasks.jar {
+    enabled = true
+}
+
+tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(21)
 }

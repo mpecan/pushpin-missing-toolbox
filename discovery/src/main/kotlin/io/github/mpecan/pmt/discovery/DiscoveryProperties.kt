@@ -32,17 +32,16 @@ data class ConfigurationDiscoveryProperties(
 
 /**
  * Configuration properties for AWS-based discovery.
+ * 
+ * @deprecated Use the new AwsDiscoveryProperties from the discovery-aws module instead.
  *
  * @property enabled Whether AWS-based discovery is enabled
  * @property region The AWS region to use
- * @property tagKey The tag key to use for filtering instances
- * @property tagValue The tag value to use for filtering instances
  */
+@Deprecated("Use the new AwsDiscoveryProperties from the discovery-aws module instead")
 data class AwsDiscoveryProperties(
     val enabled: Boolean = false,
-    val region: String = "us-east-1",
-    val tagKey: String = "service",
-    val tagValue: String = "pushpin"
+    val region: String = "us-east-1"
 )
 
 /**
