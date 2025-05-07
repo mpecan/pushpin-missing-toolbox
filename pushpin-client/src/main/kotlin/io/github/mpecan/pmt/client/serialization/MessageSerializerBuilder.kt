@@ -69,15 +69,17 @@ class MessageSerializerBuilder {
      */
     fun build(): MessageSerializer {
         val factory = formatterFactory
-        
+
         // If a formatter factory is provided, use it to create any unspecified formatters
         if (factory != null) {
             val wsFormatter = webSocketFormatter ?: factory.createWebSocketFormatter()
             val sseFormatter = httpSseStreamFormatter ?: factory.createSseStreamFormatter()
-            val httpStreamFormatter = httpStreamMessageFormatter ?: factory.createHttpStreamFormatter()
-            val httpResponseFormatter = httpResponseFormatter ?: factory.createHttpResponseFormatter()
+            val httpStreamFormatter =
+                httpStreamMessageFormatter ?: factory.createHttpStreamFormatter()
+            val httpResponseFormatter =
+                httpResponseFormatter ?: factory.createHttpResponseFormatter()
             val longPollingFormatter = longPollingFormatter ?: factory.createLongPollingFormatter()
-            
+
             return DefaultMessageSerializer(
                 wsFormatter,
                 sseFormatter,
@@ -86,24 +88,24 @@ class MessageSerializerBuilder {
                 longPollingFormatter
             )
         }
-        
+
         // If no formatter factory is provided, all formatters must be specified
-        if (webSocketFormatter == null) {
-            throw IllegalStateException("WebSocketFormatter must be provided or a FormatterFactory must be set")
+        checkNotNull(webSocketFormatter) {
+            "WebSocketFormatter must be provided or a FormatterFactory must be set"
         }
-        if (httpSseStreamFormatter == null) {
-            throw IllegalStateException("SSEStreamFormatter must be provided or a FormatterFactory must be set")
+        checkNotNull(httpSseStreamFormatter) {
+            "SSEStreamFormatter must be provided or a FormatterFactory must be set"
         }
-        if (httpStreamMessageFormatter == null) {
-            throw IllegalStateException("HttpStreamFormatter must be provided or a FormatterFactory must be set")
+        checkNotNull(httpStreamMessageFormatter) {
+            "HttpStreamFormatter must be provided or a FormatterFactory must be set"
         }
-        if (httpResponseFormatter == null) {
-            throw IllegalStateException("HttpResponseFormatter must be provided or a FormatterFactory must be set")
+        checkNotNull(httpResponseFormatter) {
+            "HttpResponseFormatter must be provided or a FormatterFactory must be set"
         }
-        if (longPollingFormatter == null) {
-            throw IllegalStateException("LongPollingFormatter must be provided or a FormatterFactory must be set")
+        checkNotNull(longPollingFormatter) {
+            "LongPollingFormatter must be provided or a FormatterFactory must be set"
         }
-        
+
         return DefaultMessageSerializer(
             webSocketFormatter!!,
             httpSseStreamFormatter!!,
@@ -112,13 +114,13 @@ class MessageSerializerBuilder {
             longPollingFormatter!!
         )
     }
-    
+
     companion object {
         /**
          * Creates a new MessageSerializerBuilder.
          */
         fun builder(): MessageSerializerBuilder = MessageSerializerBuilder()
-        
+
         /**
          * Creates a default MessageSerializer using the provided FormatterFactory.
          */
