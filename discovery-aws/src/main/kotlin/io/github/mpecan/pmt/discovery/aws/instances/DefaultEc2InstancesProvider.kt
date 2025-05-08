@@ -6,6 +6,7 @@ import io.github.mpecan.pmt.discovery.aws.clients.Ec2ClientProvider
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient
 import software.amazon.awssdk.services.autoscaling.model.DescribeAutoScalingGroupsRequest
+import software.amazon.awssdk.services.autoscaling.model.LifecycleState
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
 import software.amazon.awssdk.services.ec2.model.Filter
@@ -141,7 +142,7 @@ class DefaultEc2InstancesProvider(
 
                 response.autoScalingGroups().forEach { asg ->
                     asg.instances().forEach { instance ->
-                        if (instance.lifecycleState().toString() == "InService") {
+                        if (instance.lifecycleState() == LifecycleState.IN_SERVICE) {
                             instanceIds.add(instance.instanceId())
                         }
                     }
