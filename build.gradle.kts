@@ -25,6 +25,84 @@ repositories {
     mavenCentral()
 }
 
+// Centralized dependency versions
+extra["kotlinVersion"] = "1.9.25"
+extra["springBootVersion"] = "3.4.4"
+extra["junitVersion"] = "5.10.2"
+extra["springDependencyManagementVersion"] = "1.1.7"
+extra["jacocoVersion"] = "0.8.11"
+extra["testcontainersVersion"] = "1.19.8"
+extra["mockitoKotlinVersion"] = "5.2.1"
+extra["awsSdkVersion"] = "2.25.13"
+extra["commonsCompressVersion"] = "1.26.0"
+extra["servletApiVersion"] = "4.0.1"
+extra["kubernetesClientVersion"] = "20.0.0"
+
+// Centralized dependency declarations for all subprojects
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// Apply common configurations and dependencies to all subprojects
+subprojects {
+    // Apply plugins
+    apply {
+        plugin("org.jetbrains.kotlin.jvm")
+        plugin("org.jetbrains.kotlin.plugin.spring")
+        plugin("io.spring.dependency-management")
+    }
+
+    // Apply dependency management
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}")
+            mavenBom("software.amazon.awssdk:bom:${property("awsSdkVersion")}")
+            mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+        }
+
+        dependencies {
+            // Kotlin dependencies
+            dependency("org.jetbrains.kotlin:kotlin-reflect:${property("kotlinVersion")}")
+            dependency("org.jetbrains.kotlin:kotlin-stdlib:${property("kotlinVersion")}")
+            dependency("org.jetbrains.kotlin:kotlin-test:${property("kotlinVersion")}")
+            dependency("org.jetbrains.kotlin:kotlin-test-junit5:${property("kotlinVersion")}")
+
+            // Test dependencies
+            dependency("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
+            dependency("org.apache.commons:commons-compress:${property("commonsCompressVersion")}")
+            dependency("javax.servlet:javax.servlet-api:${property("servletApiVersion")}")
+
+            // AWS SDK dependencies
+            dependency("software.amazon.awssdk:ec2:${property("awsSdkVersion")}")
+            dependency("software.amazon.awssdk:autoscaling:${property("awsSdkVersion")}")
+            dependency("software.amazon.awssdk:sts:${property("awsSdkVersion")}")
+
+            // Kubernetes client dependencies
+            dependency("io.kubernetes:client-java:${property("kubernetesClientVersion")}")
+            dependency("io.kubernetes:client-java-api:${property("kubernetesClientVersion")}")
+            dependency("io.kubernetes:client-java-spring-integration:${property("kubernetesClientVersion")}")
+        }
+    }
+
+    // Common configurations for all subprojects
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
+}
+
 // Configure all subprojects to use JaCoCo
 subprojects {
     apply(plugin = "jacoco")

@@ -1,16 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.4"
-    id("io.spring.dependency-management") version "1.1.7"
+    id("org.springframework.boot")
 }
 
 group = "io.github.mpecan"
 version = "0.0.1-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     implementation(project(":pushpin-api"))
@@ -18,6 +11,7 @@ dependencies {
     implementation(project(":discovery"))
     implementation(project(":discovery-aws"))
     implementation(project(":discovery-kubernetes"))
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
@@ -33,18 +27,11 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.testcontainers:testcontainers:1.19.3")
-    testImplementation("org.apache.commons:commons-compress:1.26.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
-    testImplementation("javax.servlet:javax.servlet-api:4.0.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.apache.commons:commons-compress")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("javax.servlet:javax.servlet-api")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(21)
 }
