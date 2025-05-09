@@ -1,28 +1,5 @@
 package io.github.mpecan.pmt.integration
 
-/**
- * This test class is an initial effort to test ZMQ communication with multiple Pushpin servers.
- * Due to issues with multiple ZMQ connections in the test environment, this file is currently
- * completely commented out.
- * 
- * Potential issues to investigate:
- * 
- * 1. The multi-server ZMQ tests were not working correctly in the test environment
- * 2. Multiple Pushpin containers with ZMQ sockets were causing port binding conflicts
- * 3. Tests should be rewritten or modified to use different ports for each ZMQ socket
- * 
- * ZMQ works correctly with a single Pushpin server as demonstrated in ZmqIntegrationTest,
- * but needs additional investigation for multi-server scenarios.
- * 
- * To enable these tests, the following should be solved:
- * 
- * 1. Ensure each Pushpin container uses a different ZMQ port
- * 2. Configure the ZmqPublisher to properly connect to multiple servers
- * 3. Verify that message delivery works across multiple servers
- */
-
-// This test class is intentionally kept for reference, but all code is commented out
-// to prevent it from causing test failures in the CI/CD pipeline.
 
 
 import io.github.mpecan.pmt.client.WebSocketClient
@@ -47,6 +24,26 @@ import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.random.Random
 
+/**
+ * This test class is an initial effort to test ZMQ communication with multiple Pushpin servers.
+ * Due to issues with multiple ZMQ connections in the test environment, this file is currently
+ * completely commented out.
+ *
+ * Potential issues to investigate:
+ *
+ * 1. The multi-server ZMQ tests were not working correctly in the test environment
+ * 2. Multiple Pushpin containers with ZMQ sockets were causing port binding conflicts
+ * 3. Tests should be rewritten or modified to use different ports for each ZMQ socket
+ *
+ * ZMQ works correctly with a single Pushpin server as demonstrated in ZmqIntegrationTest,
+ * but needs additional investigation for multi-server scenarios.
+ *
+ * To enable these tests, the following should be solved:
+ *
+ * 1. Ensure each Pushpin container uses a different ZMQ port
+ * 2. Configure the ZmqPublisher to properly connect to multiple servers
+ * 3. Verify that message delivery works across multiple servers
+ */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
 )
@@ -99,9 +96,6 @@ class ZmqMultiServerIntegrationTest {
     
     @Autowired
     private lateinit var pushpinService: PushpinService
-    
-    @Autowired
-    private lateinit var pushpinProperties: PushpinProperties
     
     @Autowired
     private lateinit var discoveryManager: PushpinDiscoveryManager

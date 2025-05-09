@@ -83,9 +83,6 @@ class MultiServerIntegrationTest {
     private lateinit var pushpinService: PushpinService
     
     @Autowired
-    private lateinit var pushpinProperties: PushpinProperties
-    
-    @Autowired
     private lateinit var discoveryManager: PushpinDiscoveryManager
     
     private val webClient = WebClient.builder().build()
@@ -182,7 +179,6 @@ class MultiServerIntegrationTest {
 
             // Wait for message delivery
             println("Waiting for message delivery...")
-            var messageReceived = false
 
             // Wait up to 15 seconds for message delivery
             for (i in 1..30) {
@@ -197,7 +193,6 @@ class MultiServerIntegrationTest {
                 // Break early if both clients received messages
                 if (client1Messages.size > initialSize1 && client2Messages.size > initialSize2) {
                     println("Both clients received messages!")
-                    messageReceived = true
                     break
                 } else if (client1Messages.size > initialSize1 || client2Messages.size > initialSize2) {
                     println("At least one client received a message. Waiting for the other...")

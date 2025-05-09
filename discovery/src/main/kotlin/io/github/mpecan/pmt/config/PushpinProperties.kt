@@ -15,6 +15,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties
  * @property zmqEnabled Whether to use ZMQ for publishing messages instead of HTTP
  * @property zmqHwm High water mark for ZMQ sockets (max messages in queue)
  * @property zmqLinger Linger period for ZMQ sockets in milliseconds
+ * @property zmqReconnectIvl Initial reconnection interval in milliseconds
+ * @property zmqReconnectIvlMax Maximum reconnection interval in milliseconds
+ * @property zmqSendTimeout Send timeout in milliseconds
+ * @property zmqConnectionPoolEnabled Whether to use a persistent connection pool for ZMQ
+ * @property zmqConnectionPoolRefreshInterval Interval for refreshing the connection pool in milliseconds
  * @property testMode Whether test mode is enabled
  */
 @ConfigurationProperties(prefix = "pushpin")
@@ -29,6 +34,11 @@ data class PushpinProperties(
     // ZMQ settings - always using PUSH socket type for Pushpin compatibility
     val zmqHwm: Int = 1000,
     val zmqLinger: Int = 0,
+    val zmqReconnectIvl: Int = 100,
+    val zmqReconnectIvlMax: Int = 10000,
+    val zmqSendTimeout: Int = 1000,
+    val zmqConnectionPoolEnabled: Boolean = true,
+    val zmqConnectionPoolRefreshInterval: Long = 60000,
     val testMode: Boolean = false
 ) {
     /**
