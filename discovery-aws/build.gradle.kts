@@ -3,8 +3,7 @@ plugins {
     id("jacoco")
 }
 
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
+// Group and version are inherited from root project
 
 dependencies {
     implementation(project(":pushpin-api"))
@@ -42,8 +41,10 @@ tasks.jar {
     enabled = true
 }
 
+val jacocoVersion: String by project
+
 jacoco {
-    toolVersion = property("jacocoVersion") as String
+    toolVersion = jacocoVersion
 }
 
 tasks.jacocoTestReport {

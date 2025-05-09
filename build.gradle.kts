@@ -1,3 +1,12 @@
+import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+
+// Get versions from gradle.properties
+val kotlinVersion: String by project
+val springBootVersion: String by project
+val springDependencyManagementVersion: String by project
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -7,13 +16,7 @@ plugins {
     id("jacoco-report-aggregation")
 }
 
-// Import JaCoCo tasks and Kotlin extensions
-import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
+// Group and version are defined in gradle.properties
 
 java {
     toolchain {
@@ -24,19 +27,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-// Centralized dependency versions
-extra["kotlinVersion"] = "1.9.25"
-extra["springBootVersion"] = "3.4.4"
-extra["junitVersion"] = "5.10.2"
-extra["springDependencyManagementVersion"] = "1.1.7"
-extra["jacocoVersion"] = "0.8.11"
-extra["testcontainersVersion"] = "1.19.8"
-extra["mockitoKotlinVersion"] = "5.2.1"
-extra["awsSdkVersion"] = "2.25.13"
-extra["commonsCompressVersion"] = "1.26.0"
-extra["servletApiVersion"] = "4.0.1"
-extra["kubernetesClientVersion"] = "20.0.0"
 
 // Centralized dependency declarations for all subprojects
 allprojects {
@@ -54,35 +44,44 @@ subprojects {
         plugin("io.spring.dependency-management")
     }
 
+    // Get all versions from gradle.properties
+    val jacocoVersion: String by project
+    val testcontainersVersion: String by project
+    val mockitoKotlinVersion: String by project
+    val awsSdkVersion: String by project
+    val commonsCompressVersion: String by project
+    val servletApiVersion: String by project
+    val kubernetesClientVersion: String by project
+
     // Apply dependency management
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}")
-            mavenBom("software.amazon.awssdk:bom:${property("awsSdkVersion")}")
-            mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
+            mavenBom("software.amazon.awssdk:bom:$awsSdkVersion")
+            mavenBom("org.testcontainers:testcontainers-bom:$testcontainersVersion")
         }
 
         dependencies {
             // Kotlin dependencies
-            dependency("org.jetbrains.kotlin:kotlin-reflect:${property("kotlinVersion")}")
-            dependency("org.jetbrains.kotlin:kotlin-stdlib:${property("kotlinVersion")}")
-            dependency("org.jetbrains.kotlin:kotlin-test:${property("kotlinVersion")}")
-            dependency("org.jetbrains.kotlin:kotlin-test-junit5:${property("kotlinVersion")}")
+            dependency("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+            dependency("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+            dependency("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+            dependency("org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion")
 
             // Test dependencies
-            dependency("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
-            dependency("org.apache.commons:commons-compress:${property("commonsCompressVersion")}")
-            dependency("javax.servlet:javax.servlet-api:${property("servletApiVersion")}")
+            dependency("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
+            dependency("org.apache.commons:commons-compress:$commonsCompressVersion")
+            dependency("javax.servlet:javax.servlet-api:$servletApiVersion")
 
             // AWS SDK dependencies
-            dependency("software.amazon.awssdk:ec2:${property("awsSdkVersion")}")
-            dependency("software.amazon.awssdk:autoscaling:${property("awsSdkVersion")}")
-            dependency("software.amazon.awssdk:sts:${property("awsSdkVersion")}")
+            dependency("software.amazon.awssdk:ec2:$awsSdkVersion")
+            dependency("software.amazon.awssdk:autoscaling:$awsSdkVersion")
+            dependency("software.amazon.awssdk:sts:$awsSdkVersion")
 
             // Kubernetes client dependencies
-            dependency("io.kubernetes:client-java:${property("kubernetesClientVersion")}")
-            dependency("io.kubernetes:client-java-api:${property("kubernetesClientVersion")}")
-            dependency("io.kubernetes:client-java-spring-integration:${property("kubernetesClientVersion")}")
+            dependency("io.kubernetes:client-java:$kubernetesClientVersion")
+            dependency("io.kubernetes:client-java-api:$kubernetesClientVersion")
+            dependency("io.kubernetes:client-java-spring-integration:$kubernetesClientVersion")
         }
     }
 

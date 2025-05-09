@@ -4,8 +4,7 @@ plugins {
     id("java-library")
 }
 
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
+// Group and version are inherited from root project
 
 dependencies {
     api(project(":pushpin-api"))

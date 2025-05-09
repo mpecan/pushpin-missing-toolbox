@@ -2,8 +2,7 @@ plugins {
     id("org.springframework.boot")
 }
 
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
+// Group and version are inherited from root project
 
 dependencies {
     testImplementation(kotlin("test"))
