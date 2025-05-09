@@ -1,8 +1,8 @@
 package io.github.mpecan.pmt.client.formatter
 
 import io.github.mpecan.pmt.client.model.Message
-import io.github.mpecan.pmt.model.WebSocketFormat
 import io.github.mpecan.pmt.client.serialization.MessageSerializationService
+import io.github.mpecan.pmt.model.WebSocketFormat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

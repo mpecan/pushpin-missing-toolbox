@@ -1,24 +1,10 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.4"
-    id("io.spring.dependency-management") version "1.1.7"
+    id("org.springframework.boot")
     id("maven-publish")
     id("java-library")
 }
 
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:3.4.4")
-    }
-}
+// Group and version are inherited from root project
 
 dependencies {
     api(project(":pushpin-api"))
@@ -32,13 +18,21 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation(kotlin("test"))
 }
 
 java {
     withJavadocJar()
     withSourcesJar()
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+tasks.jar {
+    enabled = true
 }
 
 publishing {
@@ -79,20 +73,4 @@ publishing {
             }
         }
     }
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.bootJar {
-    enabled = false
-}
-
-tasks.jar {
-    enabled = true
-}
-
-kotlin {
-    jvmToolchain(21)
 }

@@ -1,8 +1,10 @@
 package io.github.mpecan.pmt.service
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.client.serialization.MessageSerializer
+import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -16,6 +18,7 @@ class PushpinServiceTest {
     private val webClient: WebClient = mock()
     private val messageSerializer: MessageSerializer = mock()
     private val discoveryManager: PushpinDiscoveryManager = mock()
+    private val zmqPublisher: ZmqPublisher = mock()
 
     private lateinit var pushpinProperties: PushpinProperties
     private lateinit var pushpinService: PushpinService
@@ -46,7 +49,9 @@ class PushpinServiceTest {
         pushpinService = PushpinService(
             pushpinProperties,
             discoveryManager,
-            messageSerializer
+            messageSerializer,
+            zmqPublisher,
+             jacksonObjectMapper()
         )
 
         // Use reflection to replace the webClient with our mock

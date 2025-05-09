@@ -28,17 +28,7 @@ class DiscoveryConfig {
         )
     }
 
-    /**
-     * Creates an AwsDiscovery bean.
-     */
-    @Bean
-    fun awsDiscovery(
-        discoveryProperties: DiscoveryProperties
-    ): AwsDiscovery {
-        return AwsDiscovery(
-            discoveryProperties.aws
-        )
-    }
+    // AwsDiscovery bean is now provided by discovery-aws module via auto-configuration
 
     /**
      * Creates a KubernetesDiscovery bean.
