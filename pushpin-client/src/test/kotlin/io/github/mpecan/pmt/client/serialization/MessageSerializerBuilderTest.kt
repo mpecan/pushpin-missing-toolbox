@@ -1,10 +1,6 @@
 package io.github.mpecan.pmt.client.serialization
 
 import io.github.mpecan.pmt.client.formatter.*
-import io.github.mpecan.pmt.client.model.Message
-import io.github.mpecan.pmt.model.HttpResponseFormat
-import io.github.mpecan.pmt.model.HttpStreamFormat
-import io.github.mpecan.pmt.model.WebSocketFormat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify

@@ -36,8 +36,19 @@ class PushpinServerTest {
             port = 7999,
             publishPort = 5560
         )
-        
-        assertEquals("tcp://localhost:5560", server.getPublishUrl())
+
+        // Special case for localhost - we map it to 127.0.0.1 for better connectivity
+        assertEquals("tcp://127.0.0.1:5560", server.getPublishUrl())
+
+        // Verify non-localhost behavior remains unchanged
+        val remoteServer = PushpinServer(
+            id = "remote-server",
+            host = "example.com",
+            port = 7999,
+            publishPort = 5560
+        )
+
+        assertEquals("tcp://example.com:5560", remoteServer.getPublishUrl())
     }
 
     @Test

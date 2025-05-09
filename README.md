@@ -6,6 +6,7 @@ A Spring Boot application for managing multiple Pushpin servers and allowing sys
 
 - Manage multiple Pushpin servers
 - Load balancing between Pushpin servers
+- Multi-server message broadcasting using ZeroMQ
 - Health checks for Pushpin servers
 - Authentication mechanism for secure communication
 - RESTful API for publishing messages
@@ -62,6 +63,12 @@ pushpin.defaultTimeout=5000
 # Pushpin authentication configuration
 pushpin.authEnabled=false
 pushpin.authSecret=changeme
+
+# Multi-server ZMQ configuration
+pushpin.zmqEnabled=false
+pushpin.zmqSocketType=PUB
+pushpin.zmqHwm=1000
+pushpin.zmqLinger=0
 
 # Pushpin discovery configuration
 pushpin.discovery.enabled=true
@@ -160,6 +167,32 @@ curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
     "message": "Hello, World!"
   }'
 ```
+
+## Multi-Server ZMQ Configuration
+
+The application supports publishing messages to multiple Pushpin servers using ZeroMQ (ZMQ) for improved reliability and scalability. By default, this feature is disabled for backward compatibility, but it can be enabled with the following configuration:
+
+```properties
+# Enable ZMQ for multi-server communication
+pushpin.zmqEnabled=true
+
+# Choose the socket type based on your needs
+# PUB (default): broadcast messages to all servers (recommended for most cases)
+# PUSH: distribute messages using load balancing (one server gets each message)
+pushpin.zmqSocketType=PUB
+
+# Configure ZMQ performance parameters
+pushpin.zmqHwm=1000    # High water mark (max queued messages)
+pushpin.zmqLinger=0    # Linger time in ms (how long to wait for pending messages on close)
+```
+
+When ZMQ is enabled, the application will:
+
+1. Connect to all active Pushpin servers simultaneously
+2. Publish messages to all servers via ZMQ using the selected socket type
+3. Ensure message delivery across the entire server cluster
+
+This is particularly useful in high-availability setups where clients might be connected to different Pushpin instances, and you need to ensure all clients receive all messages regardless of which server they're connected to.
 
 ## Development
 

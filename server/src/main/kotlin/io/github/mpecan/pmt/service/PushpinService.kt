@@ -1,18 +1,22 @@
 package io.github.mpecan.pmt.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.model.*
+import io.github.mpecan.pmt.model.PushpinHttpMessage
+import io.github.mpecan.pmt.model.PushpinServer
+import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.CompletableFuture
 
 /**
  * Service for managing Pushpin servers and publishing messages.
@@ -21,62 +25,140 @@ import java.util.concurrent.atomic.AtomicInteger
 class PushpinService(
     private val pushpinProperties: PushpinProperties,
     private val discoveryManager: PushpinDiscoveryManager,
-    private val messageSerializer: MessageSerializer
+    private val messageSerializer: MessageSerializer,
+    private val zmqPublisher: ZmqPublisher,
+    private val objectMapper: ObjectMapper,
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
-    private val counter = AtomicInteger(0)
 
     /**
      * Gets a server using round-robin load balancing.
      */
-    private fun getServer(): PushpinServer? {
+    private fun getServer(): List<PushpinServer>? {
         // We no longer check health here, just return a server using round-robin
         val serverList = discoveryManager.getAllServers()
         if (serverList.isEmpty()) {
             return null
         }
 
-        val index = counter.getAndIncrement() % serverList.size
-        return serverList[index]
+        return serverList
     }
 
     /**
-     * Publishes a message to a Pushpin server.
+     * Gets all active servers.
+     */
+    private fun getActiveServers(): List<PushpinServer> {
+        return discoveryManager.getAllServers().filter { it.active }
+    }
+
+    /**
+     * Publishes a message to Pushpin servers.
+     *
+     * If ZMQ is enabled, it will publish to all active servers via ZMQ.
+     * Otherwise, it will publish to a single server via HTTP using round-robin selection.
      */
     fun publishMessage(message: Message): Mono<Boolean> {
-        val server =
-            getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
-        logger.info("Publishing message to server: ${server.id}")
-        val pushpinMessage = messageSerializer.serialize(message)
-        val httpMessage = PushpinHttpMessage(listOf(pushpinMessage))
-        return webClient.post()
-            .uri("${server.getControlUrl()}/publish")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(httpMessage)
-            .retrieve()
-            .onStatus(
-                { status ->
-                    logger.info("Publishing message to server: ${server.id} at ${server.getBaseUrl()} - status: $status")
-                    status.isError
-                },
-                { clientResponse ->
-                    logger.error("Failed to publish message to server: ${server.id} at ${server.getBaseUrl()}")
-                    Mono.error(RuntimeException("Failed to publish message: ${clientResponse.statusCode()}"))
-                }
-            )
-            .bodyToMono<String>()
-            .doOnSuccess {
-                logger.info("Message published to Pushpin server ${server.id}: $it")
+        if (pushpinProperties.zmqEnabled) {
+            return publishViaZmq(message)
+        } else {
+            return publishViaHttp(message)
+        }
+    }
+
+    /**
+     * Publishes a message to all active Pushpin servers via ZMQ.
+     */
+    private fun publishViaZmq(message: Message): Mono<Boolean> {
+        val servers = getActiveServers()
+        if (servers.isEmpty()) {
+            return Mono.error(IllegalStateException("No active Pushpin servers available"))
+        }
+
+        logger.info("Publishing message to ${servers.size} servers via ZMQ")
+
+        // List all server details for debugging at trace level
+        if (logger.isTraceEnabled) {
+            servers.forEach { server ->
+                logger.trace("Server: ${server.id}, Active: ${server.active}, Publish URL: ${server.getPublishUrl()}")
             }
-            .map {
-                true
+        }
+
+        // Use the new publish method that handles both serialization and ZMQ formatting
+        val futures = zmqPublisher.publish(servers, message)
+
+        // Log basic info about the message being published
+        logger.info("Publishing message to channel: ${message.channel} via ZMQ")
+
+        // Create CompletableFuture that completes when all publishing attempts have completed
+        val allFuturesDone = CompletableFuture.allOf(*futures.map {
+            CompletableFuture.supplyAsync { it.get() }
+        }.toTypedArray())
+
+        // Create Mono from CompletableFuture
+        return Mono.fromFuture(allFuturesDone.thenApply {
+            // Check if at least one server was successful
+            val successCount = futures.count { it.get() }
+            val anySuccess = successCount > 0
+            logger.info("Published message to $successCount out of ${servers.size} servers via ZMQ")
+
+            // In tests, add a small delay to allow ZMQ messages to propagate through the system
+            if (pushpinProperties.testMode) {
+                logger.info("Test mode enabled - adding a small delay for ZMQ message propagation")
+                Thread.sleep(500)  // Small delay to allow messages to propagate in test environment
             }
+
+            anySuccess
+        })
+            .timeout(Duration.ofMillis(pushpinProperties.defaultTimeout))
             .onErrorResume { error ->
-                logger.error("Error publishing message to Pushpin server ${server.id}: ${error.message}")
+                logger.error("Error publishing message via ZMQ: ${error.message}", error)
                 Mono.just(false)
             }
-            .timeout(Duration.ofMillis(pushpinProperties.defaultTimeout))
+    }
+
+    /**
+     * Publishes a message to a single Pushpin server via HTTP (legacy method).
+     */
+    private fun publishViaHttp(message: Message): Mono<Boolean> {
+        val servers =
+            getServer() ?: return Mono.error(IllegalStateException("No Pushpin servers available"))
+        return Flux.merge(servers.map { server ->
+
+            logger.info("Publishing message to server: ${server.id} via HTTP")
+            val pushpinMessage = messageSerializer.serialize(message)
+            val httpMessage = PushpinHttpMessage(listOf(pushpinMessage))
+
+            return@map webClient.post()
+                .uri("${server.getControlUrl()}/publish")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(httpMessage)
+                .retrieve()
+                .onStatus(
+                    { status ->
+                        logger.info("Publishing message to server: ${server.id} at ${server.getBaseUrl()} - status: $status")
+                        status.isError
+                    },
+                    { clientResponse ->
+                        logger.error("Failed to publish message to server: ${server.id} at ${server.getBaseUrl()}")
+                        Mono.error(RuntimeException("Failed to publish message: ${clientResponse.statusCode()}"))
+                    }
+                )
+                .bodyToMono<String>()
+                .doOnSuccess {
+                    logger.info("Message published to Pushpin server ${server.id}: $it")
+                }
+                .map {
+                    true
+                }
+                .onErrorResume { error ->
+                    logger.error("Error publishing message to Pushpin server ${server.id}: ${error.message}")
+                    Mono.just(false)
+                }
+                .timeout(Duration.ofMillis(pushpinProperties.defaultTimeout))
+        }).reduce{ acc, value ->
+            acc && value
+        }
     }
 
     /**
@@ -86,12 +168,10 @@ class PushpinService(
         return discoveryManager.getAllServers()
     }
 
-
     /**
      * Gets a server by ID.
      */
     fun getServerById(id: String): PushpinServer? {
         return discoveryManager.getServerById(id)
     }
-
 }
