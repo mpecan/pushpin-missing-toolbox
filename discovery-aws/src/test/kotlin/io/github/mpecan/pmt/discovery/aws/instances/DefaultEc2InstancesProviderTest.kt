@@ -6,17 +6,17 @@ import io.github.mpecan.pmt.discovery.aws.clients.Ec2ClientProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.*
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.*
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient
 import software.amazon.awssdk.services.autoscaling.model.AutoScalingGroup
 import software.amazon.awssdk.services.autoscaling.model.DescribeAutoScalingGroupsRequest
 import software.amazon.awssdk.services.autoscaling.model.DescribeAutoScalingGroupsResponse
-import software.amazon.awssdk.services.autoscaling.model.Instance as AsgInstance
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import software.amazon.awssdk.services.autoscaling.model.Instance as AsgInstance
 
 @ExtendWith(MockitoExtension::class)
 class DefaultEc2InstancesProviderTest {

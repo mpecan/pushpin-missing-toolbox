@@ -1,7 +1,3 @@
-import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-
 // Get versions from gradle.properties
 val kotlinVersion: String by project
 val springBootVersion: String by project

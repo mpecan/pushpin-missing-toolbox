@@ -1,9 +1,9 @@
 package io.github.mpecan.pmt.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -5,19 +5,18 @@ import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.model.*
+import io.github.mpecan.pmt.model.PushpinHttpMessage
+import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import org.springframework.web.servlet.resource.ResourceUrlProvider
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Service for managing Pushpin servers and publishing messages.

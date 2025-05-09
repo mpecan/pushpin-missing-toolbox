@@ -2,12 +2,9 @@ package io.github.mpecan.pmt.client
 
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import reactor.core.publisher.Sinks
 import reactor.core.scheduler.Schedulers
 import java.net.URI
-import java.time.Duration
-import java.util.concurrent.atomic.AtomicReference
 
 class WebSocketClient(private val baseUrl: String) {
     private val client = ReactorNettyWebSocketClient()

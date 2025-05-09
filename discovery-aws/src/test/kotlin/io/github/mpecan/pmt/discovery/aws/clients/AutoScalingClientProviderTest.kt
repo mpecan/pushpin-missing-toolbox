@@ -5,8 +5,10 @@ import io.github.mpecan.pmt.discovery.aws.credentials.AwsCredentialsProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.*
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider as SdkCredentialsProvider
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient
 import software.amazon.awssdk.services.autoscaling.AutoScalingClientBuilder
@@ -14,6 +16,7 @@ import java.net.URI
 import java.util.function.Supplier
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider as SdkCredentialsProvider
 
 @ExtendWith(MockitoExtension::class)
 class AutoScalingClientProviderTest {

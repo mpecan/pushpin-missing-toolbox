@@ -4,7 +4,6 @@ import io.github.mpecan.pmt.discovery.aws.converter.InstanceConverter
 import io.github.mpecan.pmt.discovery.aws.health.InstanceHealthChecker
 import io.github.mpecan.pmt.discovery.aws.instances.Ec2InstancesProvider
 import io.github.mpecan.pmt.model.PushpinServer
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach

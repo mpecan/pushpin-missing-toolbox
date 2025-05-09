@@ -18,7 +18,6 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.reactive.function.client.WebClient
 
 /**
  * Base class for integration tests that use MockMvc and MockRestServiceServer to simulate a Pushpin server.

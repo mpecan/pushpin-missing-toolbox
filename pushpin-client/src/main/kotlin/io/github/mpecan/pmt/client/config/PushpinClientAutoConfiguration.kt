@@ -2,7 +2,6 @@ package io.github.mpecan.pmt.client.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.mpecan.pmt.client.formatter.*
-import io.github.mpecan.pmt.client.serialization.DefaultMessageSerializer
 import io.github.mpecan.pmt.client.serialization.JacksonMessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
@@ -40,8 +39,12 @@ class PushpinClientAutoConfiguration(
     fun webSocketMessageFormatter(serializationService: MessageSerializationService): WebSocketMessageFormatter {
         // Create formatter options from properties
         val options = FormatterOptions()
-            .let { if (properties.webSocket.type != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_TYPE, properties.webSocket.type!!) else it }
-            .let { if (properties.webSocket.action != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_ACTION, properties.webSocket.action!!) else it }
+            .let { if (properties.webSocket.type != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_TYPE,
+                properties.webSocket.type
+            ) else it }
+            .let { if (properties.webSocket.action != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_ACTION,
+                properties.webSocket.action
+            ) else it }
 
         return DefaultWebSocketMessageFormatter(serializationService, options)
     }

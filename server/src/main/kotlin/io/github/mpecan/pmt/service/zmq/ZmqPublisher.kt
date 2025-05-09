@@ -1,6 +1,5 @@
 package io.github.mpecan.pmt.service.zmq
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
