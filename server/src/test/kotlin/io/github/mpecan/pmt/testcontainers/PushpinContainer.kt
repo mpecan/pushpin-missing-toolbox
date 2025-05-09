@@ -19,11 +19,11 @@ class PushpinContainer(
 ) : GenericContainer<PushpinContainer>(DockerImageName.parse(dockerImageName)) {
 
     companion object {
-        private const val HTTP_PORT = 7999
-        private const val PUBLISH_PORT = 5560
-        private const val XPUB_PORT = 5561
-        private const val ROUTER_PORT = 5562
-        private const val SUB_PORT = 5563
+        const val HTTP_PORT = 7999
+        const val PUBLISH_PORT = 5560
+        const val XPUB_PORT = 5561
+        const val ROUTER_PORT = 5562
+        const val SUB_PORT = 5563
         private val logger = LoggerFactory.getLogger(PushpinContainer::class.java)
     }
 
@@ -35,7 +35,8 @@ class PushpinContainer(
     }
 
     init {
-        withExposedPorts(HTTP_PORT, PUBLISH_PORT, XPUB_PORT)
+        // Expose all required ports
+        withExposedPorts(HTTP_PORT, PUBLISH_PORT, XPUB_PORT, SUB_PORT, ROUTER_PORT)
         withAccessToHost(true)
 
         // Log container output
@@ -47,22 +48,38 @@ class PushpinContainer(
         withEnv("HTTP_PORT", HTTP_PORT.toString())
         withFileSystemBind("logs", "/var/log/pushpin", BindMode.READ_WRITE)
         Testcontainers.exposeHostPorts(hostPort)
-        // Create configuration with dynamic port
+        // Create configuration with dynamic port - simplified for testability
         withCommand(
             "sh", "-c",
             // Create routes file pointing to the host application
             "echo '* host.testcontainers.internal:$hostPort,over_http' > /etc/pushpin/routes && " +
                     // Start modifying the config file by ensuring these port sections are set correctly
                     "sed -i 's/http_port=.*/http_port=$HTTP_PORT/' /etc/pushpin/pushpin.conf && " +
+
+                    // ZMQ publish socket config - ensure socket binding works correctly
                     "sed -i 's/push_in_spec=.*/push_in_spec=tcp:\\/\\/*:$PUBLISH_PORT/' /etc/pushpin/pushpin.conf && " +
                     "sed -i 's/push_in_http_port=.*/push_in_http_port=$XPUB_PORT/' /etc/pushpin/pushpin.conf && " +
-                    "sed -i 's/push_in_sub_spec=.*/push_in_sub_spec=tcp:\\/\\/*:$SUB_PORT/' /etc/pushpin/pushpin.conf && " +
-                    "sed -i 's/command_spec=.*/command_spec=tcp:\\/\\/*:$ROUTER_PORT/' /etc/pushpin/pushpin.conf && " +
-                    "sed -i 's/log_level=.*/log_level=10/' /etc/pushpin/pushpin.conf && " +
+                    // Enable ZMQ for message handling
+                    "sed -i 's/zmq_publish=.*/zmq_publish=true/' /etc/pushpin/pushpin.conf && " +
+                    // Configure handler section for ZMQ
+                    "echo '[handler]' >> /etc/pushpin/pushpin.conf && " +
+                    "echo 'm2a_in_specs=tcp://*:$PUBLISH_PORT' >> /etc/pushpin/pushpin.conf && " +
+                    "echo 'm2a_in_stream=true' >> /etc/pushpin/pushpin.conf && " +
+                    "echo 'm2a_in_http=true' >> /etc/pushpin/pushpin.conf && " +
+
+                    // Set log level to debug for better diagnostics
+                    "sed -i 's/log_level=.*/log_level=3/' /etc/pushpin/pushpin.conf && " +
+
+                    // Set simple server ID
+                    "sed -i 's/id=.*/id=pushpin-test/' /etc/pushpin/pushpin.conf && " +
+
+                    // Print configuration for debugging
+                    "echo '====== PUSHPIN CONFIG ======' && " +
+                    "cat /etc/pushpin/pushpin.conf && " +
+                    "echo '====== ROUTES CONFIG ======' && " +
+                    "cat /etc/pushpin/routes && " +
 
                     // Start Pushpin with verbose logging
-                    "cat /etc/pushpin/pushpin.conf && " +
-                    "cat /etc/pushpin/routes && " +
                     "pushpin --verbose"
         )
 

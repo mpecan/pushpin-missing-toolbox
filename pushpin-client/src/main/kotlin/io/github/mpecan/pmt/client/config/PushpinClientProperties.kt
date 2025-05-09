@@ -13,25 +13,25 @@ data class PushpinClientProperties(
      */
     @NestedConfigurationProperty
     val webSocket: WebSocketProperties = WebSocketProperties(),
-    
+
     /**
      * HTTP Stream formatter configuration.
      */
     @NestedConfigurationProperty
     val httpStream: HttpStreamProperties = HttpStreamProperties(),
-    
+
     /**
      * HTTP Response formatter configuration.
      */
     @NestedConfigurationProperty
     val httpResponse: HttpResponseProperties = HttpResponseProperties(),
-    
+
     /**
      * SSE formatter configuration.
      */
     @NestedConfigurationProperty
     val sse: SSEProperties = SSEProperties(),
-    
+
     /**
      * Long polling formatter configuration.
      */

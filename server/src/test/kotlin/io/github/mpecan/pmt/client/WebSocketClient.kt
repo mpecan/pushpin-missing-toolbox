@@ -14,8 +14,11 @@ class WebSocketClient(private val baseUrl: String) {
     private val activeSubscriptions = mutableMapOf<String, Any>()
 
     fun consumeMessages(endpoint: String): Flux<String> {
-        val sink = Sinks.many().multicast().onBackpressureBuffer<String>()
+        // Use a unicast sink that doesn't buffer
+        val sink = Sinks.many().unicast().onBackpressureBuffer<String>()
         val uri = URI.create("$baseUrl$endpoint")
+
+        println("Creating WebSocket connection to $uri")
 
         // This subscription needs to be kept alive
         val subscription = client.execute(uri) { session ->
@@ -23,21 +26,25 @@ class WebSocketClient(private val baseUrl: String) {
 
             session.receive()
                 .doOnNext {
-                    println("Received message: ${it.payloadAsText}")
-                    sink.tryEmitNext(it.payloadAsText)
+                    val message = it.payloadAsText
+                    println("WebSocketClient - Received message from $uri: '$message'")
+
+                    // Always emit the message, even if it's empty
+                    val result = sink.tryEmitNext(message)
+                    println("WebSocketClient - Emit result for $uri: $result")
                 }
                 .doOnComplete {
-                    println("Connection closed normally")
+                    println("Connection closed normally: $uri")
                     sink.tryEmitComplete()
                     activeSubscriptions.remove(endpoint)
                 }
                 .doOnError { error ->
-                    println("Connection error: ${error.message}")
+                    println("Connection error for $uri: ${error.message}")
                     sink.tryEmitError(error)
                     activeSubscriptions.remove(endpoint)
                 }
                 .doOnCancel {
-                    println("Connection cancelled")
+                    println("Connection cancelled for $uri")
                     activeSubscriptions.remove(endpoint)
                 }
                 .then()
@@ -59,5 +66,10 @@ class WebSocketClient(private val baseUrl: String) {
     fun closeConnection(endpoint: String) {
         activeSubscriptions.remove(endpoint)
         println("Removed subscription for $endpoint")
+    }
+
+    fun closeAllConnections() {
+        activeSubscriptions.clear()
+        println("Closed all WebSocket connections")
     }
 }

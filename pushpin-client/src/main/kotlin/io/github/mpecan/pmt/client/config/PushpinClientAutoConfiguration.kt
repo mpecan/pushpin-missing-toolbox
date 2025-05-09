@@ -24,6 +24,7 @@ class PushpinClientAutoConfiguration(
 
     /**
      * Creates a message serialization service bean if none is provided.
+     * This service properly handles escaping of special characters in JSON strings.
      */
     @Bean
     @ConditionalOnMissingBean
@@ -41,7 +42,7 @@ class PushpinClientAutoConfiguration(
         val options = FormatterOptions()
             .let { if (properties.webSocket.type != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_TYPE, properties.webSocket.type!!) else it }
             .let { if (properties.webSocket.action != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_ACTION, properties.webSocket.action!!) else it }
-        
+
         return DefaultWebSocketMessageFormatter(serializationService, options)
     }
 
@@ -91,7 +92,7 @@ class PushpinClientAutoConfiguration(
     ): MessageSerializer {
         return MessageSerializerBuilder.defaultSerializer(formatterFactory)
     }
-    
+
     /**
      * Creates customized message formatter factories.
      * These factories can be used to create customized formatters.

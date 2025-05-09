@@ -36,8 +36,24 @@ data class PushpinServer(
 
     /**
      * Returns the publish URL for the server.
+     *
+     * For ZeroMQ connections, this specifies the TCP endpoint for publishing messages.
+     * Pushpin expects messages to be published to its PULL socket on port 5560 (by default).
+     * We should connect (not bind) to this socket.
      */
-    fun getPublishUrl(): String = "tcp://$host:$publishPort"
+    fun getPublishUrl(): String {
+        // Format: tcp://host:port (ZeroMQ format)
+        // This should point to Pushpin's PULL socket for publishing
+
+        // Special case for localhost in testing to ensure container connectivity
+        val effectiveHost = if (host == "localhost") "127.0.0.1" else host
+        val url = "tcp://$effectiveHost:$publishPort"
+
+        // For debugging purposes in logs
+        println("ZMQ Publish URL for server $id: $url (connecting to Pushpin's PULL socket)")
+
+        return url
+    }
 
     /**
      * Returns the health check URL for the server.
