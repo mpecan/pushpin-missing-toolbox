@@ -49,7 +49,6 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         }
     }
 
-
     @Test
     fun `should receive message via WebSocket`() {
         // Given
@@ -101,13 +100,13 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
         // Use StepVerifier to test the WebSocket stream
         val stepVerifier = StepVerifier.create(wsFlux)
             .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
-            .expectNextMatches{
+            .expectNextMatches {
                 it.contains("First WebSocket message")
             }
-            .expectNextMatches{
+            .expectNextMatches {
                 it.contains("Second WebSocket message")
             }
-            .expectNextMatches{
+            .expectNextMatches {
                 it.contains("Third WebSocket message")
             }
             .thenCancel()
@@ -164,7 +163,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
     fun `should transmit binary data via WebSocket`() {
         // Given
         val channel = "test-channel-${UUID.randomUUID()}"
-        val binaryData = ByteArray(10) { it.toByte() }  // Sample binary data
+        val binaryData = ByteArray(10) { it.toByte() } // Sample binary data
         val encodedData = Base64.getEncoder().encodeToString(binaryData)
         val messageText = """{"type":"binary","data":"$encodedData"}"""
 
@@ -220,7 +219,7 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
         // When/Then: The connection should remain open for a while, indicating ping/pong is working
         // This is a simple test that just verifies the connection doesn't close prematurely
-        waitForConnection(2000)  // Wait longer than normal to ensure ping/pong has a chance to occur
+        waitForConnection(2000) // Wait longer than normal to ensure ping/pong has a chance to occur
 
         stepVerifier.verify(Duration.ofSeconds(3))
         wsClient.closeConnection("/api/ws/$channel")

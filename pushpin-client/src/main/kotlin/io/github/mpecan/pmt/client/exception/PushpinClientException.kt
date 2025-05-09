@@ -5,7 +5,7 @@ package io.github.mpecan.pmt.client.exception
  */
 open class PushpinClientException(
     message: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : RuntimeException(message, cause)
 
 /**
@@ -13,7 +13,7 @@ open class PushpinClientException(
  */
 class MessageSerializationException(
     message: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : PushpinClientException(message, cause)
 
 /**
@@ -21,7 +21,7 @@ class MessageSerializationException(
  */
 class MessageFormattingException(
     message: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : PushpinClientException(message, cause)
 
 /**
@@ -31,7 +31,7 @@ class PublishingException(
     message: String,
     serverInfo: String? = null,
     statusCode: Int? = null,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : PushpinClientException(
     message = when {
         serverInfo != null && statusCode != null -> "$message (Server: $serverInfo, Status: $statusCode)"
@@ -39,7 +39,7 @@ class PublishingException(
         statusCode != null -> "$message (Status: $statusCode)"
         else -> message
     },
-    cause = cause
+    cause = cause,
 )
 
 /**
@@ -47,7 +47,7 @@ class PublishingException(
  */
 class NoServerAvailableException(
     message: String = "No Pushpin servers available",
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : PushpinClientException(message, cause)
 
 /**
@@ -57,7 +57,7 @@ class PushpinTimeoutException(
     message: String = "Connection to Pushpin server timed out",
     serverInfo: String? = null,
     timeoutMs: Long? = null,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : PushpinClientException(
     message = when {
         serverInfo != null && timeoutMs != null -> "$message (Server: $serverInfo, Timeout: ${timeoutMs}ms)"
@@ -65,7 +65,7 @@ class PushpinTimeoutException(
         timeoutMs != null -> "$message (Timeout: ${timeoutMs}ms)"
         else -> message
     },
-    cause = cause
+    cause = cause,
 )
 
 /**
@@ -74,8 +74,8 @@ class PushpinTimeoutException(
 class PushpinAuthenticationException(
     message: String = "Authentication with Pushpin server failed",
     serverInfo: String? = null,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : PushpinClientException(
     message = if (serverInfo != null) "$message (Server: $serverInfo)" else message,
-    cause = cause
+    cause = cause,
 )

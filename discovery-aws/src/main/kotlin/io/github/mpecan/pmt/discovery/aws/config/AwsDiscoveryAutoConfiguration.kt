@@ -18,8 +18,7 @@ import software.amazon.awssdk.services.ec2.Ec2Client
 
 /**
  * Autoconfiguration for AWS-based Pushpin discovery.
- * 
- * This autoconfiguration is conditionally enabled:
+ * * This autoconfiguration is conditionally enabled:
  * - When the EC2Client class is available on the classpath
  * - When the pushpin.discovery.aws.enabled property is true (defaults to false)
  */
@@ -30,7 +29,7 @@ import software.amazon.awssdk.services.ec2.Ec2Client
     prefix = "pushpin.discovery.aws",
     name = ["enabled"],
     havingValue = "true",
-    matchIfMissing = false
+    matchIfMissing = false,
 )
 class AwsDiscoveryAutoConfiguration {
 
@@ -42,7 +41,7 @@ class AwsDiscoveryAutoConfiguration {
     fun ec2InstancesProvider(): Ec2InstancesProvider {
         return DefaultEc2InstancesProvider()
     }
-    
+
     /**
      * Creates a DefaultInstanceHealthChecker bean if none exists.
      */
@@ -51,7 +50,7 @@ class AwsDiscoveryAutoConfiguration {
     fun instanceHealthChecker(): InstanceHealthChecker {
         return DefaultInstanceHealthChecker()
     }
-    
+
     /**
      * Creates a DefaultInstanceConverter bean if none exists.
      */
@@ -60,7 +59,7 @@ class AwsDiscoveryAutoConfiguration {
     fun instanceConverter(): InstanceConverter {
         return DefaultInstanceConverter()
     }
-    
+
     /**
      * Creates an AwsDiscovery bean.
      */
@@ -70,13 +69,13 @@ class AwsDiscoveryAutoConfiguration {
         properties: AwsDiscoveryProperties,
         instancesProvider: Ec2InstancesProvider,
         instanceHealthChecker: InstanceHealthChecker,
-        instanceConverter: InstanceConverter
+        instanceConverter: InstanceConverter,
     ): AwsDiscovery {
         return AwsDiscovery(
             properties = properties,
             instancesProvider = instancesProvider,
             instanceHealthChecker = instanceHealthChecker,
-            instanceConverter = instanceConverter
+            instanceConverter = instanceConverter,
         )
     }
 }

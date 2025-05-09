@@ -56,11 +56,13 @@ tasks.jacocoTestReport {
 
     // Exclude KubernetesDiscoveryAutoConfiguration from coverage since it's just configuration
     classDirectories.setFrom(
-        files(classDirectories.files.map {
-            fileTree(it) {
-                exclude("**/config/**")
-            }
-        })
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/config/**")
+                }
+            },
+        ),
     )
 
     dependsOn(tasks.test)

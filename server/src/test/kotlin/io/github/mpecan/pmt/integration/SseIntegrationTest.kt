@@ -61,11 +61,11 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val stepVerifier = StepVerifier.create(sseFlux)
             .expectNext(
                 ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
+                    "Successfully subscribed to channel: $channel",
+                ).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(messageText).build()
+                ServerSentEvent.builder(messageText).build(),
             )
             .thenCancel()
             .verifyLater()
@@ -99,17 +99,17 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val stepVerifier = StepVerifier.create(sseFlux)
             .expectNext(
                 ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
+                    "Successfully subscribed to channel: $channel",
+                ).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(message1.replace("", "")).build()
+                ServerSentEvent.builder(message1.replace("", "")).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(message2.replace("", "")).build()
+                ServerSentEvent.builder(message2.replace("", "")).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(message3.replace("", "")).build()
+                ServerSentEvent.builder(message3.replace("", "")).build(),
             )
             .thenCancel()
             .verifyLater()
@@ -144,13 +144,13 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val stepVerifier = StepVerifier.create(sseFlux)
             .expectNext(
                 ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
+                    "Successfully subscribed to channel: $channel",
+                ).build(),
             )
             .expectNext(
                 ServerSentEvent.builder(messageText)
                     .event(eventType)
-                    .build()
+                    .build(),
             )
             .thenCancel()
             .verifyLater()

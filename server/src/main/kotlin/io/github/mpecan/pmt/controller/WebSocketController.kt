@@ -33,11 +33,11 @@ class WebSocketController {
         @RequestHeader(
             "Content-Type",
             required = false,
-            defaultValue = "application/websocket-events"
+            defaultValue = "application/websocket-events",
         ) contentType: String,
         @RequestHeader("Sec-WebSocket-Key", required = true) secWebSocketAccept: String,
         @RequestHeader headers: Map<String, String>,
-        @RequestBody body: String
+        @RequestBody body: String,
     ): ResponseEntity<String> {
         // Process the incoming WebSocket events
         val events = parseWebSocketEvents(body)

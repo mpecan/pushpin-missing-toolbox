@@ -17,7 +17,7 @@ class DefaultPushpinHealthChecker(
     private val webClient: WebClient,
     private val healthCheckEnabled: Boolean,
     private val defaultTimeout: Long,
-    private val pushpinService: PushpinService
+    private val pushpinService: PushpinService,
 ) : PushpinHealthChecker {
     private val logger = LoggerFactory.getLogger(DefaultPushpinHealthChecker::class.java)
     private val healthyServers = ConcurrentHashMap<String, PushpinServer>()
@@ -33,7 +33,7 @@ class DefaultPushpinHealthChecker(
             .doOnSuccess { response ->
                 logger.debug("Health check response from server ${server.id}: $response")
             }
-            .doOnError{
+            .doOnError {
                 logger.error("Error checking health of server ${server.id}: ${it.message}")
             }
             .map { true }

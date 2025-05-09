@@ -39,7 +39,7 @@ data class PushpinProperties(
     val zmqSendTimeout: Int = 1000,
     val zmqConnectionPoolEnabled: Boolean = true,
     val zmqConnectionPoolRefreshInterval: Long = 60000,
-    val testMode: Boolean = false
+    val testMode: Boolean = false,
 ) {
     /**
      * Configuration properties for a Pushpin server.
@@ -52,7 +52,7 @@ data class PushpinProperties(
         val publishPort: Int = 5560,
         val active: Boolean = true,
         val weight: Int = 100,
-        val healthCheckPath: String = "/api/health/check"
+        val healthCheckPath: String = "/api/health/check",
     ) {
         /**
          * Converts to a PushpinServer model.
@@ -65,8 +65,7 @@ data class PushpinProperties(
             publishPort = publishPort,
             active = active,
             weight = weight,
-            healthCheckPath = healthCheckPath
+            healthCheckPath = healthCheckPath,
         )
     }
-
 }

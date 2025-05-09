@@ -55,14 +55,17 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
         // First, set up a poll
         val pollMono = longPollingClient.consumeMessages("/api/long-polling/$channel")
 
-
         val stepVerifier = StepVerifier.create(pollMono)
             .expectNextMatches { response ->
-                (response.containsKey("channel") && response["channel"] == channel &&
-                        response["message"].toString().contains("Hello from Long-Polling test!")) ||
-                        (response.containsKey("message") &&
-                                response["message"].toString()
-                                    .contains("Hello from Long-Polling test!"))
+                (
+                    response.containsKey("channel") && response["channel"] == channel &&
+                        response["message"].toString().contains("Hello from Long-Polling test!")
+                    ) ||
+                    (
+                        response.containsKey("message") &&
+                            response["message"].toString()
+                                .contains("Hello from Long-Polling test!")
+                        )
             }
             .thenCancel()
             .verifyLater()
@@ -92,15 +95,19 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
         // Set up a poll
         val pollMono1 = longPollingClient.consumeMessages("/api/long-polling/$channel")
 
-        val stepVerifier1 =   // Verify the first message
+        val stepVerifier1 = // Verify the first message
             StepVerifier.create(pollMono1)
                 .expectNextMatches { response ->
-                    (response.containsKey("channel") && response["channel"] == channel &&
+                    (
+                        response.containsKey("channel") && response["channel"] == channel &&
                             response["message"].toString()
-                                .contains("First Long-Polling message")) ||
-                            (response.containsKey("message") &&
-                                    response["message"].toString()
-                                        .contains("First Long-Polling message"))
+                                .contains("First Long-Polling message")
+                        ) ||
+                        (
+                            response.containsKey("message") &&
+                                response["message"].toString()
+                                    .contains("First Long-Polling message")
+                            )
                 }
                 .thenCancel()
                 .verifyLater()
@@ -113,20 +120,23 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
         // Then: Verify that the message was received via Long-Polling
         stepVerifier1.verify(Duration.ofSeconds(30))
 
-
         // For the second message
         // Set up another poll
         val pollMono2 = longPollingClient.consumeMessages("/api/long-polling/$channel")
 
-        val stepVerifier2 =   // Verify the second message
+        val stepVerifier2 = // Verify the second message
             StepVerifier.create(pollMono2)
                 .expectNextMatches { response ->
-                    (response.containsKey("channel") && response["channel"] == channel &&
+                    (
+                        response.containsKey("channel") && response["channel"] == channel &&
                             response["message"].toString()
-                                .contains("Second Long-Polling message")) ||
-                            (response.containsKey("message") &&
-                                    response["message"].toString()
-                                        .contains("Second Long-Polling message"))
+                                .contains("Second Long-Polling message")
+                        ) ||
+                        (
+                            response.containsKey("message") &&
+                                response["message"].toString()
+                                    .contains("Second Long-Polling message")
+                            )
                 }
                 .thenCancel()
                 .verifyLater()
@@ -141,15 +151,19 @@ class LongPollingIntegrationTest : PushpinIntegrationTest() {
         // Set up another poll
         val pollMono3 = longPollingClient.consumeMessages("/api/long-polling/$channel")
 
-        val stepVerifier3 =   // Verify the third message
+        val stepVerifier3 = // Verify the third message
             StepVerifier.create(pollMono3)
                 .expectNextMatches { response ->
-                    (response.containsKey("channel") && response["channel"] == channel &&
+                    (
+                        response.containsKey("channel") && response["channel"] == channel &&
                             response["message"].toString()
-                                .contains("Third Long-Polling message")) ||
-                            (response.containsKey("message") &&
-                                    response["message"].toString()
-                                        .contains("Third Long-Polling message"))
+                                .contains("Third Long-Polling message")
+                        ) ||
+                        (
+                            response.containsKey("message") &&
+                                response["message"].toString()
+                                    .contains("Third Long-Polling message")
+                            )
                 }
                 .thenCancel()
                 .verifyLater()

@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 class ZmqPublisher(
     private val pushpinProperties: PushpinProperties,
     private val messageSerializer: MessageSerializer,
-    private val messageSerializationService: MessageSerializationService
+    private val messageSerializationService: MessageSerializationService,
 ) {
     private val logger = LoggerFactory.getLogger(ZmqPublisher::class.java)
     private val context = ZContext()
@@ -45,7 +45,9 @@ class ZmqPublisher(
      * Initializes the ZMQ publisher.
      */
     init {
-        logger.info("Initializing ZMQ publisher with PUSH socket type and connection pool: ${pushpinProperties.zmqConnectionPoolEnabled}")
+        logger.info(
+            "Initializing ZMQ publisher with PUSH socket type and connection pool: ${pushpinProperties.zmqConnectionPoolEnabled}",
+        )
     }
 
     /**
@@ -123,7 +125,7 @@ class ZmqPublisher(
             val serversToRemove = knownServerIds.filter { serverId ->
                 // We can't directly check server activity here without a discovery manager,
                 // but this prepares for future enhancements
-                false  // In a future version, check against active servers
+                false // In a future version, check against active servers
             }
 
             serversToRemove.forEach { serverId ->
@@ -150,17 +152,16 @@ class ZmqPublisher(
      * @param message The PushpinMessage to publish
      * @return List of Futures with publishing results
      */
-    fun publishMessage(
-        servers: List<PushpinServer>,
-        message: PushpinMessage
-    ): List<Future<Boolean>> {
+    fun publishMessage(servers: List<PushpinServer>, message: PushpinMessage): List<Future<Boolean>> {
         logger.debug("Publishing message to channel: ${message.channel} on ${servers.size} servers")
 
         // Format the message for ZMQ
         val dataString = "J${messageSerializationService.serialize(message)}"
         val data = dataString.toByteArray()
 
-        logger.debug("Sending message to channel: ${message.channel} on ${servers.size} servers with data length: ${data.size} bytes")
+        logger.debug(
+            "Sending message to channel: ${message.channel} on ${servers.size} servers with data length: ${data.size} bytes",
+        )
         return publishRaw(servers, message.channel, data)
     }
 
@@ -172,10 +173,7 @@ class ZmqPublisher(
      * @param message The PushpinMessage to publish
      * @return Mono<Boolean> that completes with true if all messages were sent successfully, false otherwise
      */
-    fun publishMessageReactive(
-        servers: List<PushpinServer>,
-        message: PushpinMessage
-    ): Mono<Boolean> {
+    fun publishMessageReactive(servers: List<PushpinServer>, message: PushpinMessage): Mono<Boolean> {
         if (servers.isEmpty()) {
             logger.warn("No servers to publish to")
             return Mono.just(false)
@@ -198,11 +196,7 @@ class ZmqPublisher(
      * @param data The formatted data to send
      * @return List of Futures with publishing results
      */
-    fun publishRaw(
-        servers: List<PushpinServer>,
-        channel: String,
-        data: ByteArray
-    ): List<Future<Boolean>> {
+    fun publishRaw(servers: List<PushpinServer>, channel: String, data: ByteArray): List<Future<Boolean>> {
         return servers.map { server ->
             executor.submit<Boolean> {
                 try {
@@ -233,7 +227,7 @@ class ZmqPublisher(
                 } catch (e: Exception) {
                     logger.error(
                         "Failed to publish message to server ${server.id}: ${e.message}",
-                        e
+                        e,
                     )
                     false
                 }
@@ -250,11 +244,7 @@ class ZmqPublisher(
      * @param data The formatted data to send
      * @return Mono<Boolean> that completes with true if all messages were sent successfully, false otherwise
      */
-    fun publishRawReactive(
-        servers: List<PushpinServer>,
-        channel: String,
-        data: ByteArray
-    ): Mono<Boolean> {
+    fun publishRawReactive(servers: List<PushpinServer>, channel: String, data: ByteArray): Mono<Boolean> {
         // Create a mono that handles the publishing on a bounded elastic scheduler
         return Mono.fromCallable {
             val results = servers.map { server ->
@@ -282,7 +272,7 @@ class ZmqPublisher(
                 } catch (e: Exception) {
                     logger.error(
                         "Failed to publish message to server ${server.id}: ${e.message}",
-                        e
+                        e,
                     )
                     false
                 }

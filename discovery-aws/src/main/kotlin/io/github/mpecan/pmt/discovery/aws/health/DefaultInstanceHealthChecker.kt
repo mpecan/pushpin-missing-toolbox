@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.ec2.model.SummaryStatus
  * Default implementation of InstanceHealthChecker that checks if an EC2 instance is running and healthy.
  */
 open class DefaultInstanceHealthChecker(
-    private val ec2ClientProvider: Ec2ClientProvider = Ec2ClientProvider()
+    private val ec2ClientProvider: Ec2ClientProvider = Ec2ClientProvider(),
 ) : InstanceHealthChecker {
     private val logger = LoggerFactory.getLogger(DefaultInstanceHealthChecker::class.java)
 
@@ -33,7 +33,7 @@ open class DefaultInstanceHealthChecker(
                     DescribeInstanceStatusRequest.builder()
                         .instanceIds(instance.instanceId())
                         .includeAllInstances(true)
-                        .build()
+                        .build(),
                 )
 
                 val instanceStatus = statusResponse.instanceStatuses().firstOrNull()

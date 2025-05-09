@@ -14,8 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A discovery mechanism that discovers Pushpin servers from Kubernetes pods.
- * 
- * This implementation uses the Kubernetes API to discover pods with specific labels
+ * * This implementation uses the Kubernetes API to discover pods with specific labels
  * and converts them to PushpinServer instances. It supports filtering by labels
  * and can be configured to use either pod IPs or node ports.
  */
@@ -23,17 +22,17 @@ open class KubernetesDiscovery(
     private val properties: KubernetesDiscoveryProperties,
     private val podProvider: KubernetesPodProvider,
     private val podHealthChecker: PodHealthChecker,
-    private val podConverter: PodConverter
+    private val podConverter: PodConverter,
 ) : PushpinDiscovery {
 
     private val logger = LoggerFactory.getLogger(KubernetesDiscovery::class.java)
 
     override val id: String = "kubernetes"
-    
+
     // Cache of Kubernetes pods and last refresh time
     private val podCache = ConcurrentHashMap<String, V1Pod>()
     private var lastCacheRefresh: Instant = Instant.EPOCH
-    
+
     /**
      * Discovers Pushpin servers from Kubernetes pods based on labels.
      */
@@ -42,16 +41,16 @@ open class KubernetesDiscovery(
             logger.debug("Kubernetes discovery is disabled")
             return Flux.empty()
         }
-        
+
         logger.debug("Discovering Pushpin servers from Kubernetes pods")
-        
+
         return Flux.defer {
             refreshPodCacheIfNeeded()
-            
+
             Flux.fromIterable(podCache.values)
                 .filter { pod -> podHealthChecker.isHealthy(pod, properties) }
                 .map { pod -> podConverter.toPushpinServer(pod, properties) }
-                .doOnNext { server -> 
+                .doOnNext { server ->
                     logger.debug("Discovered Pushpin server from Kubernetes: ${server.id} at ${server.getBaseUrl()}")
                 }
                 .doOnError { error ->
@@ -66,12 +65,12 @@ open class KubernetesDiscovery(
     private fun refreshPodCacheIfNeeded() {
         val now = Instant.now()
         val cacheExpiration = lastCacheRefresh.plus(Duration.ofSeconds(properties.refreshCacheSeconds.toLong()))
-        
+
         if (now.isAfter(cacheExpiration)) {
             logger.debug("Refreshing Kubernetes pod cache")
             try {
                 podCache.clear()
-                
+
                 // Discover pods
                 val pods = podProvider.getPods(properties)
                 pods.forEach { pod ->
@@ -80,7 +79,7 @@ open class KubernetesDiscovery(
                         podCache[podName] = pod
                     }
                 }
-                
+
                 lastCacheRefresh = now
                 logger.debug("Kubernetes pod cache refreshed - found ${podCache.size} pods")
             } catch (e: Exception) {

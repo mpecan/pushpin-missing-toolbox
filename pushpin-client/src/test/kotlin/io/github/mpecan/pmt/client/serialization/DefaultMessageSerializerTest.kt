@@ -30,7 +30,7 @@ class DefaultMessageSerializerTest {
             httpSseStreamFormatter,
             httpStreamMessageFormatter,
             httpResponseFormatter,
-            longPollingFormatter
+            longPollingFormatter,
         )
     }
 
@@ -42,7 +42,7 @@ class DefaultMessageSerializerTest {
             data = "Hello, World!",
             id = "test-id",
             prevId = "test-prev-id",
-            transports = listOf(Transport.WebSocket, Transport.HttpStreamSSE, Transport.HttpResponseSSE)
+            transports = listOf(Transport.WebSocket, Transport.HttpStreamSSE, Transport.HttpResponseSSE),
         )
         val webSocketFormat = WebSocketFormat(content = "ws-content", action = "send", type = "text")
         val httpStreamFormat = HttpStreamFormat(content = "http-stream-content", action = "send")
@@ -65,8 +65,8 @@ class DefaultMessageSerializerTest {
             formats = mapOf(
                 "ws-message" to webSocketFormat,
                 "http-stream" to httpStreamFormat,
-                "http-response" to httpResponseFormat
-            )
+                "http-response" to httpResponseFormat,
+            ),
         )
 
         // Compare the individual components
@@ -84,7 +84,7 @@ class DefaultMessageSerializerTest {
         val message = Message(
             channel = "test-channel",
             data = "Hello, World!",
-            transports = listOf(Transport.HttpStream)
+            transports = listOf(Transport.HttpStream),
         )
         val webSocketFormat = WebSocketFormat(content = "ws-content", action = "send", type = "text")
         val httpStreamFormat = HttpStreamFormat(content = "http-stream-content", action = "send")
@@ -100,8 +100,8 @@ class DefaultMessageSerializerTest {
             channel = "test-channel",
             formats = mapOf(
                 "ws-message" to webSocketFormat,
-                "http-stream" to httpStreamFormat
-            )
+                "http-stream" to httpStreamFormat,
+            ),
         )
         assertEquals(expected, result)
     }
@@ -112,7 +112,7 @@ class DefaultMessageSerializerTest {
         val message = Message(
             channel = "test-channel",
             data = "Hello, World!",
-            transports = listOf(Transport.LongPolling)
+            transports = listOf(Transport.LongPolling),
         )
         val webSocketFormat = WebSocketFormat(content = "ws-content", action = "send", type = "text")
         val longPollingFormat = HttpResponseFormat(body = "long-polling-body")
@@ -128,8 +128,8 @@ class DefaultMessageSerializerTest {
             channel = "test-channel",
             formats = mapOf(
                 "ws-message" to webSocketFormat,
-                "http-response" to longPollingFormat
-            )
+                "http-response" to longPollingFormat,
+            ),
         )
         assertEquals(expected, result)
     }

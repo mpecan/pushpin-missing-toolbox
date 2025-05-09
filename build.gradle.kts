@@ -198,7 +198,6 @@ tasks.register("testWithCoverage") {
     finalizedBy(jacocoAggregatedReport)
 }
 
-
 tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
     checkForGradleUpdate = true
     outputFormatter = "json"

@@ -11,9 +11,9 @@ import io.github.mpecan.pmt.model.WebSocketFormat
  */
 class DefaultWebSocketMessageFormatter(
     serializationService: MessageSerializationService,
-    options: FormatterOptions = FormatterOptions()
+    options: FormatterOptions = FormatterOptions(),
 ) : AbstractMessageFormatter<WebSocketFormat>(serializationService, options), WebSocketMessageFormatter {
-    
+
     /**
      * Additional WebSocket-specific options.
      */
@@ -21,12 +21,12 @@ class DefaultWebSocketMessageFormatter(
         const val OPTION_WS_TYPE = "ws.type"
         const val OPTION_WS_ACTION = "ws.action"
         const val OPTION_WS_CLOSE_CODE = "ws.close.code"
-        
+
         // Default values
         const val DEFAULT_WS_TYPE = WebSocketFormat.TYPE_TEXT
         const val DEFAULT_WS_ACTION = WebSocketFormat.ACTION_SEND
     }
-    
+
     /**
      * Formats a message for WebSocket transport.
      *
@@ -38,7 +38,7 @@ class DefaultWebSocketMessageFormatter(
     override fun format(message: Message): WebSocketFormat {
         return formatWithHooks(message)
     }
-    
+
     /**
      * Performs the actual formatting of the message.
      *
@@ -50,14 +50,14 @@ class DefaultWebSocketMessageFormatter(
         val type = options.additionalOptions[OPTION_WS_TYPE] as? String ?: DEFAULT_WS_TYPE
         val action = options.additionalOptions[OPTION_WS_ACTION] as? String ?: DEFAULT_WS_ACTION
         val closeCode = options.additionalOptions[OPTION_WS_CLOSE_CODE] as? Int
-        
+
         // Check for type and action in message metadata (overrides options)
         val metaType = message.meta?.get("ws.type") as? String
         val metaAction = message.meta?.get("ws.action") as? String
         val metaCloseCode = message.meta?.get("ws.close.code") as? Int
-        
+
         val finalAction = metaAction ?: action
-        
+
         return when (finalAction) {
             WebSocketFormat.ACTION_CLOSE -> {
                 WebSocketFormat.close(metaCloseCode ?: closeCode)
@@ -75,43 +75,43 @@ class DefaultWebSocketMessageFormatter(
             }
         }
     }
-    
+
     /**
      * Creates a new formatter with custom WebSocket type.
      */
     fun withType(type: String): DefaultWebSocketMessageFormatter {
         return DefaultWebSocketMessageFormatter(
             serializationService,
-            options.withOption(OPTION_WS_TYPE, type)
+            options.withOption(OPTION_WS_TYPE, type),
         )
     }
-    
+
     /**
      * Creates a new formatter with custom WebSocket action.
      */
     fun withAction(action: String): DefaultWebSocketMessageFormatter {
         return DefaultWebSocketMessageFormatter(
             serializationService,
-            options.withOption(OPTION_WS_ACTION, action)
+            options.withOption(OPTION_WS_ACTION, action),
         )
     }
-    
+
     /**
      * Creates a new formatter for closing WebSocket connections.
      */
     fun withCloseAction(closeCode: Int? = null): DefaultWebSocketMessageFormatter {
         val opts = options
             .withOption(OPTION_WS_ACTION, WebSocketFormat.ACTION_CLOSE)
-        
+
         return if (closeCode != null) {
             DefaultWebSocketMessageFormatter(
                 serializationService,
-                opts.withOption(OPTION_WS_CLOSE_CODE, closeCode)
+                opts.withOption(OPTION_WS_CLOSE_CODE, closeCode),
             )
         } else {
             DefaultWebSocketMessageFormatter(
                 serializationService,
-                opts
+                opts,
             )
         }
     }

@@ -18,7 +18,7 @@ data class DiscoveryProperties(
     val refreshInterval: Duration = Duration.ofMinutes(1),
     val configuration: ConfigurationDiscoveryProperties = ConfigurationDiscoveryProperties(),
     val aws: AwsDiscoveryProperties = AwsDiscoveryProperties(),
-    val kubernetes: KubernetesDiscoveryProperties = KubernetesDiscoveryProperties()
+    val kubernetes: KubernetesDiscoveryProperties = KubernetesDiscoveryProperties(),
 )
 
 /**
@@ -27,13 +27,12 @@ data class DiscoveryProperties(
  * @property enabled Whether configuration-based discovery is enabled
  */
 data class ConfigurationDiscoveryProperties(
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
 )
 
 /**
  * Configuration properties for AWS-based discovery.
- * 
- * @deprecated Use the new AwsDiscoveryProperties from the discovery-aws module instead.
+ * * @deprecated Use the new AwsDiscoveryProperties from the discovery-aws module instead.
  *
  * @property enabled Whether AWS-based discovery is enabled
  * @property region The AWS region to use
@@ -41,7 +40,7 @@ data class ConfigurationDiscoveryProperties(
 @Deprecated("Use the new AwsDiscoveryProperties from the discovery-aws module instead")
 data class AwsDiscoveryProperties(
     val enabled: Boolean = false,
-    val region: String = "us-east-1"
+    val region: String = "us-east-1",
 )
 
 /**
@@ -54,5 +53,5 @@ data class AwsDiscoveryProperties(
 data class KubernetesDiscoveryProperties(
     val enabled: Boolean = false,
     val namespace: String = "default",
-    val labelSelector: String = "app=pushpin"
+    val labelSelector: String = "app=pushpin",
 )

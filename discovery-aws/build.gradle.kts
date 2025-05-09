@@ -56,11 +56,13 @@ tasks.jacocoTestReport {
 
     // Exclude auto-configuration classes from coverage
     classDirectories.setFrom(
-        files(classDirectories.files.map {
-            fileTree(it) {
-                exclude("**/config/**")
-            }
-        })
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/config/**")
+                }
+            },
+        ),
     )
 
     dependsOn(tasks.test)

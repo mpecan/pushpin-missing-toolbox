@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class PushpinDiscoveryManager(
     private val properties: DiscoveryProperties,
-    private val discoveries: List<PushpinDiscovery>
+    private val discoveries: List<PushpinDiscovery>,
 ) : InitializingBean {
     private val logger = LoggerFactory.getLogger(PushpinDiscoveryManager::class.java)
     private val servers = ConcurrentHashMap<String, PushpinServer>()

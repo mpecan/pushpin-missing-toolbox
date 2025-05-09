@@ -5,8 +5,8 @@ import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.model.HttpStreamFormat
 
 class SimpleHttpStreamMessageFormatter(
-    private val serializationService: MessageSerializationService
-): HttpStreamMessageFormatter {
+    private val serializationService: MessageSerializationService,
+) : HttpStreamMessageFormatter {
     override fun format(message: Message): HttpStreamFormat {
         // Handle string data differently to avoid extra quotes
         val data = when (message.data) {
@@ -15,7 +15,7 @@ class SimpleHttpStreamMessageFormatter(
         }
 
         return HttpStreamFormat(
-            content = data + "\n"
+            content = data + "\n",
         )
     }
 }

@@ -10,13 +10,13 @@ import io.github.mpecan.pmt.model.HttpResponseFormat
  * This formatter creates a JSON response for long-polling requests.
  */
 class DefaultLongPollingMessageFormatter(
-    private val serializationService: MessageSerializationService
+    private val serializationService: MessageSerializationService,
 ) : LongPollingMessageFormatter {
     override fun format(message: Message): HttpResponseFormat {
         // For long-polling, we need to include the channel in the response
         val responseData = mapOf(
             "channel" to message.channel,
-            "message" to  "${message.data}",
+            "message" to "${message.data}",
         )
 
         return HttpResponseFormat(

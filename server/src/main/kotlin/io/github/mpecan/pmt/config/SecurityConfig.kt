@@ -33,11 +33,11 @@ class SecurityConfig(private val pushpinProperties: PushpinProperties) {
                     .requestMatchers("/api/pushpin/auth").permitAll()
                     .requestMatchers("/actuator/health").permitAll()
                     .requestMatchers("/actuator/info").permitAll()
-            }.let{ innerHttp ->
+            }.let { innerHttp ->
                 if (pushpinProperties.authEnabled) {
                     innerHttp.addFilterBefore(
                         PushpinAuthFilter(pushpinProperties.authSecret),
-                        UsernamePasswordAuthenticationFilter::class.java
+                        UsernamePasswordAuthenticationFilter::class.java,
                     ).authorizeHttpRequests {
                         it
                             .anyRequest().authenticated()
@@ -49,8 +49,6 @@ class SecurityConfig(private val pushpinProperties: PushpinProperties) {
                     }
                 }
             }
-
-
 
         return http.build()
     }
@@ -79,18 +77,20 @@ class PushpinAuthFilter(private val authSecret: String) : org.springframework.we
     override fun doFilterInternal(
         request: jakarta.servlet.http.HttpServletRequest,
         response: jakarta.servlet.http.HttpServletResponse,
-        filterChain: jakarta.servlet.FilterChain
+        filterChain: jakarta.servlet.FilterChain,
     ) {
         val authHeader = request.getHeader("X-Pushpin-Auth")
-        
+
         if (authHeader != null && authHeader == authSecret) {
             // Create authentication token
             val auth = org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                "pushpin", null, listOf(org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_PUSHPIN"))
+                "pushpin",
+                null,
+                listOf(org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_PUSHPIN")),
             )
             org.springframework.security.core.context.SecurityContextHolder.getContext().authentication = auth
         }
-        
+
         filterChain.doFilter(request, response)
     }
 }

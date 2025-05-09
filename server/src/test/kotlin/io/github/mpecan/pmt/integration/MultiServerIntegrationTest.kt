@@ -25,12 +25,11 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Integration tests for multi-server message delivery.
- * 
- * These tests verify that messages are correctly delivered to clients connected to different Pushpin servers
+ * * These tests verify that messages are correctly delivered to clients connected to different Pushpin servers
  * using HTTP transport for message publishing.
  */
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
 )
 @Testcontainers
 class MultiServerIntegrationTest {
@@ -56,7 +55,7 @@ class MultiServerIntegrationTest {
 
         // List of containers for convenience
         private val pushpinContainers by lazy { listOf(pushpinContainer1, pushpinContainer2) }
-        
+
         /**
          * Configure Spring Boot application properties to use multiple Pushpin containers
          */
@@ -67,33 +66,33 @@ class MultiServerIntegrationTest {
             TestcontainersUtils.configureMultiplePushpinProperties(
                 registry,
                 pushpinContainers,
-                zmqEnabled = false
+                zmqEnabled = false,
             )
-            
+
             // Set server port
             registry.add("server.port") { SERVER_PORT }
-            
+
             // Enable test mode for better diagnostics
             registry.add("pushpin.test-mode") { true }
         }
     }
-    
+
     @Autowired
     private lateinit var pushpinService: PushpinService
-    
+
     @Autowired
     private lateinit var discoveryManager: PushpinDiscoveryManager
-    
+
     private val webClient = WebClient.builder().build()
     private val clients = CopyOnWriteArrayList<WebSocketClient>()
-    
+
     @BeforeEach
     fun setUp() {
         // Ensure we can access the Pushpin servers
         val servers = discoveryManager.getAllServers()
         assert(servers.size == 2) { "Expected 2 Pushpin servers, got ${servers.size}" }
     }
-    
+
     @AfterEach
     fun tearDown() {
         // Close all WebSocket clients
@@ -106,7 +105,7 @@ class MultiServerIntegrationTest {
         }
         clients.clear()
     }
-    
+
     /**
      * Tests that messages are delivered to clients connected to different Pushpin servers
      * when publishing via HTTP to multiple servers.
@@ -124,8 +123,16 @@ class MultiServerIntegrationTest {
         // Create WebSocket clients - one for each Pushpin server
         val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
         val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        println("Created WebSocket client 1 connecting to ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        println("Created WebSocket client 2 connecting to ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+        println(
+            "Created WebSocket client 1 connecting to ws://localhost:${pushpinContainer1.getMappedPort(
+                PushpinContainer.HTTP_PORT,
+            )}",
+        )
+        println(
+            "Created WebSocket client 2 connecting to ws://localhost:${pushpinContainer2.getMappedPort(
+                PushpinContainer.HTTP_PORT,
+            )}",
+        )
 
         // Add clients to the cleanup list
         this.clients.add(client1)
@@ -141,7 +148,7 @@ class MultiServerIntegrationTest {
                 println("Client 1 received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -149,7 +156,7 @@ class MultiServerIntegrationTest {
                 println("Client 2 received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -204,13 +211,23 @@ class MultiServerIntegrationTest {
 
             // Verify that messages were received by both clients
             if (client1Messages.size > initialSize1) {
-                println("✅ Client 1 successfully received message: ${client1Messages.subList(initialSize1, client1Messages.size)}")
+                println(
+                    "✅ Client 1 successfully received message: ${client1Messages.subList(
+                        initialSize1,
+                        client1Messages.size,
+                    )}",
+                )
             } else {
                 fail("Client 1 did not receive any messages after publishing")
             }
 
             if (client2Messages.size > initialSize2) {
-                println("✅ Client 2 successfully received message: ${client2Messages.subList(initialSize2, client2Messages.size)}")
+                println(
+                    "✅ Client 2 successfully received message: ${client2Messages.subList(
+                        initialSize2,
+                        client2Messages.size,
+                    )}",
+                )
             } else {
                 fail("Client 2 did not receive any messages after publishing")
             }
@@ -222,7 +239,7 @@ class MultiServerIntegrationTest {
             subscription2.dispose()
         }
     }
-    
+
     /**
      * Tests publishing multiple messages to multiple clients connected to different servers.
      */
@@ -233,9 +250,9 @@ class MultiServerIntegrationTest {
         val messages = listOf(
             "First message from multi-server test",
             "Second message from multi-server test",
-            "Third message from multi-server test"
+            "Third message from multi-server test",
         )
-        
+
         // Create message collectors for verification
         val client1Messages = Collections.synchronizedList(mutableListOf<String>())
         val client2Messages = Collections.synchronizedList(mutableListOf<String>())
@@ -259,7 +276,7 @@ class MultiServerIntegrationTest {
                 println("Client 1 (multi-message test) received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -267,7 +284,7 @@ class MultiServerIntegrationTest {
                 println("Client 2 (multi-message test) received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -285,19 +302,19 @@ class MultiServerIntegrationTest {
 
             // Publish multiple messages via the PushpinService
             println("Publishing ${messages.size} messages to channel: $channel")
-            
+
             messages.forEachIndexed { index, messageText ->
                 val message = Message.simple(channel, mapOf("text" to messageText))
                 val result = pushpinService.publishMessage(message).block(Duration.ofSeconds(10))
                 assert(result == true) { "Failed to publish message $index: $messageText" }
-                
+
                 // Small delay between messages to ensure ordering
                 Thread.sleep(500)
             }
 
             // Wait for message delivery
             println("Waiting for all messages to be delivered...")
-            
+
             // Wait up to 20 seconds for message delivery
             for (i in 1..40) {
                 Thread.sleep(500)
@@ -305,13 +322,14 @@ class MultiServerIntegrationTest {
                 // Print progress every few seconds
                 if (i % 4 == 0) {
                     println("Waiting for message delivery... Attempt $i")
-                    println("Client 1 messages: ${client1Messages.size - initialSize1}/${messages.size}, " +
-                            "Client 2 messages: ${client2Messages.size - initialSize2}/${messages.size}")
+                    println(
+                        "Client 1 messages: ${client1Messages.size - initialSize1}/${messages.size}, " +
+                            "Client 2 messages: ${client2Messages.size - initialSize2}/${messages.size}",
+                    )
                 }
 
                 // Break early if both clients received all messages
-                if (client1Messages.size >= initialSize1 + messages.size && 
-                    client2Messages.size >= initialSize2 + messages.size) {
+                if (client1Messages.size >= initialSize1 + messages.size && client2Messages.size >= initialSize2 + messages.size) {
                     println("Both clients received all messages!")
                     break
                 }
@@ -322,12 +340,8 @@ class MultiServerIntegrationTest {
             println("Client 2 received ${client2Messages.size - initialSize2}/${messages.size} messages")
 
             // Verify that all messages were received by both clients
-            assert(client1Messages.size >= initialSize1 + messages.size) { 
-                "Client 1 did not receive all messages. Expected ${messages.size}, got ${client1Messages.size - initialSize1}" 
-            }
-            assert(client2Messages.size >= initialSize2 + messages.size) { 
-                "Client 2 did not receive all messages. Expected ${messages.size}, got ${client2Messages.size - initialSize2}" 
-            }
+            assert(client1Messages.size >= initialSize1 + messages.size) { "Client 1 did not receive all messages. Expected ${messages.size}, got ${client1Messages.size - initialSize1}" }
+            assert(client2Messages.size >= initialSize2 + messages.size) { "Client 2 did not receive all messages. Expected ${messages.size}, got ${client2Messages.size - initialSize2}" }
 
             println("Multiple message delivery test completed successfully!")
         } finally {
@@ -336,7 +350,7 @@ class MultiServerIntegrationTest {
             subscription2.dispose()
         }
     }
-    
+
     /**
      * Tests publishing messages with different formats to multiple servers.
      */
@@ -369,7 +383,7 @@ class MultiServerIntegrationTest {
                 println("Client 1 (format test) received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -377,7 +391,7 @@ class MultiServerIntegrationTest {
                 println("Client 2 (format test) received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -400,7 +414,7 @@ class MultiServerIntegrationTest {
 
             // Wait for message delivery
             println("Waiting for message delivery...")
-            
+
             // Wait up to 15 seconds for message delivery
             for (i in 1..30) {
                 Thread.sleep(500)
@@ -410,7 +424,7 @@ class MultiServerIntegrationTest {
                     println("Both clients received messages!")
                     break
                 }
-                
+
                 // Print progress every few seconds
                 if (i % 4 == 0) {
                     println("Still waiting for message delivery... Attempt $i")
@@ -425,14 +439,10 @@ class MultiServerIntegrationTest {
             // Verify message reception
             assert(client1Messages.size > initialSize1) { "Client 1 did not receive the JSON message" }
             assert(client2Messages.size > initialSize2) { "Client 2 did not receive the JSON message" }
-            
+
             // Verify message content contains JSON message text
-            assert(client1Messages.any { it.contains("Hello from JSON") }) { 
-                "Client 1 did not receive proper message content" 
-            }
-            assert(client2Messages.any { it.contains("Hello from JSON") }) { 
-                "Client 2 did not receive proper message content" 
-            }
+            assert(client1Messages.any { it.contains("Hello from JSON") }) { "Client 1 did not receive proper message content" }
+            assert(client2Messages.any { it.contains("Hello from JSON") }) { "Client 2 did not receive proper message content" }
 
             println("Format test delivery completed successfully!")
         } finally {
@@ -477,7 +487,7 @@ class MultiServerIntegrationTest {
                 println("Client 1 (channel $channel1) received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -485,7 +495,7 @@ class MultiServerIntegrationTest {
                 println("Client 2 (channel $channel2) received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -512,7 +522,7 @@ class MultiServerIntegrationTest {
 
             // Wait for message delivery
             println("Waiting for message delivery...")
-            
+
             // Wait up to 15 seconds for message delivery
             for (i in 1..30) {
                 Thread.sleep(500)
@@ -522,12 +532,14 @@ class MultiServerIntegrationTest {
                     println("Both clients received messages on their respective channels!")
                     break
                 }
-                
+
                 // Print progress every few seconds
                 if (i % 4 == 0) {
                     println("Still waiting for message delivery... Attempt $i")
-                    println("Client 1 (channel $channel1): ${client1Messages.size}, " +
-                            "Client 2 (channel $channel2): ${client2Messages.size}")
+                    println(
+                        "Client 1 (channel $channel1): ${client1Messages.size}, " +
+                            "Client 2 (channel $channel2): ${client2Messages.size}",
+                    )
                 }
             }
 
@@ -538,65 +550,65 @@ class MultiServerIntegrationTest {
             // Verify message reception
             assert(client1Messages.size > initialSize1) { "Client 1 did not receive the message on channel $channel1" }
             assert(client2Messages.size > initialSize2) { "Client 2 did not receive the message on channel $channel2" }
-            
+
             // Verify message content
             assert(client1Messages.any { it.contains(message1) }) { "Client 1 did not receive proper message content" }
             assert(client2Messages.any { it.contains(message2) }) { "Client 2 did not receive proper message content" }
 
             // Now test cross-channel isolation by creating clients for the opposite channels
             println("Testing channel isolation...")
-            
-            val crossClient1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-            val crossClient2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+
+            val crossClient1 = WebSocketClient(
+                "ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}",
+            )
+            val crossClient2 = WebSocketClient(
+                "ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}",
+            )
             this.clients.add(crossClient1)
             this.clients.add(crossClient2)
-            
+
             val crossMessages1 = Collections.synchronizedList(mutableListOf<String>())
             val crossMessages2 = Collections.synchronizedList(mutableListOf<String>())
-            
+
             // Connect to the opposite channels
             val crossFlux1 = crossClient1.consumeMessages("/api/ws/$channel2")
             val crossFlux2 = crossClient2.consumeMessages("/api/ws/$channel1")
-            
+
             // Setup subscriptions
             val crossSubscription1 = crossFlux1.subscribe(
                 { message ->
                     println("Cross client 1 (channel $channel2) received: $message")
                     crossMessages1.add(message)
                 },
-                { error -> println("Cross client 1 error: ${error.message}") }
+                { error -> println("Cross client 1 error: ${error.message}") },
             )
-            
+
             val crossSubscription2 = crossFlux2.subscribe(
                 { message ->
                     println("Cross client 2 (channel $channel1) received: $message")
                     crossMessages2.add(message)
                 },
-                { error -> println("Cross client 2 error: ${error.message}") }
+                { error -> println("Cross client 2 error: ${error.message}") },
             )
-            
+
             // Wait for subscription messages
             Thread.sleep(2000)
-            
+
             // Verify subscription messages were received
             assert(crossMessages1.size >= 1) { "Cross client 1 did not receive subscription confirmation" }
             assert(crossMessages2.size >= 1) { "Cross client 2 did not receive subscription confirmation" }
-            
+
             // Remember message counts
             val crossInitialSize1 = crossMessages1.size
             val crossInitialSize2 = crossMessages2.size
-            
+
             // Wait to verify that no cross-channel messages were received
             Thread.sleep(3000)
-            
+
             // Cross clients should not receive any messages after the subscription
-            assert(crossMessages1.size == crossInitialSize1) { 
-                "Cross client 1 received messages meant for channel 1 on channel 2" 
-            }
-            assert(crossMessages2.size == crossInitialSize2) { 
-                "Cross client 2 received messages meant for channel 2 on channel 1" 
-            }
-            
+            assert(crossMessages1.size == crossInitialSize1) { "Cross client 1 received messages meant for channel 1 on channel 2" }
+            assert(crossMessages2.size == crossInitialSize2) { "Cross client 2 received messages meant for channel 2 on channel 1" }
+
             // Clean up cross subscriptions
             crossSubscription1.dispose()
             crossSubscription2.dispose()
@@ -608,7 +620,7 @@ class MultiServerIntegrationTest {
             subscription2.dispose()
         }
     }
-    
+
     /**
      * Helper method to publish a message through the REST API.
      */
@@ -616,7 +628,7 @@ class MultiServerIntegrationTest {
         channel: String,
         message: Any,
         eventType: String? = null,
-        contentType: MediaType = MediaType.TEXT_PLAIN
+        contentType: MediaType = MediaType.TEXT_PLAIN,
     ): Boolean {
         val uri = if (eventType != null) {
             "http://localhost:$SERVER_PORT/api/pushpin/publish/$channel?event=$eventType"
@@ -634,7 +646,7 @@ class MultiServerIntegrationTest {
 
         return response?.statusCode?.is2xxSuccessful ?: false
     }
-    
+
     /**
      * Helper method to fail a test with a message.
      */

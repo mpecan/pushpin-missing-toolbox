@@ -13,4 +13,3 @@ interface InstanceConverter {
      */
     fun toPushpinServer(instance: Instance, properties: AwsDiscoveryProperties): PushpinServer
 }
-

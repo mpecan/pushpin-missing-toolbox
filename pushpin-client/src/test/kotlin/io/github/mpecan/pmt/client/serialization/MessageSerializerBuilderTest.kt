@@ -50,7 +50,7 @@ class MessageSerializerBuilderTest {
         val httpStreamFormatter = mock<HttpStreamMessageFormatter>()
         val httpResponseFormatter = mock<HttpResponseMessageFormatter>()
         val longPollingFormatter = mock<LongPollingMessageFormatter>()
-        
+
         val formatterFactory = mock<FormatterFactory>()
         whenever(formatterFactory.createWebSocketFormatter()).thenReturn(webSocketFormatter)
         whenever(formatterFactory.createSseStreamFormatter()).thenReturn(httpSseStreamFormatter)
@@ -66,7 +66,7 @@ class MessageSerializerBuilderTest {
         // Then
         assertNotNull(serializer)
         assertTrue(serializer is DefaultMessageSerializer)
-        
+
         // Verify that factory methods were called
         verify(formatterFactory).createWebSocketFormatter()
         verify(formatterFactory).createSseStreamFormatter()
@@ -83,7 +83,7 @@ class MessageSerializerBuilderTest {
         val httpStreamFormatter = mock<HttpStreamMessageFormatter>()
         val httpResponseFormatter = mock<HttpResponseMessageFormatter>()
         val longPollingFormatter = mock<LongPollingMessageFormatter>()
-        
+
         val formatterFactory = mock<FormatterFactory>()
         whenever(formatterFactory.createSseStreamFormatter()).thenReturn(httpSseStreamFormatter)
         whenever(formatterFactory.createHttpStreamFormatter()).thenReturn(httpStreamFormatter)
@@ -99,19 +99,19 @@ class MessageSerializerBuilderTest {
         // Then
         assertNotNull(serializer)
         assertTrue(serializer is DefaultMessageSerializer)
-        
+
         // Verify that factory methods were called for all but WebSocket formatter
         verify(formatterFactory).createSseStreamFormatter()
         verify(formatterFactory).createHttpStreamFormatter()
         verify(formatterFactory).createHttpResponseFormatter()
         verify(formatterFactory).createLongPollingFormatter()
-        
+
         // This part is difficult to test without refactoring DefaultMessageSerializer
         // for easier testing, as its methods are not easily mockable.
-        // For production code, we would refactor DefaultMessageSerializer to be 
+        // For production code, we would refactor DefaultMessageSerializer to be
         // more testable, but for now, we'll skip this part of the test
     }
-    
+
     @Test
     fun `defaultSerializer should create a serializer with factory formatters`() {
         // Given
@@ -120,7 +120,7 @@ class MessageSerializerBuilderTest {
         val httpStreamFormatter = mock<HttpStreamMessageFormatter>()
         val httpResponseFormatter = mock<HttpResponseMessageFormatter>()
         val longPollingFormatter = mock<LongPollingMessageFormatter>()
-        
+
         val formatterFactory = mock<FormatterFactory>()
         whenever(formatterFactory.createWebSocketFormatter()).thenReturn(webSocketFormatter)
         whenever(formatterFactory.createSseStreamFormatter()).thenReturn(httpSseStreamFormatter)
@@ -134,7 +134,7 @@ class MessageSerializerBuilderTest {
         // Then
         assertNotNull(serializer)
         assertTrue(serializer is DefaultMessageSerializer)
-        
+
         // Verify that factory methods were called
         verify(formatterFactory).createWebSocketFormatter()
         verify(formatterFactory).createSseStreamFormatter()

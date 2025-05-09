@@ -88,7 +88,7 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
         // Given
         val message = Message.simple(
             "test-channel-${UUID.randomUUID()}",
-            mapOf("text" to "Hello from integration test!")
+            mapOf("text" to "Hello from integration test!"),
         )
 
         // When/Then

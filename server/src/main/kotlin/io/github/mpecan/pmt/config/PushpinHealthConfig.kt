@@ -31,13 +31,13 @@ class PushpinHealthConfig {
     fun pushpinHealthChecker(
         webClient: WebClient,
         pushpinProperties: PushpinProperties,
-        pushpinService: PushpinService
+        pushpinService: PushpinService,
     ): PushpinHealthChecker {
         return DefaultPushpinHealthChecker(
             webClient,
             pushpinProperties.healthCheckEnabled,
             pushpinProperties.defaultTimeout,
-            pushpinService
+            pushpinService,
         )
     }
 }

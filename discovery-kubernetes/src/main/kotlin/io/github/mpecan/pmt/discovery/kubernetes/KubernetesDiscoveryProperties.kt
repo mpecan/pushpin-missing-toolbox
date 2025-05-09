@@ -35,5 +35,5 @@ data class KubernetesDiscoveryProperties(
     val healthCheckPath: String = "/api/health/check",
     val useNodePort: Boolean = false,
     val useService: Boolean = false,
-    val serviceName: String = "pushpin"
+    val serviceName: String = "pushpin",
 )

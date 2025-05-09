@@ -23,7 +23,7 @@ class KubernetesDiscoveryTest {
         enabled = true,
         namespace = "test-namespace",
         labelSelector = "app=pushpin",
-        refreshCacheSeconds = 10
+        refreshCacheSeconds = 10,
     )
 
     @Test
@@ -34,7 +34,7 @@ class KubernetesDiscoveryTest {
             properties = disabledProperties,
             podProvider = podProvider,
             podHealthChecker = podHealthChecker,
-            podConverter = podConverter
+            podConverter = podConverter,
         )
 
         // When
@@ -53,7 +53,7 @@ class KubernetesDiscoveryTest {
             properties = properties,
             podProvider = podProvider,
             podHealthChecker = podHealthChecker,
-            podConverter = podConverter
+            podConverter = podConverter,
         )
 
         val pod1 = createPod("pod-1", "192.168.1.1")
@@ -88,7 +88,7 @@ class KubernetesDiscoveryTest {
             properties = properties,
             podProvider = podProvider,
             podHealthChecker = podHealthChecker,
-            podConverter = podConverter
+            podConverter = podConverter,
         )
 
         val pod1 = createPod("pod-1", "192.168.1.1")

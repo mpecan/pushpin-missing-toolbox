@@ -36,9 +36,9 @@ class DefaultEc2InstancesProviderTest {
             enabled = true,
             region = "us-east-1",
             tags = mapOf("service" to "pushpin"),
-            useAutoScalingGroups = false
+            useAutoScalingGroups = false,
         )
-        
+
         // Common setup that applies to all tests
         whenever(ec2ClientProvider.getClient(any())).thenReturn(ec2Client)
         whenever(autoScalingClientProvider.getClient(any())).thenReturn(autoScalingClient)
@@ -92,9 +92,9 @@ class DefaultEc2InstancesProviderTest {
         // Set properties to use Auto Scaling Groups instead of tags
         val asgProperties = properties.copy(
             useAutoScalingGroups = true,
-            tags = emptyMap() // No tag filtering
+            tags = emptyMap(), // No tag filtering
         )
-        
+
         // Create mock ASG instances with InService lifecycle state
         val asgInstance1 = AsgInstance.builder()
             .instanceId("i-asg-12345")
@@ -161,10 +161,10 @@ class DefaultEc2InstancesProviderTest {
         // Now that we've fixed the implementation to use ASG discovery exclusively,
         // let's verify that the instances were returned
         assertEquals(2, instances.size, "Should have found 2 instances from ASG")
-        
+
         // Get the discovered instance IDs
         val instanceIds = instances.map { it.instanceId() }
-        
+
         // Verify both instances were found
         assertTrue(instanceIds.contains("i-asg-12345"), "Should contain instance i-asg-12345")
         assertTrue(instanceIds.contains("i-asg-67890"), "Should contain instance i-asg-67890")

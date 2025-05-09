@@ -14,7 +14,7 @@ class DefaultPodConverterTest {
         port = 7999,
         controlPort = 5564,
         publishPort = 5560,
-        healthCheckPath = "/test/health"
+        healthCheckPath = "/test/health",
     )
 
     @Test
@@ -43,12 +43,12 @@ class DefaultPodConverterTest {
         val pod = V1Pod()
             .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
             .status(V1PodStatus().podIP("192.168.1.1").hostIP("10.0.0.1"))
-        
+
         val nodePortProperties = KubernetesDiscoveryProperties(
             useNodePort = true,
             port = 30999, // NodePort is typically in the 30000-32767 range
             controlPort = 30564,
-            publishPort = 30560
+            publishPort = 30560,
         )
 
         // When
@@ -68,14 +68,16 @@ class DefaultPodConverterTest {
         val annotations = mapOf(
             "pushpin.io/http-port" to "8080",
             "pushpin.io/control-port" to "6000",
-            "pushpin.io/publish-port" to "6001"
+            "pushpin.io/publish-port" to "6001",
         )
-        
+
         val pod = V1Pod()
-            .metadata(V1ObjectMeta()
-                .name("test-pod")
-                .namespace("test-namespace")
-                .annotations(annotations))
+            .metadata(
+                V1ObjectMeta()
+                    .name("test-pod")
+                    .namespace("test-namespace")
+                    .annotations(annotations),
+            )
             .status(V1PodStatus().podIP("192.168.1.1"))
 
         // When

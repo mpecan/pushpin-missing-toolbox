@@ -61,8 +61,8 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
         StepVerifier.create(responseFlux)
             .expectNextMatches { response ->
                 response["success"] == true &&
-                        response["message"] == "This is a non-streaming HTTP response" &&
-                        response["channel"] == channel
+                    response["message"] == "This is a non-streaming HTTP response" &&
+                    response["channel"] == channel
             }
             .expectComplete()
             .verify(Duration.ofSeconds(10))
