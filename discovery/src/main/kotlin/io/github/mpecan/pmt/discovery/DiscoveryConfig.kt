@@ -20,11 +20,11 @@ class DiscoveryConfig {
     @Bean
     fun configurationBasedDiscovery(
         discoveryProperties: DiscoveryProperties,
-        pushpinProperties: PushpinProperties
+        pushpinProperties: PushpinProperties,
     ): ConfigurationBasedDiscovery {
         return ConfigurationBasedDiscovery(
             discoveryProperties.configuration,
-            pushpinProperties
+            pushpinProperties,
         )
     }
 
@@ -34,11 +34,9 @@ class DiscoveryConfig {
      * Creates a KubernetesDiscovery bean.
      */
     @Bean
-    fun kubernetesDiscovery(
-        discoveryProperties: DiscoveryProperties
-    ): KubernetesDiscovery {
+    fun kubernetesDiscovery(discoveryProperties: DiscoveryProperties): KubernetesDiscovery {
         return KubernetesDiscovery(
-            discoveryProperties.kubernetes
+            discoveryProperties.kubernetes,
         )
     }
 
@@ -48,11 +46,11 @@ class DiscoveryConfig {
     @Bean
     fun pushpinDiscoveryManager(
         discoveryProperties: DiscoveryProperties,
-        discoveries: List<PushpinDiscovery>
+        discoveries: List<PushpinDiscovery>,
     ): PushpinDiscoveryManager {
         return PushpinDiscoveryManager(
             discoveryProperties,
-            discoveries
+            discoveries,
         )
     }
 
@@ -60,9 +58,7 @@ class DiscoveryConfig {
      * Creates a bean for the discovery properties to be used in the @Scheduled annotation.
      */
     @Bean
-    fun discoveryProperties(
-        discoveryProperties: DiscoveryProperties
-    ): DiscoveryProperties {
+    fun discoveryProperties(discoveryProperties: DiscoveryProperties): DiscoveryProperties {
         return discoveryProperties
     }
 }

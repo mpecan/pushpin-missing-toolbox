@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux
  */
 class ConfigurationBasedDiscovery(
     private val properties: ConfigurationDiscoveryProperties,
-    private val pushpinProperties: PushpinProperties
+    private val pushpinProperties: PushpinProperties,
 ) : PushpinDiscovery {
 
     private val logger = LoggerFactory.getLogger(ConfigurationBasedDiscovery::class.java)
@@ -20,7 +20,7 @@ class ConfigurationBasedDiscovery(
 
     override fun discoverServers(): Flux<PushpinServer> {
         logger.debug("Discovering Pushpin servers from configuration")
-        
+
         return Flux.fromIterable(pushpinProperties.servers)
             .filter { it.active }
             .map { it.toPushpinServer() }

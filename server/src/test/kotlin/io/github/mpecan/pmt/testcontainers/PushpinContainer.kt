@@ -15,7 +15,7 @@ import java.time.Duration
  * This container runs a Pushpin server with the necessary configuration for integration testing.
  */
 class PushpinContainer(
-    dockerImageName: String = "fanout/pushpin:1.40.1"
+    dockerImageName: String = "fanout/pushpin:1.40.1",
 ) : GenericContainer<PushpinContainer>(DockerImageName.parse(dockerImageName)) {
 
     companion object {
@@ -50,43 +50,44 @@ class PushpinContainer(
         Testcontainers.exposeHostPorts(hostPort)
         // Create configuration with dynamic port - simplified for testability
         withCommand(
-            "sh", "-c",
+            "sh",
+            "-c",
             // Create routes file pointing to the host application
             "echo '* host.testcontainers.internal:$hostPort,over_http' > /etc/pushpin/routes && " +
-                    // Start modifying the config file by ensuring these port sections are set correctly
-                    "sed -i 's/http_port=.*/http_port=$HTTP_PORT/' /etc/pushpin/pushpin.conf && " +
+                // Start modifying the config file by ensuring these port sections are set correctly
+                "sed -i 's/http_port=.*/http_port=$HTTP_PORT/' /etc/pushpin/pushpin.conf && " +
 
-                    // ZMQ publish socket config - ensure socket binding works correctly
-                    "sed -i 's/push_in_spec=.*/push_in_spec=tcp:\\/\\/*:$PUBLISH_PORT/' /etc/pushpin/pushpin.conf && " +
-                    "sed -i 's/push_in_http_port=.*/push_in_http_port=$XPUB_PORT/' /etc/pushpin/pushpin.conf && " +
-                    // Enable ZMQ for message handling
-                    "sed -i 's/zmq_publish=.*/zmq_publish=true/' /etc/pushpin/pushpin.conf && " +
-                    // Configure handler section for ZMQ
-                    "echo '[handler]' >> /etc/pushpin/pushpin.conf && " +
-                    "echo 'm2a_in_specs=tcp://*:$PUBLISH_PORT' >> /etc/pushpin/pushpin.conf && " +
-                    "echo 'm2a_in_stream=true' >> /etc/pushpin/pushpin.conf && " +
-                    "echo 'm2a_in_http=true' >> /etc/pushpin/pushpin.conf && " +
+                // ZMQ publish socket config - ensure socket binding works correctly
+                "sed -i 's/push_in_spec=.*/push_in_spec=tcp:\\/\\/*:$PUBLISH_PORT/' /etc/pushpin/pushpin.conf && " +
+                "sed -i 's/push_in_http_port=.*/push_in_http_port=$XPUB_PORT/' /etc/pushpin/pushpin.conf && " +
+                // Enable ZMQ for message handling
+                "sed -i 's/zmq_publish=.*/zmq_publish=true/' /etc/pushpin/pushpin.conf && " +
+                // Configure handler section for ZMQ
+                "echo '[handler]' >> /etc/pushpin/pushpin.conf && " +
+                "echo 'm2a_in_specs=tcp://*:$PUBLISH_PORT' >> /etc/pushpin/pushpin.conf && " +
+                "echo 'm2a_in_stream=true' >> /etc/pushpin/pushpin.conf && " +
+                "echo 'm2a_in_http=true' >> /etc/pushpin/pushpin.conf && " +
 
-                    // Set log level to debug for better diagnostics
-                    "sed -i 's/log_level=.*/log_level=3/' /etc/pushpin/pushpin.conf && " +
+                // Set log level to debug for better diagnostics
+                "sed -i 's/log_level=.*/log_level=3/' /etc/pushpin/pushpin.conf && " +
 
-                    // Set simple server ID
-                    "sed -i 's/id=.*/id=pushpin-test/' /etc/pushpin/pushpin.conf && " +
+                // Set simple server ID
+                "sed -i 's/id=.*/id=pushpin-test/' /etc/pushpin/pushpin.conf && " +
 
-                    // Print configuration for debugging
-                    "echo '====== PUSHPIN CONFIG ======' && " +
-                    "cat /etc/pushpin/pushpin.conf && " +
-                    "echo '====== ROUTES CONFIG ======' && " +
-                    "cat /etc/pushpin/routes && " +
+                // Print configuration for debugging
+                "echo '====== PUSHPIN CONFIG ======' && " +
+                "cat /etc/pushpin/pushpin.conf && " +
+                "echo '====== ROUTES CONFIG ======' && " +
+                "cat /etc/pushpin/routes && " +
 
-                    // Start Pushpin with verbose logging
-                    "pushpin --verbose"
+                // Start Pushpin with verbose logging
+                "pushpin --verbose",
         )
 
         // Use a wait strategy that checks both HTTP and control ports
         waitingFor(
             Wait.forListeningPort()
-                .withStartupTimeout(Duration.ofSeconds(60))
+                .withStartupTimeout(Duration.ofSeconds(60)),
         )
 
         super.start()
@@ -110,15 +111,15 @@ class PushpinContainer(
     /**
      * Gets the base URL for HTTP requests.
      */
-    fun getBaseUrl(): String = "http://${host}:${getHttpPort()}"
+    fun getBaseUrl(): String = "http://$host:${getHttpPort()}"
 
     /**
      * Gets the control URL for publishing messages.
      */
-    fun getControlUrl(): String = "http://${host}:${getControlPort()}"
+    fun getControlUrl(): String = "http://$host:${getControlPort()}"
 
     /**
      * Gets the publish URL for ZMQ connections.
      */
-    fun getPublishUrl(): String = "tcp://${host}:${getPublishPort()}"
+    fun getPublishUrl(): String = "tcp://$host:${getPublishPort()}"
 }

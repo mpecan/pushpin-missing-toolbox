@@ -19,8 +19,7 @@ import org.springframework.context.annotation.Bean
 
 /**
  * Autoconfiguration for Kubernetes-based Pushpin discovery.
- * 
- * This autoconfiguration is conditionally enabled:
+ * * This autoconfiguration is conditionally enabled:
  * - When the Kubernetes ApiClient class is available on the classpath
  * - When the pushpin.discovery.kubernetes.enabled property is true (defaults to false)
  */
@@ -31,7 +30,7 @@ import org.springframework.context.annotation.Bean
     prefix = "pushpin.discovery.kubernetes",
     name = ["enabled"],
     havingValue = "true",
-    matchIfMissing = false
+    matchIfMissing = false,
 )
 class KubernetesDiscoveryAutoConfiguration {
 
@@ -43,7 +42,7 @@ class KubernetesDiscoveryAutoConfiguration {
     fun kubernetesClientProvider(): KubernetesClientProvider {
         return KubernetesClientProvider()
     }
-    
+
     /**
      * Creates a DefaultKubernetesPodProvider bean if none exists.
      */
@@ -52,7 +51,7 @@ class KubernetesDiscoveryAutoConfiguration {
     fun kubernetesPodProvider(clientProvider: KubernetesClientProvider): KubernetesPodProvider {
         return DefaultKubernetesPodProvider(clientProvider)
     }
-    
+
     /**
      * Creates a DefaultPodHealthChecker bean if none exists.
      */
@@ -61,7 +60,7 @@ class KubernetesDiscoveryAutoConfiguration {
     fun podHealthChecker(): PodHealthChecker {
         return DefaultPodHealthChecker()
     }
-    
+
     /**
      * Creates a DefaultPodConverter bean if none exists.
      */
@@ -70,7 +69,7 @@ class KubernetesDiscoveryAutoConfiguration {
     fun podConverter(): PodConverter {
         return DefaultPodConverter()
     }
-    
+
     /**
      * Creates a KubernetesDiscovery bean.
      */
@@ -80,13 +79,13 @@ class KubernetesDiscoveryAutoConfiguration {
         properties: KubernetesDiscoveryProperties,
         podProvider: KubernetesPodProvider,
         podHealthChecker: PodHealthChecker,
-        podConverter: PodConverter
+        podConverter: PodConverter,
     ): KubernetesDiscovery {
         return KubernetesDiscovery(
             properties = properties,
             podProvider = podProvider,
             podHealthChecker = podHealthChecker,
-            podConverter = podConverter
+            podConverter = podConverter,
         )
     }
 }

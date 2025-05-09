@@ -13,7 +13,7 @@ import java.util.function.Supplier
  */
 class Ec2ClientProvider(
     private val credentialsProvider: AwsCredentialsProvider = AwsCredentialsProvider(),
-    private val clientBuilderSupplier: Supplier<Ec2ClientBuilder> = Supplier { Ec2Client.builder() }
+    private val clientBuilderSupplier: Supplier<Ec2ClientBuilder> = Supplier { Ec2Client.builder() },
 ) {
     /**
      * Gets or creates an EC2 client for the given properties.
@@ -21,17 +21,16 @@ class Ec2ClientProvider(
     fun getClient(properties: AwsDiscoveryProperties): Ec2Client {
         val region = Region.of(properties.region)
         val credentials = credentialsProvider.getCredentials(properties)
-        
+
         val builder = clientBuilderSupplier.get()
             .region(region)
             .credentialsProvider(credentials)
-        
+
         // Add custom endpoint if configured (useful for testing with localstack)
         if (!properties.endpoint.isNullOrBlank()) {
             builder.endpointOverride(URI.create(properties.endpoint))
         }
-        
+
         return builder.build()
     }
 }
-

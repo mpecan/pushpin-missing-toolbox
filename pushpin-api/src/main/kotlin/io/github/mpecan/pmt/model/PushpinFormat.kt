@@ -10,12 +10,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
-    property = "formatType"
+    property = "formatType",
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = HttpResponseFormat::class, name = "http-response"),
     JsonSubTypes.Type(value = HttpStreamFormat::class, name = "http-stream"),
-    JsonSubTypes.Type(value = WebSocketFormat::class, name = "ws-message")
+    JsonSubTypes.Type(value = WebSocketFormat::class, name = "ws-message"),
 )
 @JsonInclude(JsonInclude.Include.NON_NULL)
 interface PushpinFormat {

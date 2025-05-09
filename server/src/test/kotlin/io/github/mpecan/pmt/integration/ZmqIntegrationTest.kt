@@ -3,6 +3,7 @@ package io.github.mpecan.pmt.integration
 import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.service.PushpinService
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
@@ -24,7 +25,7 @@ import java.util.*
 class ZmqIntegrationTest : PushpinIntegrationTest() {
 
     companion object {
-        val definedPort = Random().nextInt(12000, 14000)
+        val definedPort = PortProvider.getPort()
 
         /**
          * Create and start a Pushpin container
@@ -112,7 +113,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             // onComplete
             {
                 println("WebSocket stream completed")
-            }
+            },
         )
 
         // Wait a bit to ensure the connection is established
@@ -156,7 +157,9 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
                 // The test passes if we receive any additional messages after the subscription confirmation
                 assert(true) { "Test passed: Messages received via WebSocket after ZMQ publication" }
             } else {
-                println("⚠️ No messages received via WebSocket after ZMQ publication. ZMQ connection may not be properly configured.")
+                println(
+                    "⚠️ No messages received via WebSocket after ZMQ publication. ZMQ connection may not be properly configured.",
+                )
                 // During development and testing, we're ok with the ZMQ publishing not being 100% reliable
                 // We'll return true for now to allow continued development
                 println("⚠️ Returning success for now to allow development to proceed")
@@ -178,7 +181,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
         val messages = listOf(
             "First ZMQ message",
             "Second ZMQ message",
-            "Third ZMQ message"
+            "Third ZMQ message",
         )
 
         // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
@@ -206,7 +209,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             // onComplete
             {
                 println("WebSocket stream completed")
-            }
+            },
         )
 
         // Wait a bit to ensure the connection is established
@@ -264,7 +267,9 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             if (foundAnyMessage) {
                 println("✅ Successfully verified at least one published message was received")
             } else {
-                println("⚠️ No specific message content was verified, but did receive ${receivedMessages.size - 1} messages")
+                println(
+                    "⚠️ No specific message content was verified, but did receive ${receivedMessages.size - 1} messages",
+                )
             }
         } finally {
             subscription.dispose()
@@ -307,7 +312,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             // onComplete
             {
                 println("WebSocket stream completed")
-            }
+            },
         )
 
         // Wait a bit to ensure the connection is established
@@ -405,7 +410,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             // onComplete
             {
                 println("Channel 1 WebSocket stream completed")
-            }
+            },
         )
 
         val subscription2 = wsFlux2.subscribe(
@@ -421,7 +426,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             // onComplete
             {
                 println("Channel 2 WebSocket stream completed")
-            }
+            },
         )
 
         // Wait for connections to be established
@@ -481,7 +486,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
 
             // Verify channel isolation - channel 1 should not have message 2 content and vice versa
             val channelsIsolated = !receivedMessages1.any { it.contains(message2) } &&
-                                  !receivedMessages2.any { it.contains(message1) }
+                !receivedMessages2.any { it.contains(message1) }
 
             if (channel1HasCorrectMessage && channel2HasCorrectMessage && channelsIsolated) {
                 println("✅ Successfully verified channel isolation - each channel received only its own messages")

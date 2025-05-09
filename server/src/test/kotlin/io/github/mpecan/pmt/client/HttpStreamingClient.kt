@@ -14,8 +14,7 @@ class HttpStreamingClient(baseUrl: String) {
 
     /**
      * Consumes a stream of text from an HTTP streaming endpoint.
-     * 
-     * @param endpoint The endpoint to stream from
+     * * @param endpoint The endpoint to stream from
      * @return A Flux of text chunks
      */
     fun consumeStream(endpoint: String): Flux<String> {

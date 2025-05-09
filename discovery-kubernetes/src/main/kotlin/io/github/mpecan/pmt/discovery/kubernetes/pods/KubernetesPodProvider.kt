@@ -23,7 +23,7 @@ interface KubernetesPodProvider {
  * Default implementation of KubernetesPodProvider that discovers pods from Kubernetes API.
  */
 class DefaultKubernetesPodProvider(
-    private val clientProvider: KubernetesClientProvider = KubernetesClientProvider()
+    private val clientProvider: KubernetesClientProvider = KubernetesClientProvider(),
 ) : KubernetesPodProvider {
     private val logger = LoggerFactory.getLogger(DefaultKubernetesPodProvider::class.java)
 
@@ -32,7 +32,7 @@ class DefaultKubernetesPodProvider(
 
         try {
             val coreApi = clientProvider.getCoreApi(properties)
-            
+
             // If we're using a service, get pods via the service selector
             if (properties.useService) {
                 pods.addAll(getPodsFromService(properties, coreApi))
@@ -40,7 +40,7 @@ class DefaultKubernetesPodProvider(
                 // Otherwise get pods directly using label selector
                 pods.addAll(getPodsDirectly(properties, coreApi))
             }
-            
+
             logger.debug("Discovered ${pods.size} pods")
         } catch (e: Exception) {
             logger.error("Error discovering Kubernetes pods: ${e.message}", e)
@@ -54,7 +54,7 @@ class DefaultKubernetesPodProvider(
      */
     private fun getPodsDirectly(
         properties: KubernetesDiscoveryProperties,
-        coreApi: io.kubernetes.client.openapi.apis.CoreV1Api
+        coreApi: io.kubernetes.client.openapi.apis.CoreV1Api,
     ): List<V1Pod> {
         val pods = mutableListOf<V1Pod>()
 
@@ -62,7 +62,7 @@ class DefaultKubernetesPodProvider(
             val podList = if (properties.namespace != null) {
                 // Get pods in specific namespace using builder pattern
                 coreApi.listNamespacedPod(properties.namespace)
-                    .apply { 
+                    .apply {
                         properties.fieldSelector?.let { fieldSelector(it) }
                         properties.labelSelector?.let { labelSelector(it) }
                     }
@@ -70,7 +70,7 @@ class DefaultKubernetesPodProvider(
             } else {
                 // Get pods across all namespaces using builder pattern
                 coreApi.listPodForAllNamespaces()
-                    .apply { 
+                    .apply {
                         properties.fieldSelector?.let { fieldSelector(it) }
                         properties.labelSelector?.let { labelSelector(it) }
                     }
@@ -91,25 +91,25 @@ class DefaultKubernetesPodProvider(
      */
     private fun getPodsFromService(
         properties: KubernetesDiscoveryProperties,
-        coreApi: io.kubernetes.client.openapi.apis.CoreV1Api
+        coreApi: io.kubernetes.client.openapi.apis.CoreV1Api,
     ): List<V1Pod> {
         val pods = mutableListOf<V1Pod>()
-        
+
         try {
             // Get the namespace to use
             val namespace = properties.namespace ?: "default"
-            
+
             // Get the service using builder pattern
             val service = coreApi.readNamespacedService(properties.serviceName, namespace)
                 .execute()
-            
+
             // Extract the selector from the service
             val selector = service.spec?.selector
-            
+
             if (selector != null && selector.isNotEmpty()) {
                 // Convert selector map to label selector string
                 val labelSelector = selector.entries.joinToString(",") { "${it.key}=${it.value}" }
-                
+
                 // Get pods that match the service selector using builder pattern
                 val podList = coreApi.listNamespacedPod(namespace)
                     .apply {
@@ -117,7 +117,7 @@ class DefaultKubernetesPodProvider(
                         labelSelector(labelSelector)
                     }
                     .execute()
-                
+
                 podList.items?.let { pods.addAll(it) }
             } else {
                 logger.warn("Service ${properties.serviceName} does not have any selectors")
@@ -125,7 +125,7 @@ class DefaultKubernetesPodProvider(
         } catch (e: ApiException) {
             logger.error("Failed to get pods from service: ${e.responseBody}", e)
         }
-        
+
         return pods
     }
 }

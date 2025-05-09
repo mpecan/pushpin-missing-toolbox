@@ -35,12 +35,14 @@ class DefaultPodHealthCheckerTest {
         val readyCondition = V1PodCondition()
             .type("Ready")
             .status("True")
-        
+
         val pod = V1Pod()
             .metadata(V1ObjectMeta().name("test-pod"))
-            .status(V1PodStatus()
-                .phase("Running")
-                .conditions(listOf(readyCondition)))
+            .status(
+                V1PodStatus()
+                    .phase("Running")
+                    .conditions(listOf(readyCondition)),
+            )
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, properties)
@@ -55,12 +57,14 @@ class DefaultPodHealthCheckerTest {
         val readyCondition = V1PodCondition()
             .type("Ready")
             .status("False")
-        
+
         val pod = V1Pod()
             .metadata(V1ObjectMeta().name("test-pod"))
-            .status(V1PodStatus()
-                .phase("Running")
-                .conditions(listOf(readyCondition)))
+            .status(
+                V1PodStatus()
+                    .phase("Running")
+                    .conditions(listOf(readyCondition)),
+            )
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, properties)
@@ -76,12 +80,14 @@ class DefaultPodHealthCheckerTest {
         val readyCondition = V1PodCondition()
             .type("Ready")
             .status("False")
-        
+
         val pod = V1Pod()
             .metadata(V1ObjectMeta().name("test-pod"))
-            .status(V1PodStatus()
-                .phase("Running")
-                .conditions(listOf(readyCondition)))
+            .status(
+                V1PodStatus()
+                    .phase("Running")
+                    .conditions(listOf(readyCondition)),
+            )
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, propertiesWithoutHealthCheck)

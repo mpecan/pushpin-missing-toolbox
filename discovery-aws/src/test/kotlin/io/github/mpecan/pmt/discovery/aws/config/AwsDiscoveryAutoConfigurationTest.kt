@@ -115,17 +115,11 @@ class AwsDiscoveryAutoConfigurationTest {
     }
 
     class CustomInstanceHealthChecker : InstanceHealthChecker {
-        override fun isHealthy(
-            instance: Instance,
-            properties: AwsDiscoveryProperties
-        ) = true
+        override fun isHealthy(instance: Instance, properties: AwsDiscoveryProperties) = true
     }
 
     class CustomInstanceConverter : InstanceConverter {
-        override fun toPushpinServer(
-            instance: Instance,
-            properties: AwsDiscoveryProperties
-        ) =
+        override fun toPushpinServer(instance: Instance, properties: AwsDiscoveryProperties) =
             mock(io.github.mpecan.pmt.model.PushpinServer::class.java)
     }
 }

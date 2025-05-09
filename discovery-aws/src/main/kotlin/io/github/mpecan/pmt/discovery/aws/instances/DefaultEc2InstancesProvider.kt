@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.ec2.model.Instance
  */
 class DefaultEc2InstancesProvider(
     private val ec2ClientProvider: Ec2ClientProvider = Ec2ClientProvider(),
-    private val autoScalingClientProvider: AutoScalingClientProvider = AutoScalingClientProvider()
+    private val autoScalingClientProvider: AutoScalingClientProvider = AutoScalingClientProvider(),
 ) : Ec2InstancesProvider {
     private val logger = LoggerFactory.getLogger(DefaultEc2InstancesProvider::class.java)
 
@@ -78,7 +78,7 @@ class DefaultEc2InstancesProvider(
                     DescribeInstancesRequest.builder()
                         .filters(filters)
                         .nextToken(nextToken)
-                        .build()
+                        .build(),
                 )
 
                 response.reservations().forEach { reservation ->
@@ -104,7 +104,7 @@ class DefaultEc2InstancesProvider(
     private fun getInstancesFromAutoScalingGroups(
         ec2Client: Ec2Client,
         autoScalingClient: AutoScalingClient,
-        properties: AwsDiscoveryProperties
+        properties: AwsDiscoveryProperties,
     ): List<Instance> {
         val instances = mutableListOf<Instance>()
 
@@ -134,7 +134,7 @@ class DefaultEc2InstancesProvider(
                                     autoScalingGroupNames(properties.autoScalingGroupNames)
                                 }
                             }
-                            .build()
+                            .build(),
                     )
                 } else {
                     autoScalingClient.describeAutoScalingGroups(request)
@@ -189,7 +189,7 @@ class DefaultEc2InstancesProvider(
                 Filter.builder()
                     .name("tag:$key")
                     .values(value)
-                    .build()
+                    .build(),
             )
         }
 
@@ -198,7 +198,7 @@ class DefaultEc2InstancesProvider(
             Filter.builder()
                 .name("instance-state-name")
                 .values("running")
-                .build()
+                .build(),
         )
 
         return filters

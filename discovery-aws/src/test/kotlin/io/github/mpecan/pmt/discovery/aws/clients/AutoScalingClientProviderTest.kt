@@ -28,35 +28,37 @@ class AutoScalingClientProviderTest {
         val mockAwsCredentials = mock<SdkCredentialsProvider>()
         val mockAutoScalingClientBuilder = mock<AutoScalingClientBuilder>()
         val mockAutoScalingClient = mock<AutoScalingClient>()
-        
+
         val properties = AwsDiscoveryProperties(
-            region = "eu-central-1"
+            region = "eu-central-1",
         )
-        
+
         // Setup mocks for builder pattern
         whenever(mockCredentialsProvider.getCredentials(any())).thenReturn(mockAwsCredentials)
         whenever(mockAutoScalingClientBuilder.region(any<Region>())).thenReturn(mockAutoScalingClientBuilder)
-        whenever(mockAutoScalingClientBuilder.credentialsProvider(any<SdkCredentialsProvider>())).thenReturn(mockAutoScalingClientBuilder)
+        whenever(mockAutoScalingClientBuilder.credentialsProvider(any<SdkCredentialsProvider>())).thenReturn(
+            mockAutoScalingClientBuilder,
+        )
         whenever(mockAutoScalingClientBuilder.build()).thenReturn(mockAutoScalingClient)
-        
+
         // Create provider with constructor-injected mocked dependencies
         val builderSupplier = Supplier { mockAutoScalingClientBuilder }
         val provider = AutoScalingClientProvider(mockCredentialsProvider, builderSupplier)
-        
+
         // Act
         val client = provider.getClient(properties)
-        
+
         // Assert
         assertNotNull(client)
         assertEquals(mockAutoScalingClient, client)
-        
+
         // Verify correct region and credentials were set
         verify(mockAutoScalingClientBuilder).region(Region.of("eu-central-1"))
         verify(mockAutoScalingClientBuilder).credentialsProvider(mockAwsCredentials)
         verify(mockAutoScalingClientBuilder).build()
         verify(mockCredentialsProvider).getCredentials(properties)
     }
-    
+
     @Test
     fun `should use custom endpoint when provided`() {
         // Arrange
@@ -64,31 +66,33 @@ class AutoScalingClientProviderTest {
         val mockAwsCredentials = mock<SdkCredentialsProvider>()
         val mockAutoScalingClientBuilder = mock<AutoScalingClientBuilder>()
         val mockAutoScalingClient = mock<AutoScalingClient>()
-        
+
         val customEndpoint = "http://localhost:4566"
         val properties = AwsDiscoveryProperties(
             region = "eu-central-1",
-            endpoint = customEndpoint
+            endpoint = customEndpoint,
         )
-        
+
         // Setup mocks for builder pattern
         whenever(mockCredentialsProvider.getCredentials(any())).thenReturn(mockAwsCredentials)
         whenever(mockAutoScalingClientBuilder.region(any<Region>())).thenReturn(mockAutoScalingClientBuilder)
-        whenever(mockAutoScalingClientBuilder.credentialsProvider(any<SdkCredentialsProvider>())).thenReturn(mockAutoScalingClientBuilder)
+        whenever(mockAutoScalingClientBuilder.credentialsProvider(any<SdkCredentialsProvider>())).thenReturn(
+            mockAutoScalingClientBuilder,
+        )
         whenever(mockAutoScalingClientBuilder.endpointOverride(any<URI>())).thenReturn(mockAutoScalingClientBuilder)
         whenever(mockAutoScalingClientBuilder.build()).thenReturn(mockAutoScalingClient)
-        
+
         // Create provider with constructor-injected mocked dependencies
         val builderSupplier = Supplier { mockAutoScalingClientBuilder }
         val provider = AutoScalingClientProvider(mockCredentialsProvider, builderSupplier)
-        
+
         // Act
         val client = provider.getClient(properties)
-        
+
         // Assert
         assertNotNull(client)
         assertEquals(mockAutoScalingClient, client)
-        
+
         // Verify custom endpoint was set
         verify(mockAutoScalingClientBuilder).endpointOverride(URI.create(customEndpoint))
     }

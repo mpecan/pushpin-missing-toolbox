@@ -18,19 +18,19 @@ class ConfigurationBasedDiscoveryTest {
             id = "server1",
             host = "localhost",
             port = 7999,
-            active = true
+            active = true,
         )
         val serverProps2 = PushpinProperties.ServerProperties(
             id = "server2",
             host = "localhost",
             port = 8000,
-            active = true
+            active = true,
         )
         val inactiveServerProps = PushpinProperties.ServerProperties(
             id = "inactive",
             host = "localhost",
             port = 8001,
-            active = false
+            active = false,
         )
 
         whenever(pushpinProperties.servers).thenReturn(listOf(serverProps1, serverProps2, inactiveServerProps))
@@ -55,7 +55,7 @@ class ConfigurationBasedDiscoveryTest {
             id = "inactive",
             host = "localhost",
             port = 8001,
-            active = false
+            active = false,
         )
 
         whenever(pushpinProperties.servers).thenReturn(listOf(inactiveServerProps))

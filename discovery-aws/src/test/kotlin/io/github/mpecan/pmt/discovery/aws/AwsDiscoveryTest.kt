@@ -26,10 +26,10 @@ class AwsDiscoveryTest {
 
     @Mock
     private lateinit var mockInstancesProvider: Ec2InstancesProvider
-    
+
     @Mock
     private lateinit var mockHealthChecker: InstanceHealthChecker
-    
+
     @Mock
     private lateinit var mockConverter: InstanceConverter
 
@@ -43,7 +43,7 @@ class AwsDiscoveryTest {
         .state(InstanceState.builder().name(InstanceStateName.RUNNING).build())
         .tags(Tag.builder().key("Name").value("pushpin-1").build())
         .build()
-        
+
     private val testInstance2 = Instance.builder()
         .instanceId("i-test2")
         .privateIpAddress("10.0.0.2")
@@ -51,21 +51,21 @@ class AwsDiscoveryTest {
         .state(InstanceState.builder().name(InstanceStateName.RUNNING).build())
         .tags(Tag.builder().key("Name").value("pushpin-2").build())
         .build()
-        
+
     private val testServer1 = PushpinServer(
         id = "pushpin-1",
         host = "10.0.0.1",
         port = 7999,
         controlPort = 5564,
-        publishPort = 5560
+        publishPort = 5560,
     )
-    
+
     private val testServer2 = PushpinServer(
         id = "pushpin-2",
         host = "10.0.0.2",
         port = 7999,
         controlPort = 5564,
-        publishPort = 5560
+        publishPort = 5560,
     )
 
     @BeforeEach
@@ -82,7 +82,7 @@ class AwsDiscoveryTest {
             port = 7999,
             controlPort = 5564,
             publishPort = 5560,
-            privateIp = true
+            privateIp = true,
         )
 
         // Create AWS discovery with mocked components
@@ -90,7 +90,7 @@ class AwsDiscoveryTest {
             properties = properties,
             instancesProvider = mockInstancesProvider,
             instanceHealthChecker = mockHealthChecker,
-            instanceConverter = mockConverter
+            instanceConverter = mockConverter,
         )
     }
 
@@ -102,7 +102,7 @@ class AwsDiscoveryTest {
             properties = properties,
             instancesProvider = mockInstancesProvider,
             instanceHealthChecker = mockHealthChecker,
-            instanceConverter = mockConverter
+            instanceConverter = mockConverter,
         )
         assertTrue(awsDiscovery.isEnabled())
 
@@ -112,7 +112,7 @@ class AwsDiscoveryTest {
             properties = properties,
             instancesProvider = mockInstancesProvider,
             instanceHealthChecker = mockHealthChecker,
-            instanceConverter = mockConverter
+            instanceConverter = mockConverter,
         )
         assertFalse(awsDiscovery.isEnabled())
     }
@@ -125,7 +125,7 @@ class AwsDiscoveryTest {
             properties = properties,
             instancesProvider = mockInstancesProvider,
             instanceHealthChecker = mockHealthChecker,
-            instanceConverter = mockConverter
+            instanceConverter = mockConverter,
         )
 
         // Verify that the result is an empty flux
@@ -138,15 +138,15 @@ class AwsDiscoveryTest {
     fun `discoverServers should return servers from EC2 instances`() {
         // Setup mock instances provider to return test instances
         `when`(mockInstancesProvider.getInstances(properties)).thenReturn(listOf(testInstance1, testInstance2))
-        
+
         // Setup mock health checker to return true for all instances
         `when`(mockHealthChecker.isHealthy(testInstance1, properties)).thenReturn(true)
         `when`(mockHealthChecker.isHealthy(testInstance2, properties)).thenReturn(true)
-        
+
         // Setup mock converter to return test servers
         `when`(mockConverter.toPushpinServer(testInstance1, properties)).thenReturn(testServer1)
         `when`(mockConverter.toPushpinServer(testInstance2, properties)).thenReturn(testServer2)
-        
+
         // Call discoverServers and verify the result
         StepVerifier.create(awsDiscovery.discoverServers())
             .expectNext(testServer1)
@@ -154,19 +154,19 @@ class AwsDiscoveryTest {
             .expectComplete()
             .verify()
     }
-    
+
     @Test
     fun `discoverServers should filter unhealthy instances`() {
         // Setup mock instances provider to return test instances
         `when`(mockInstancesProvider.getInstances(properties)).thenReturn(listOf(testInstance1, testInstance2))
-        
+
         // Setup mock health checker to return true for first instance and false for second
         `when`(mockHealthChecker.isHealthy(testInstance1, properties)).thenReturn(true)
         `when`(mockHealthChecker.isHealthy(testInstance2, properties)).thenReturn(false)
-        
+
         // Setup mock converter to return test servers
         `when`(mockConverter.toPushpinServer(testInstance1, properties)).thenReturn(testServer1)
-        
+
         // Call discoverServers and verify only the healthy instance is returned
         StepVerifier.create(awsDiscovery.discoverServers())
             .expectNext(testServer1)

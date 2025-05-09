@@ -1,12 +1,10 @@
 package io.github.mpecan.pmt.integration
 
-
-
 import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.service.PushpinService
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinContainer
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.AfterEach
@@ -22,7 +20,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.random.Random
 
 /**
  * This test class is an initial effort to test ZMQ communication with multiple Pushpin servers.
@@ -45,14 +42,14 @@ import kotlin.random.Random
  * 3. Verify that message delivery works across multiple servers
  */
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
 )
 @Testcontainers
 class ZmqMultiServerIntegrationTest {
 
     companion object {
         private val network = Network.newNetwork()
-        private val serverPort = Random.nextInt(12000, 13000)
+        private val serverPort = PortProvider.getPort()
 
         // Create individual Pushpin containers with shared network
         @Container
@@ -71,7 +68,7 @@ class ZmqMultiServerIntegrationTest {
 
         // List of containers for convenience
         private val pushpinContainers by lazy { listOf(pushpinContainer1, pushpinContainer2) }
-        
+
         @DynamicPropertySource
         @JvmStatic
         fun configureProperties(registry: DynamicPropertyRegistry) {
@@ -79,35 +76,35 @@ class ZmqMultiServerIntegrationTest {
             TestcontainersUtils.configureMultiplePushpinProperties(
                 registry,
                 pushpinContainers,
-                zmqEnabled = true
+                zmqEnabled = true,
             )
-            
+
             // Set server port
             registry.add("server.port") { serverPort }
-            
+
             // Enable test mode for better diagnostics
             registry.add("pushpin.test-mode") { true }
-            
+
             // Set ZMQ HWM and linger
             registry.add("pushpin.zmq-hwm") { 1000 }
             registry.add("pushpin.zmq-linger") { 0 }
         }
     }
-    
+
     @Autowired
     private lateinit var pushpinService: PushpinService
-    
+
     @Autowired
     private lateinit var discoveryManager: PushpinDiscoveryManager
-    
+
     private val clients = CopyOnWriteArrayList<WebSocketClient>()
-    
+
     @BeforeEach
     fun setUp() {
         // Ensure we can access the Pushpin servers
         val servers = discoveryManager.getAllServers()
         assert(servers.size == 2) { "Expected 2 Pushpin servers, got ${servers.size}" }
-        
+
         // Print server details for debugging
         servers.forEach { server ->
             println("Server: ${server.id}")
@@ -117,7 +114,7 @@ class ZmqMultiServerIntegrationTest {
             println("  Publish URL: ${server.getPublishUrl()}")
         }
     }
-    
+
     @AfterEach
     fun tearDown() {
         // Close all WebSocket clients
@@ -130,7 +127,7 @@ class ZmqMultiServerIntegrationTest {
         }
         clients.clear()
     }
-    
+
     @Test
     fun `should deliver messages to clients connected to different servers via ZMQ`() {
         // Simple channel name with random UUID to avoid conflicts
@@ -144,8 +141,16 @@ class ZmqMultiServerIntegrationTest {
         // Create WebSocket clients - one for each Pushpin server
         val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
         val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        println("Created WebSocket client 1 connecting to ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        println("Created WebSocket client 2 connecting to ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+        println(
+            "Created WebSocket client 1 connecting to ws://localhost:${pushpinContainer1.getMappedPort(
+                PushpinContainer.HTTP_PORT,
+            )}",
+        )
+        println(
+            "Created WebSocket client 2 connecting to ws://localhost:${pushpinContainer2.getMappedPort(
+                PushpinContainer.HTTP_PORT,
+            )}",
+        )
 
         // Add clients to the cleanup list
         this.clients.add(client1)
@@ -161,7 +166,7 @@ class ZmqMultiServerIntegrationTest {
                 println("Client 1 received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -169,7 +174,7 @@ class ZmqMultiServerIntegrationTest {
                 println("Client 2 received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -230,11 +235,21 @@ class ZmqMultiServerIntegrationTest {
             val anyClientReceivedMessages = client1Messages.size > initialSize1 || client2Messages.size > initialSize2
 
             if (client1Messages.size > initialSize1) {
-                println("✅ Client 1 successfully received message: ${client1Messages.subList(initialSize1, client1Messages.size)}")
+                println(
+                    "✅ Client 1 successfully received message: ${client1Messages.subList(
+                        initialSize1,
+                        client1Messages.size,
+                    )}",
+                )
             }
 
             if (client2Messages.size > initialSize2) {
-                println("✅ Client 2 successfully received message: ${client2Messages.subList(initialSize2, client2Messages.size)}")
+                println(
+                    "✅ Client 2 successfully received message: ${client2Messages.subList(
+                        initialSize2,
+                        client2Messages.size,
+                    )}",
+                )
             }
 
             // In ZMQ multi-server tests, we only require that at least one client receives messages
@@ -249,7 +264,7 @@ class ZmqMultiServerIntegrationTest {
             subscription2.dispose()
         }
     }
-    
+
     @Test
     fun `should deliver multiple messages via ZMQ to clients connected to different servers`() {
         // Channel with random UUID to avoid conflicts
@@ -257,7 +272,7 @@ class ZmqMultiServerIntegrationTest {
         val messages = listOf(
             "First ZMQ message from multi-server test",
             "Second ZMQ message from multi-server test",
-            "Third ZMQ message from multi-server test"
+            "Third ZMQ message from multi-server test",
         )
 
         // Create message collectors for verification
@@ -283,7 +298,7 @@ class ZmqMultiServerIntegrationTest {
                 println("Client 1 (multi-message test) received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -291,7 +306,7 @@ class ZmqMultiServerIntegrationTest {
                 println("Client 2 (multi-message test) received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -329,13 +344,16 @@ class ZmqMultiServerIntegrationTest {
                 // Print progress every few seconds
                 if (i % 4 == 0) {
                     println("Waiting for message delivery... Attempt $i")
-                    println("Client 1 messages: ${client1Messages.size - initialSize1}/${messages.size}, " +
-                            "Client 2 messages: ${client2Messages.size - initialSize2}/${messages.size}")
+                    println(
+                        "Client 1 messages: ${client1Messages.size - initialSize1}/${messages.size}, " +
+                            "Client 2 messages: ${client2Messages.size - initialSize2}/${messages.size}",
+                    )
                 }
 
                 // Break early if both clients received all messages
                 if (client1Messages.size >= initialSize1 + messages.size &&
-                    client2Messages.size >= initialSize2 + messages.size) {
+                    client2Messages.size >= initialSize2 + messages.size
+                ) {
                     println("Both clients received all messages!")
                     break
                 }
@@ -355,7 +373,7 @@ class ZmqMultiServerIntegrationTest {
             // Check if any of our messages were received by either client
             val anyMessageReceived = messages.any { messageText ->
                 client1Messages.any { it.contains(messageText) } ||
-                client2Messages.any { it.contains(messageText) }
+                    client2Messages.any { it.contains(messageText) }
             }
 
             // Only verify content if messages were received
@@ -380,7 +398,7 @@ class ZmqMultiServerIntegrationTest {
             subscription2.dispose()
         }
     }
-    
+
     @Test
     fun `should deliver messages to separate channels on different servers via ZMQ`() {
         // Create two separate channels
@@ -412,7 +430,7 @@ class ZmqMultiServerIntegrationTest {
                 println("Client 1 (channel $channel1) received: $message")
                 client1Messages.add(message)
             },
-            { error -> println("Client 1 error: ${error.message}") }
+            { error -> println("Client 1 error: ${error.message}") },
         )
 
         val subscription2 = flux2.subscribe(
@@ -420,7 +438,7 @@ class ZmqMultiServerIntegrationTest {
                 println("Client 2 (channel $channel2) received: $message")
                 client2Messages.add(message)
             },
-            { error -> println("Client 2 error: ${error.message}") }
+            { error -> println("Client 2 error: ${error.message}") },
         )
 
         try {
@@ -463,8 +481,10 @@ class ZmqMultiServerIntegrationTest {
                 // Print progress every few seconds
                 if (i % 4 == 0) {
                     println("Still waiting for message delivery... Attempt $i")
-                    println("Client 1 (channel $channel1): ${client1Messages.size}, " +
-                            "Client 2 (channel $channel2): ${client2Messages.size}")
+                    println(
+                        "Client 1 (channel $channel1): ${client1Messages.size}, " +
+                            "Client 2 (channel $channel2): ${client2Messages.size}",
+                    )
                 }
             }
 
@@ -482,7 +502,7 @@ class ZmqMultiServerIntegrationTest {
             // Verify that at least one client received the expected message content
             val anyClientReceivedCorrectMessage =
                 (client1Messages.size > initialSize1 && client1Messages.any { it.contains(message1) }) ||
-                (client2Messages.size > initialSize2 && client2Messages.any { it.contains(message2) })
+                    (client2Messages.size > initialSize2 && client2Messages.any { it.contains(message2) })
 
             // Only verify content if messages were received
             if (anyClientReceivedMessages) {
@@ -492,14 +512,30 @@ class ZmqMultiServerIntegrationTest {
             }
 
             println("Message content verification: $anyClientReceivedCorrectMessage")
-            println("Client 1 has message: ${client1Messages.size > initialSize1}, has correct content: ${client1Messages.any { it.contains(message1) }}")
-            println("Client 2 has message: ${client2Messages.size > initialSize2}, has correct content: ${client2Messages.any { it.contains(message2) }}")
+            println(
+                "Client 1 has message: ${client1Messages.size > initialSize1}, has correct content: ${client1Messages.any {
+                    it.contains(
+                        message1,
+                    )
+                }}",
+            )
+            println(
+                "Client 2 has message: ${client2Messages.size > initialSize2}, has correct content: ${client2Messages.any {
+                    it.contains(
+                        message2,
+                    )
+                }}",
+            )
 
             // Now test cross-channel isolation by creating clients for the opposite channels
             println("Testing channel isolation...")
 
-            val crossClient1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-            val crossClient2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+            val crossClient1 = WebSocketClient(
+                "ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}",
+            )
+            val crossClient2 = WebSocketClient(
+                "ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}",
+            )
             this.clients.add(crossClient1)
             this.clients.add(crossClient2)
 
@@ -516,7 +552,7 @@ class ZmqMultiServerIntegrationTest {
                     println("Cross client 1 (channel $channel2) received: $message")
                     crossMessages1.add(message)
                 },
-                { error -> println("Cross client 1 error: ${error.message}") }
+                { error -> println("Cross client 1 error: ${error.message}") },
             )
 
             val crossSubscription2 = crossFlux2.subscribe(
@@ -524,7 +560,7 @@ class ZmqMultiServerIntegrationTest {
                     println("Cross client 2 (channel $channel1) received: $message")
                     crossMessages2.add(message)
                 },
-                { error -> println("Cross client 2 error: ${error.message}") }
+                { error -> println("Cross client 2 error: ${error.message}") },
             )
 
             // Wait for subscription messages
@@ -553,7 +589,7 @@ class ZmqMultiServerIntegrationTest {
             // At least one of the clients should receive the isolation message
             val anyClientReceivedIsolationMessage =
                 client1Messages.size > initialSize1 + 1 ||
-                client2Messages.size > initialSize2 + 1
+                    client2Messages.size > initialSize2 + 1
 
             assert(anyClientReceivedIsolationMessage) {
                 "Neither client received the additional isolation test messages"

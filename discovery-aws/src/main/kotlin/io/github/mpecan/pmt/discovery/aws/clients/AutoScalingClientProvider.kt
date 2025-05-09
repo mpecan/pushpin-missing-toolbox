@@ -13,7 +13,7 @@ import java.util.function.Supplier
  */
 class AutoScalingClientProvider(
     private val credentialsProvider: AwsCredentialsProvider = AwsCredentialsProvider(),
-    private val clientBuilderSupplier: Supplier<AutoScalingClientBuilder> = Supplier { AutoScalingClient.builder() }
+    private val clientBuilderSupplier: Supplier<AutoScalingClientBuilder> = Supplier { AutoScalingClient.builder() },
 ) {
     /**
      * Gets or creates an Auto Scaling client for the given properties.

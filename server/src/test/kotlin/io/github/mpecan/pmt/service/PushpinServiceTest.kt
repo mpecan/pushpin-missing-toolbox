@@ -30,19 +30,19 @@ class PushpinServiceTest {
             id = "test-server-1",
             host = "localhost",
             port = 7999,
-            active = true
+            active = true,
         )
 
         val serverProps2 = PushpinProperties.ServerProperties(
             id = "test-server-2",
             host = "localhost",
             port = 7998,
-            active = true
+            active = true,
         )
 
         pushpinProperties = PushpinProperties(
             servers = listOf(serverProps1, serverProps2),
-            healthCheckEnabled = false
+            healthCheckEnabled = false,
         )
 
         // Create service with mocked dependencies
@@ -51,7 +51,7 @@ class PushpinServiceTest {
             discoveryManager,
             messageSerializer,
             zmqPublisher,
-             jacksonObjectMapper()
+            jacksonObjectMapper(),
         )
 
         // Use reflection to replace the webClient with our mock
@@ -65,7 +65,7 @@ class PushpinServiceTest {
         whenever(discoveryManager.getAllServers()).thenReturn(
             pushpinProperties.servers.map {
                 it.toPushpinServer()
-            }
+            },
         )
         val servers = pushpinService.getAllServers()
 
@@ -76,7 +76,9 @@ class PushpinServiceTest {
 
     @Test
     fun `getServerById should return the correct server`() {
-        whenever(discoveryManager.getServerById("test-server-1")).thenReturn(pushpinProperties.servers[0].toPushpinServer())
+        whenever(discoveryManager.getServerById("test-server-1")).thenReturn(
+            pushpinProperties.servers[0].toPushpinServer(),
+        )
         val server = pushpinService.getServerById("test-server-1")
 
         assertTrue(server != null)

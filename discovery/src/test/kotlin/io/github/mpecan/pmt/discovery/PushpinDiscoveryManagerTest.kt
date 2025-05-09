@@ -29,12 +29,12 @@ class PushpinDiscoveryManagerTest {
         val server1 = PushpinServer(
             id = "server1",
             host = "localhost",
-            port = 7999
+            port = 7999,
         )
         val server2 = PushpinServer(
             id = "server2",
             host = "localhost",
-            port = 8000
+            port = 8000,
         )
         whenever(discoveryProperties.refreshInterval).thenReturn(Duration.ofMinutes(1))
 
@@ -75,7 +75,7 @@ class PushpinDiscoveryManagerTest {
         val server1 = PushpinServer(
             id = "server1",
             host = "localhost",
-            port = 7999
+            port = 7999,
         )
 
         whenever(discovery1.isEnabled()).thenReturn(true)
@@ -101,12 +101,12 @@ class PushpinDiscoveryManagerTest {
         val server1 = PushpinServer(
             id = "server1",
             host = "localhost",
-            port = 7999
+            port = 7999,
         )
         val server2 = PushpinServer(
             id = "server2",
             host = "localhost",
-            port = 8000
+            port = 8000,
         )
 
         whenever(discovery1.isEnabled()).thenReturn(true)

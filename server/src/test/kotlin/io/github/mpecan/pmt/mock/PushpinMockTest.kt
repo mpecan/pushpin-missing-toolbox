@@ -80,16 +80,20 @@ abstract class PushpinMockTest {
         // Set up mock for health check
         mockServer.expect(requestTo("http://localhost:$PUSHPIN_PORT/status"))
             .andExpect(method(HttpMethod.GET))
-            .andRespond(withStatus(HttpStatus.OK)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body("OK"))
+            .andRespond(
+                withStatus(HttpStatus.OK)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("OK"),
+            )
 
         // Set up mock for publish endpoint
         mockServer.expect(requestTo("http://localhost:$CONTROL_PORT/publish"))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(withStatus(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{}"))
+            .andRespond(
+                withStatus(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{}"),
+            )
     }
 
     /**
@@ -98,9 +102,11 @@ abstract class PushpinMockTest {
     protected fun mockHealthCheck(status: HttpStatus = HttpStatus.OK) {
         mockServer.expect(requestTo("http://localhost:$PUSHPIN_PORT/status"))
             .andExpect(method(HttpMethod.GET))
-            .andRespond(withStatus(status)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(if (status == HttpStatus.OK) "OK" else "Error"))
+            .andRespond(
+                withStatus(status)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(if (status == HttpStatus.OK) "OK" else "Error"),
+            )
     }
 
     /**
@@ -109,9 +115,11 @@ abstract class PushpinMockTest {
     protected fun mockPublish(status: HttpStatus = HttpStatus.OK) {
         mockServer.expect(requestTo("http://localhost:$CONTROL_PORT/publish"))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(withStatus(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{}"))
+            .andRespond(
+                withStatus(status)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{}"),
+            )
     }
 
     /**

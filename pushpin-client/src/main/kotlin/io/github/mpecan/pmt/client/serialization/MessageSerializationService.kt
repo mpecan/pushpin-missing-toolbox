@@ -20,7 +20,7 @@ interface MessageSerializationService {
  * Implementation of MessageSerializationService using Jackson ObjectMapper.
  */
 class JacksonMessageSerializationService(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : MessageSerializationService {
     // Create a dedicated ObjectMapper configured for compact JSON output
     private val compactMapper = objectMapper.copy().apply {

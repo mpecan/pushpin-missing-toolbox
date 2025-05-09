@@ -12,4 +12,3 @@ interface InstanceHealthChecker {
      */
     fun isHealthy(instance: Instance, properties: AwsDiscoveryProperties): Boolean
 }
-

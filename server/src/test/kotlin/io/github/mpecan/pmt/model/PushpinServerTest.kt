@@ -10,9 +10,9 @@ class PushpinServerTest {
         val server = PushpinServer(
             id = "test-server",
             host = "localhost",
-            port = 7999
+            port = 7999,
         )
-        
+
         assertEquals("http://localhost:7999", server.getBaseUrl())
     }
 
@@ -22,9 +22,9 @@ class PushpinServerTest {
             id = "test-server",
             host = "localhost",
             port = 7999,
-            controlPort = 5564
+            controlPort = 5564,
         )
-        
+
         assertEquals("http://localhost:5564", server.getControlUrl())
     }
 
@@ -34,7 +34,7 @@ class PushpinServerTest {
             id = "test-server",
             host = "localhost",
             port = 7999,
-            publishPort = 5560
+            publishPort = 5560,
         )
 
         // Special case for localhost - we map it to 127.0.0.1 for better connectivity
@@ -45,7 +45,7 @@ class PushpinServerTest {
             id = "remote-server",
             host = "example.com",
             port = 7999,
-            publishPort = 5560
+            publishPort = 5560,
         )
 
         assertEquals("tcp://example.com:5560", remoteServer.getPublishUrl())
@@ -57,9 +57,9 @@ class PushpinServerTest {
             id = "test-server",
             host = "localhost",
             port = 7999,
-            healthCheckPath = "/status"
+            healthCheckPath = "/status",
         )
-        
+
         assertEquals("http://localhost:7999/status", server.getHealthCheckUrl())
     }
 
@@ -68,9 +68,9 @@ class PushpinServerTest {
         val server = PushpinServer(
             id = "test-server",
             host = "localhost",
-            port = 7999
+            port = 7999,
         )
-        
+
         assertEquals("http://localhost:7999", server.toUri().toString())
     }
 }

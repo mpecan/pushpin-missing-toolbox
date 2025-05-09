@@ -36,7 +36,12 @@ abstract class PushpinIntegrationTest {
      * @param eventType Optional event type for SSE
      * @return True if the message was published successfully
      */
-    protected fun publishMessage(channel: String, message: Any, eventType: String? = null, contentType: MediaType = MediaType.TEXT_PLAIN): Boolean {
+    protected fun publishMessage(
+        channel: String,
+        message: Any,
+        eventType: String? = null,
+        contentType: MediaType = MediaType.TEXT_PLAIN,
+    ): Boolean {
         val uri = if (eventType != null) {
             "http://localhost:$port/api/pushpin/publish/$channel?event=$eventType"
         } else {
@@ -67,12 +72,12 @@ abstract class PushpinIntegrationTest {
         channel: String,
         data: Any,
         transports: List<Any>,
-        eventType: String? = null
+        eventType: String? = null,
     ): Boolean {
         val message = mapOf(
             "channel" to channel,
             "data" to data,
-            "transports" to transports
+            "transports" to transports,
         )
 
         val uri = if (eventType != null) {
