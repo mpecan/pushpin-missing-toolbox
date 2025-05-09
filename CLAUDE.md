@@ -30,3 +30,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - HTTP errors use standard Spring status codes
 - Use mockito-kotlin for cleaner mocking syntax (e.g., use `whenever` instead of `when`)
 - Prefer constructor injection to make tests more readable and maintainable
+- Tests must be run and pass before any PR or commit
+- Always verify API compatibility in external libraries by writing tests
+- Use explicit versions in build.gradle.kts for all dependencies
+- When working with external API clients (AWS, Kubernetes, etc.), use mocks in tests to avoid reliance on live services
