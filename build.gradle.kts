@@ -10,6 +10,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
     id("jacoco-report-aggregation")
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
+    id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 // Group and version are defined in gradle.properties
@@ -38,6 +40,7 @@ subprojects {
         plugin("org.jetbrains.kotlin.jvm")
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("io.spring.dependency-management")
+        plugin("org.jlleitschuh.gradle.ktlint")
     }
 
     // Get all versions from gradle.properties
@@ -95,6 +98,20 @@ subprojects {
 
     kotlin {
         jvmToolchain(17)
+    }
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        verbose.set(true)
+        android.set(false)
+        outputToConsole.set(true)
+        outputColorName.set("RED")
+        ignoreFailures.set(true) // Set to true for CI to continue on lint errors
+        enableExperimentalRules.set(true)
+
+        filter {
+            exclude("**/generated/**")
+            exclude("**/build/**")
+        }
     }
 }
 
@@ -181,3 +198,10 @@ tasks.register("testWithCoverage") {
     finalizedBy(jacocoAggregatedReport)
 }
 
+
+tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+    checkForGradleUpdate = true
+    outputFormatter = "json"
+    outputDir = "build/reports/dependencyUpdates"
+    reportfileName = "report"
+}
