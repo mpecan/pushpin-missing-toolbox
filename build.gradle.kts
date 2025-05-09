@@ -1,3 +1,12 @@
+import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+
+// Get versions from gradle.properties
+val kotlinVersion: String by project
+val springBootVersion: String by project
+val springDependencyManagementVersion: String by project
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -7,13 +16,7 @@ plugins {
     id("jacoco-report-aggregation")
 }
 
-// Import JaCoCo tasks and Kotlin extensions
-import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
+// Group and version are defined in gradle.properties
 
 java {
     toolchain {
@@ -23,6 +26,80 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+// Centralized dependency declarations for all subprojects
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// Apply common configurations and dependencies to all subprojects
+subprojects {
+    // Apply plugins
+    apply {
+        plugin("org.jetbrains.kotlin.jvm")
+        plugin("org.jetbrains.kotlin.plugin.spring")
+        plugin("io.spring.dependency-management")
+    }
+
+    // Get all versions from gradle.properties
+    val jacocoVersion: String by project
+    val testcontainersVersion: String by project
+    val mockitoKotlinVersion: String by project
+    val awsSdkVersion: String by project
+    val commonsCompressVersion: String by project
+    val servletApiVersion: String by project
+    val kubernetesClientVersion: String by project
+
+    // Apply dependency management
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
+            mavenBom("software.amazon.awssdk:bom:$awsSdkVersion")
+            mavenBom("org.testcontainers:testcontainers-bom:$testcontainersVersion")
+        }
+
+        dependencies {
+            // Kotlin dependencies
+            dependency("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+            dependency("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+            dependency("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+            dependency("org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion")
+
+            // Test dependencies
+            dependency("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
+            dependency("org.apache.commons:commons-compress:$commonsCompressVersion")
+            dependency("javax.servlet:javax.servlet-api:$servletApiVersion")
+
+            // AWS SDK dependencies
+            dependency("software.amazon.awssdk:ec2:$awsSdkVersion")
+            dependency("software.amazon.awssdk:autoscaling:$awsSdkVersion")
+            dependency("software.amazon.awssdk:sts:$awsSdkVersion")
+
+            // Kubernetes client dependencies
+            dependency("io.kubernetes:client-java:$kubernetesClientVersion")
+            dependency("io.kubernetes:client-java-api:$kubernetesClientVersion")
+            dependency("io.kubernetes:client-java-spring-integration:$kubernetesClientVersion")
+        }
+    }
+
+    // Common configurations for all subprojects
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 // Configure all subprojects to use JaCoCo

@@ -1,17 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.4"
-    id("io.spring.dependency-management") version "1.1.7"
+    id("org.springframework.boot")
     id("jacoco")
 }
 
-group = "io.github.mpecan"
-version = "0.0.1-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
+// Group and version are inherited from root project
 
 dependencies {
     implementation(project(":pushpin-api"))
@@ -26,22 +18,22 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation(kotlin("test"))
 }
 
-tasks.bootJar{
+tasks.bootJar {
     enabled = false
 }
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(21)
+
+tasks.jar {
+    enabled = true
 }
 
+val jacocoVersion: String by project
+
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = jacocoVersion
 }
 
 tasks.jacocoTestReport {
