@@ -17,8 +17,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Properties: camelCase (controlPort)
 - Test methods: use backticks with descriptive names
 
+## Dependency Management
+- Prefer constructor injection over field injection for better testability
+- Use primary constructors with default values for dependencies where appropriate
+- For external services (like AWS), inject clients or factories to allow mocking in tests
+- For testing, use mockito-kotlin library with constructor injection instead of subclassing
+
 ## Testing
 - JUnit 5 with Spring Boot Test
 - Integration tests use Testcontainers
 - Test classes: *Test for unit tests, *IntegrationTest for integration
 - HTTP errors use standard Spring status codes
+- Use mockito-kotlin for cleaner mocking syntax (e.g., use `whenever` instead of `when`)
+- Prefer constructor injection to make tests more readable and maintainable
