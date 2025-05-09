@@ -26,11 +26,10 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     
-    // AWS SDK dependencies
-    implementation(platform("software.amazon.awssdk:bom:2.25.13")) // Use the BOM for AWS SDK version management
-    implementation("software.amazon.awssdk:ec2")                   // EC2 client
-    implementation("software.amazon.awssdk:autoscaling")           // Auto Scaling client
-    implementation("software.amazon.awssdk:sts")                   // STS for IAM role support
+    // Kubernetes client dependencies
+    implementation("io.kubernetes:client-java:20.0.0")
+    implementation("io.kubernetes:client-java-api:20.0.0")
+    implementation("io.kubernetes:client-java-spring-integration:20.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
@@ -38,8 +37,8 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     testImplementation(kotlin("test"))
     
-    // AWS testing dependencies
-    testImplementation("org.testcontainers:localstack:1.19.8")
+    // Kubernetes testing dependencies
+    testImplementation("org.testcontainers:k3s:1.19.8")
 }
 
 tasks.bootJar{
@@ -69,7 +68,7 @@ tasks.jacocoTestReport {
         csv.required.set(false)
     }
 
-    // Exclude auto-configuration classes from coverage
+    // Exclude KubernetesDiscoveryAutoConfiguration from coverage since it's just configuration
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
