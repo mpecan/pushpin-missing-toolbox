@@ -2,7 +2,6 @@ package io.github.mpecan.pmt.discovery.kubernetes.health
 
 import io.github.mpecan.pmt.discovery.kubernetes.KubernetesDiscoveryProperties
 import io.kubernetes.client.openapi.models.V1Pod
-import io.kubernetes.client.openapi.models.V1PodCondition
 import org.slf4j.LoggerFactory
 
 /**

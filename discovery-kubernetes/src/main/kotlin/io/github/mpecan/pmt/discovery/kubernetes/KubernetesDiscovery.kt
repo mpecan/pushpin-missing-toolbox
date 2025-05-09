@@ -1,7 +1,6 @@
 package io.github.mpecan.pmt.discovery.kubernetes
 
 import io.github.mpecan.pmt.discovery.PushpinDiscovery
-import io.github.mpecan.pmt.discovery.kubernetes.clients.KubernetesClientProvider
 import io.github.mpecan.pmt.discovery.kubernetes.converter.PodConverter
 import io.github.mpecan.pmt.discovery.kubernetes.health.PodHealthChecker
 import io.github.mpecan.pmt.discovery.kubernetes.pods.KubernetesPodProvider

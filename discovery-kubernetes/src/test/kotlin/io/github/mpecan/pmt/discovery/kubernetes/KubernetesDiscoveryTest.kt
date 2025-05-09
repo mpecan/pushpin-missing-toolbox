@@ -11,10 +11,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import reactor.core.publisher.Flux
 import reactor.test.StepVerifier
 import java.time.Duration
-import java.util.Collections
 
 class KubernetesDiscoveryTest {
 

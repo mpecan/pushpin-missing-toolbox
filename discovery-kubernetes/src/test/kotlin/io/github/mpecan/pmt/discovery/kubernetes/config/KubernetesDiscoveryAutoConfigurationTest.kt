@@ -3,11 +3,8 @@ package io.github.mpecan.pmt.discovery.kubernetes.config
 import io.github.mpecan.pmt.discovery.kubernetes.KubernetesDiscovery
 import io.github.mpecan.pmt.discovery.kubernetes.KubernetesDiscoveryProperties
 import io.github.mpecan.pmt.discovery.kubernetes.clients.KubernetesClientProvider
-import io.github.mpecan.pmt.discovery.kubernetes.converter.DefaultPodConverter
 import io.github.mpecan.pmt.discovery.kubernetes.converter.PodConverter
-import io.github.mpecan.pmt.discovery.kubernetes.health.DefaultPodHealthChecker
 import io.github.mpecan.pmt.discovery.kubernetes.health.PodHealthChecker
-import io.github.mpecan.pmt.discovery.kubernetes.pods.DefaultKubernetesPodProvider
 import io.github.mpecan.pmt.discovery.kubernetes.pods.KubernetesPodProvider
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test

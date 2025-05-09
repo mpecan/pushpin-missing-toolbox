@@ -9,13 +9,13 @@ import io.github.mpecan.pmt.discovery.kubernetes.health.DefaultPodHealthChecker
 import io.github.mpecan.pmt.discovery.kubernetes.health.PodHealthChecker
 import io.github.mpecan.pmt.discovery.kubernetes.pods.DefaultKubernetesPodProvider
 import io.github.mpecan.pmt.discovery.kubernetes.pods.KubernetesPodProvider
+import io.kubernetes.client.openapi.ApiClient
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import io.kubernetes.client.openapi.ApiClient
 
 /**
  * Autoconfiguration for Kubernetes-based Pushpin discovery.

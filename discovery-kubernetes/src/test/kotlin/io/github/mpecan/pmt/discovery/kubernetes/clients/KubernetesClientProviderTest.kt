@@ -1,17 +1,10 @@
 package io.github.mpecan.pmt.discovery.kubernetes.clients
 
 import io.github.mpecan.pmt.discovery.kubernetes.KubernetesDiscoveryProperties
-import io.kubernetes.client.util.Config
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.test.assertNotNull
 
 class KubernetesClientProviderTest {
-
-    @TempDir
-    lateinit var tempDir: Path
     
     private val provider = KubernetesClientProvider()
 
