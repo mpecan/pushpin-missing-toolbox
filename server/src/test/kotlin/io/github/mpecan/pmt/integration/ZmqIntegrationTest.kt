@@ -3,6 +3,7 @@ package io.github.mpecan.pmt.integration
 import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.service.PushpinService
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
@@ -24,7 +25,7 @@ import java.util.*
 class ZmqIntegrationTest : PushpinIntegrationTest() {
 
     companion object {
-        val definedPort = Random().nextInt(12000, 14000)
+        val definedPort = PortProvider.getPort()
 
         /**
          * Create and start a Pushpin container

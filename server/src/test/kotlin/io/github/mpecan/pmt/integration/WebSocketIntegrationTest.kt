@@ -1,6 +1,7 @@
 package io.github.mpecan.pmt.integration
 
 import io.github.mpecan.pmt.client.WebSocketClient
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
@@ -27,7 +28,7 @@ import java.util.*
 class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
     companion object {
-        val definedPort = Random().nextInt(10000, 12000)
+        val definedPort = PortProvider.getPort()
 
         /**
          * Create and start a Pushpin container

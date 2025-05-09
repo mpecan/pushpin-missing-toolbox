@@ -2,9 +2,9 @@ package io.github.mpecan.pmt.integration
 
 import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.service.PushpinService
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinContainer
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.AfterEach
@@ -22,7 +22,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.random.Random
 
 /**
  * Integration tests for multi-server message delivery.
@@ -38,7 +37,7 @@ class MultiServerIntegrationTest {
 
     companion object {
         private val network = Network.newNetwork()
-        private val SERVER_PORT = Random.nextInt(13000, 14000)
+        private val SERVER_PORT = PortProvider.getPort()
 
         // Create individual Pushpin containers with shared network
         @Container
