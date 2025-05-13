@@ -1,15 +1,21 @@
 package io.github.mpecan.pmt.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.model.PushpinHttpMessage
 import io.github.mpecan.pmt.model.PushpinServer
+import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.encryption.ChannelEncryptionService
+import io.github.mpecan.pmt.security.model.ChannelPermission
+import io.github.mpecan.pmt.security.service.ChannelAuthorizationService
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -27,7 +33,9 @@ class PushpinService(
     private val discoveryManager: PushpinDiscoveryManager,
     private val messageSerializer: MessageSerializer,
     private val zmqPublisher: ZmqPublisher,
-    private val objectMapper: ObjectMapper,
+    private val channelAuthorizationService: ChannelAuthorizationService,
+    private val channelEncryptionService: ChannelEncryptionService,
+    private val auditLogService: AuditLogService
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
@@ -57,13 +65,63 @@ class PushpinService(
      *
      * If ZMQ is enabled, it will publish to all active servers via ZMQ.
      * Otherwise, it will publish to a single server via HTTP using round-robin selection.
+     *
+     * Before publishing, the method checks if the user has permission to publish to the channel
+     * and encrypts the message content if encryption is enabled.
      */
     fun publishMessage(message: Message): Mono<Boolean> {
-        if (pushpinProperties.zmqEnabled) {
-            return publishViaZmq(message)
-        } else {
-            return publishViaHttp(message)
+        // Check if user has permission to publish to this channel
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication != null && pushpinProperties.authEnabled) {
+            // Check channel authorization
+            if (!hasPermissionToPublish(authentication, message.channel)) {
+                val username = authentication.name
+                auditLogService.logAuthorizationFailure(
+                    username,
+                    "unknown",
+                    "channel:${message.channel}",
+                    "WRITE"
+                )
+                return Mono.error(AccessDeniedException("No permission to publish to channel ${message.channel}"))
+            }
+
+            // Log channel access
+            auditLogService.logChannelAccess(
+                authentication.name,
+                "unknown",
+                message.channel,
+                "publish message"
+            )
         }
+
+        // Encrypt message data if needed
+        if (pushpinProperties.security.encryption.enabled) {
+            // Convert data to string, encrypt it, and create a new message
+            val dataStr = message.data.toString()
+            val encryptedData = channelEncryptionService.encrypt(dataStr)
+            val encryptedMessage = message.copy(
+                data = encryptedData
+            )
+
+            if (pushpinProperties.zmqEnabled) {
+                return publishViaZmq(encryptedMessage)
+            } else {
+                return publishViaHttp(encryptedMessage)
+            }
+        } else {
+            if (pushpinProperties.zmqEnabled) {
+                return publishViaZmq(message)
+            } else {
+                return publishViaHttp(message)
+            }
+        }
+    }
+
+    /**
+     * Checks if the user has permission to publish to the specified channel.
+     */
+    private fun hasPermissionToPublish(authentication: Authentication, channelId: String): Boolean {
+        return channelAuthorizationService.hasPermission(authentication, channelId, ChannelPermission.WRITE)
     }
 
     /**

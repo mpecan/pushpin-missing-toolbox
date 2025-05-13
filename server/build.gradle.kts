@@ -22,6 +22,18 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
+    // OAuth2 Resource Server and JWT
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+
+    // For symmetric key token generation in the AuthController (development/testing only)
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+    // Rate limiting
+    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0")
+
     // ZeroMQ for multi-server support
     implementation("org.zeromq:jeromq:0.5.4")
 

@@ -1,9 +1,11 @@
 package io.github.mpecan.pmt.service
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
+import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.encryption.ChannelEncryptionService
+import io.github.mpecan.pmt.security.service.ChannelAuthorizationService
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,6 +21,9 @@ class PushpinServiceTest {
     private val messageSerializer: MessageSerializer = mock()
     private val discoveryManager: PushpinDiscoveryManager = mock()
     private val zmqPublisher: ZmqPublisher = mock()
+    private val channelAuthorizationService: ChannelAuthorizationService = mock()
+    private val channelEncryptionService: ChannelEncryptionService = mock()
+    private val auditLogService: AuditLogService = mock()
 
     private lateinit var pushpinProperties: PushpinProperties
     private lateinit var pushpinService: PushpinService
@@ -45,13 +50,25 @@ class PushpinServiceTest {
             healthCheckEnabled = false
         )
 
+        // Create security properties
+        val securityProps = PushpinProperties.SecurityProperties(
+            encryption = PushpinProperties.EncryptionProperties(enabled = false)
+        )
+
+        // Update properties to include security settings
+        pushpinProperties = pushpinProperties.copy(
+            security = securityProps
+        )
+
         // Create service with mocked dependencies
         pushpinService = PushpinService(
             pushpinProperties,
             discoveryManager,
             messageSerializer,
             zmqPublisher,
-             jacksonObjectMapper()
+            channelAuthorizationService,
+            channelEncryptionService,
+            auditLogService
         )
 
         // Use reflection to replace the webClient with our mock

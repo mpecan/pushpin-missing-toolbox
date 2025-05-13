@@ -8,7 +8,14 @@ A Spring Boot application for managing multiple Pushpin servers and allowing sys
 - Load balancing between Pushpin servers
 - Multi-server message broadcasting using ZeroMQ
 - Health checks for Pushpin servers
-- Authentication mechanism for secure communication
+- Comprehensive security features:
+  - Multiple authentication mechanisms (token-based, JWT)
+  - Role-based access control for channel operations
+  - Channel-level permissions (read/write/admin)
+  - Rate limiting to prevent abuse
+  - HMAC signature verification for server-to-server communication
+  - Encryption for sensitive channel data
+  - Detailed security audit logging
 - RESTful API for publishing messages
 - Server-Sent Events (SSE) support for realtime updates
 - Extensible server discovery system (configuration-based, AWS, Kubernetes, etc.)
@@ -64,9 +71,35 @@ pushpin.defaultTimeout=5000
 pushpin.authEnabled=false
 pushpin.authSecret=changeme
 
+# JWT Authentication
+pushpin.security.jwt.enabled=false
+pushpin.security.jwt.secret=changemechangemechangemechangemechangemechangeme
+pushpin.security.jwt.issuer=pushpin-missing-toolbox
+pushpin.security.jwt.audience=pushpin-client
+pushpin.security.jwt.expirationMs=3600000
+
+# Rate limiting
+pushpin.security.rateLimit.enabled=false
+pushpin.security.rateLimit.capacity=100
+pushpin.security.rateLimit.refillTimeInMillis=60000
+
+# Audit logging
+pushpin.security.auditLogging.enabled=true
+pushpin.security.auditLogging.level=INFO
+
+# HMAC request signing for server-to-server communication
+pushpin.security.hmac.enabled=false
+pushpin.security.hmac.algorithm=HmacSHA256
+pushpin.security.hmac.secretKey=changeme
+pushpin.security.hmac.headerName=X-Pushpin-Signature
+
+# Encryption for sensitive channel data
+pushpin.security.encryption.enabled=false
+pushpin.security.encryption.algorithm=AES/GCM/NoPadding
+pushpin.security.encryption.secretKey=
+
 # Multi-server ZMQ configuration
 pushpin.zmqEnabled=false
-pushpin.zmqSocketType=PUB
 pushpin.zmqHwm=1000
 pushpin.zmqLinger=0
 
@@ -149,9 +182,13 @@ To get information about healthy Pushpin servers:
 curl http://localhost:8080/api/pushpin/servers/healthy
 ```
 
-## Authentication
+## Security Features
 
-By default, authentication is disabled. To enable authentication:
+### Authentication
+
+The system supports multiple authentication methods:
+
+#### Token-based Authentication
 
 1. Set `pushpin.authEnabled=true` in the application.properties file
 2. Set a secure value for `pushpin.authSecret`
@@ -167,6 +204,137 @@ curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
     "message": "Hello, World!"
   }'
 ```
+
+#### JWT Authentication
+
+For more robust authentication using JWT tokens:
+
+1. Set `pushpin.authEnabled=true` in the application.properties file
+2. Set `pushpin.security.jwt.enabled=true`
+3. Configure JWT properties (provider, issuer, audience, etc.)
+4. Include the JWT token in the `Authorization` header
+
+The system supports multiple JWT providers:
+
+##### Symmetric Key (Development/Testing)
+
+```properties
+pushpin.security.jwt.provider=symmetric
+pushpin.security.jwt.secret=your-secret-key-at-least-32-chars-long
+pushpin.security.jwt.issuer=pushpin-missing-toolbox
+pushpin.security.jwt.audience=pushpin-client
+```
+
+For testing with the symmetric provider, you can get a token:
+
+```bash
+# Get JWT token
+curl -X POST http://localhost:8080/api/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "your-username",
+    "password": "your-password"
+  }'
+```
+
+##### Keycloak Integration
+
+```properties
+pushpin.security.jwt.provider=keycloak
+pushpin.security.jwt.jwksUri=https://your-keycloak-server/auth/realms/your-realm/protocol/openid-connect/certs
+pushpin.security.jwt.issuer=https://your-keycloak-server/auth/realms/your-realm
+pushpin.security.jwt.audience=your-client-id
+```
+
+##### Auth0 Integration
+
+```properties
+pushpin.security.jwt.provider=auth0
+pushpin.security.jwt.jwksUri=https://your-auth0-tenant.auth0.com/.well-known/jwks.json
+pushpin.security.jwt.issuer=https://your-auth0-tenant.auth0.com/
+pushpin.security.jwt.audience=your-api-identifier
+```
+
+Using the JWT token:
+
+```bash
+# Use the JWT token to authenticate requests
+curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-jwt-token-here" \
+  -d '{
+    "message": "Hello, World!"
+  }'
+```
+
+### Channel Permissions
+
+The system supports fine-grained permissions for channel operations:
+
+- **READ**: Ability to subscribe to a channel
+- **WRITE**: Ability to publish messages to a channel
+- **ADMIN**: Full administrative access to a channel
+
+Permissions can be granted to specific users or roles:
+
+```bash
+# Grant permissions to a user
+curl -X POST http://localhost:8080/api/auth/permissions/user \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer admin-jwt-token" \
+  -d '{
+    "username": "some-user",
+    "channelId": "some-channel",
+    "permissions": ["READ", "WRITE"]
+  }'
+
+# Grant permissions to a role
+curl -X POST http://localhost:8080/api/auth/permissions/role \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer admin-jwt-token" \
+  -d '{
+    "role": "ROLE_USER",
+    "channelId": "some-channel",
+    "permissions": ["READ"]
+  }'
+```
+
+### Rate Limiting
+
+To prevent abuse, you can enable rate limiting:
+
+1. Set `pushpin.security.rateLimit.enabled=true`
+2. Configure the capacity and refill time
+
+The system will automatically limit the number of requests per user or IP address.
+
+### Server-to-Server HMAC Signatures
+
+For secure server-to-server communication, you can enable HMAC signature verification:
+
+1. Set `pushpin.security.hmac.enabled=true`
+2. Configure a secure secret key
+3. Include the following headers in server-to-server requests:
+   - `X-Pushpin-Signature`: HMAC signature of the request body
+   - `X-Pushpin-Timestamp`: Current timestamp
+
+### Encryption for Sensitive Channel Data
+
+For channels that contain sensitive information, you can enable encryption:
+
+1. Set `pushpin.security.encryption.enabled=true`
+2. Configure an encryption secret key
+
+The system will automatically encrypt message content before publishing and decrypt it when retrieving.
+
+### Audit Logging
+
+The system includes comprehensive audit logging for security events:
+
+1. Set `pushpin.security.auditLogging.enabled=true`
+2. Choose a logging level (INFO, DEBUG, WARN, ERROR)
+
+Security events are logged with detailed information about the user, IP address, resource, and action.
 
 ## Multi-Server ZMQ Configuration
 
