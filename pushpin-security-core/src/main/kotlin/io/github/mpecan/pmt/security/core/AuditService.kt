@@ -42,6 +42,40 @@ interface AuditService {
      * Log a security configuration change event.
      */
     fun logSecurityConfigChange(username: String, ipAddress: String, details: String)
+    
+    /**
+     * Log a remote authorization check event.
+     */
+    fun logRemoteAuthorizationCheck(
+        username: String,
+        ipAddress: String,
+        channelId: String,
+        authorized: Boolean,
+        source: String = "remote",
+        duration: Long? = null
+    )
+    
+    /**
+     * Log a remote authorization error event.
+     */
+    fun logRemoteAuthorizationError(
+        username: String,
+        ipAddress: String,
+        channelId: String?,
+        error: String
+    )
+    
+    /**
+     * Log a channel list retrieval event.
+     */
+    fun logChannelListRetrieval(
+        username: String,
+        ipAddress: String,
+        channelCount: Int,
+        source: String = "remote",
+        duration: Long? = null,
+        pattern: String? = null
+    )
 }
 
 /**

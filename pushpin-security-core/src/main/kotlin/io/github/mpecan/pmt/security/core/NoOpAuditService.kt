@@ -34,4 +34,35 @@ class NoOpAuditService : AuditService {
     override fun logSecurityConfigChange(username: String, ipAddress: String, details: String) {
         // No-op
     }
+    
+    override fun logRemoteAuthorizationCheck(
+        username: String,
+        ipAddress: String,
+        channelId: String,
+        authorized: Boolean,
+        source: String,
+        duration: Long?
+    ) {
+        // No-op
+    }
+    
+    override fun logRemoteAuthorizationError(
+        username: String,
+        ipAddress: String,
+        channelId: String?,
+        error: String
+    ) {
+        // No-op
+    }
+    
+    override fun logChannelListRetrieval(
+        username: String,
+        ipAddress: String,
+        channelCount: Int,
+        source: String,
+        duration: Long?,
+        pattern: String?
+    ) {
+        // No-op
+    }
 }

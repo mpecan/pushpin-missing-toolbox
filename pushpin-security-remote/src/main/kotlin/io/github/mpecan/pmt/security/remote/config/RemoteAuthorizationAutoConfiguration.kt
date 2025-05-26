@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.security.remote.config
 
+import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.remote.HttpRemoteSubscriptionClient
 import io.github.mpecan.pmt.security.remote.RemoteAuthorizationClient
 import io.github.mpecan.pmt.security.remote.RemoteAuthorizationProperties
@@ -53,9 +54,10 @@ class RemoteAuthorizationAutoConfiguration {
     fun remoteAuthorizationClient(
         properties: RemoteAuthorizationProperties,
         cache: SubscriptionAuthorizationCache,
-        restTemplate: RestTemplate
+        restTemplate: RestTemplate,
+        auditService: AuditService
     ): RemoteAuthorizationClient {
-        return HttpRemoteSubscriptionClient(properties, cache, restTemplate)
+        return HttpRemoteSubscriptionClient(properties, cache, restTemplate, auditService)
     }
 }
 

@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.security.remote
 
+import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.http.HttpServletRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -42,6 +43,9 @@ class HttpRemoteSubscriptionClientTest {
 
     @Mock
     private lateinit var mockRequest: HttpServletRequest
+
+    @Mock
+    private lateinit var mockAuditService: AuditService
 
     private lateinit var httpRemoteSubscriptionClient: HttpRemoteSubscriptionClient
     private lateinit var properties: RemoteAuthorizationProperties
@@ -101,7 +105,8 @@ class HttpRemoteSubscriptionClientTest {
         httpRemoteSubscriptionClient = HttpRemoteSubscriptionClient(
             properties,
             mockCache,
-            mockRestTemplate
+            mockRestTemplate,
+            mockAuditService
         )
     }
 

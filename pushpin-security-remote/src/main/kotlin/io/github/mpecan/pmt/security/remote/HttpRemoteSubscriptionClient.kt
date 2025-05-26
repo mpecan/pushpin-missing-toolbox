@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.security.remote
 
+import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
@@ -18,95 +19,193 @@ import java.net.URI
 class HttpRemoteSubscriptionClient(
     private val properties: RemoteAuthorizationProperties,
     private val cache: SubscriptionAuthorizationCache,
-    private val restTemplate: RestTemplate
+    private val restTemplate: RestTemplate,
+    private val auditService: AuditService
 ) : RemoteAuthorizationClient {
     private val logger = LoggerFactory.getLogger(HttpRemoteSubscriptionClient::class.java)
 
     override fun canSubscribe(request: HttpServletRequest, channelId: String): Boolean {
-        val userId = getCurrentUserId() ?: return false
+        val userId = getCurrentUserId()
+        if (userId == null) {
+            auditService.logAuthFailure(
+                username = "anonymous",
+                ipAddress = request.remoteAddr,
+                details = "No authenticated user for channel subscription check: $channelId"
+            )
+            return false
+        }
         
         // Check cache first if enabled
         if (properties.cache.enabled) {
             cache.getSubscriptionCheck(userId, channelId)?.let {
                 logger.debug("Cache hit for subscription check: user={}, channel={}, result={}", 
                     userId, channelId, it)
+                auditService.logRemoteAuthorizationCheck(
+                    username = userId,
+                    ipAddress = request.remoteAddr,
+                    channelId = channelId,
+                    authorized = it,
+                    source = "cache"
+                )
                 return it
             }
         }
         
+        val startTime = System.currentTimeMillis()
         try {
             val result = when (properties.method.uppercase()) {
                 "GET" -> checkSubscriptionWithGet(request, userId, channelId)
                 else -> checkSubscriptionWithPost(request, userId, channelId)
             }
             
+            val duration = System.currentTimeMillis() - startTime
+            
             // Cache the result if enabled
             if (properties.cache.enabled) {
                 cache.cacheSubscriptionCheck(userId, channelId, result)
             }
             
+            auditService.logRemoteAuthorizationCheck(
+                username = userId,
+                ipAddress = request.remoteAddr,
+                channelId = channelId,
+                authorized = result,
+                source = "remote",
+                duration = duration
+            )
+            
             return result
         } catch (e: Exception) {
             logger.error("Error checking subscription with remote service: {}", e.message)
+            auditService.logRemoteAuthorizationError(
+                username = userId,
+                ipAddress = request.remoteAddr,
+                channelId = channelId,
+                error = "${e.javaClass.simpleName}: ${e.message ?: "Unknown error"}"
+            )
             return false
         }
     }
 
     override fun getSubscribableChannels(request: HttpServletRequest): List<String> {
-        val userId = getCurrentUserId() ?: return emptyList()
+        val userId = getCurrentUserId()
+        if (userId == null) {
+            auditService.logAuthFailure(
+                username = "anonymous",
+                ipAddress = request.remoteAddr,
+                details = "No authenticated user for channel list retrieval"
+            )
+            return emptyList()
+        }
         
         // Check cache first if enabled
         if (properties.cache.enabled) {
             cache.getSubscribableChannels(userId)?.let {
                 logger.debug("Cache hit for subscribable channels: user={}, channels={}", userId, it)
+                auditService.logChannelListRetrieval(
+                    username = userId,
+                    ipAddress = request.remoteAddr,
+                    channelCount = it.size,
+                    source = "cache"
+                )
                 return it
             }
         }
         
+        val startTime = System.currentTimeMillis()
         try {
             val result = when (properties.method.uppercase()) {
                 "GET" -> getSubscribableChannelsWithGet(request, userId)
                 else -> getSubscribableChannelsWithPost(request, userId)
             }
             
+            val duration = System.currentTimeMillis() - startTime
+            
             // Cache the result if enabled
             if (properties.cache.enabled) {
                 cache.cacheSubscribableChannels(userId, result)
             }
             
+            auditService.logChannelListRetrieval(
+                username = userId,
+                ipAddress = request.remoteAddr,
+                channelCount = result.size,
+                source = "remote",
+                duration = duration
+            )
+            
             return result
         } catch (e: Exception) {
             logger.error("Error getting subscribable channels from remote service: {}", e.message)
+            auditService.logRemoteAuthorizationError(
+                username = userId,
+                ipAddress = request.remoteAddr,
+                channelId = null,
+                error = "Channel list retrieval failed - ${e.javaClass.simpleName}: ${e.message ?: "Unknown error"}"
+            )
             return emptyList()
         }
     }
 
     override fun getSubscribableChannelsByPattern(request: HttpServletRequest, pattern: String): List<String> {
-        val userId = getCurrentUserId() ?: return emptyList()
+        val userId = getCurrentUserId()
+        if (userId == null) {
+            auditService.logAuthFailure(
+                username = "anonymous",
+                ipAddress = request.remoteAddr,
+                details = "No authenticated user for channel list by pattern: $pattern"
+            )
+            return emptyList()
+        }
         
         // Check cache first if enabled
         if (properties.cache.enabled) {
             cache.getSubscribableChannelsByPattern(userId, pattern)?.let {
                 logger.debug("Cache hit for channels by pattern: user={}, pattern={}, channels={}", 
                     userId, pattern, it)
+                auditService.logChannelListRetrieval(
+                    username = userId,
+                    ipAddress = request.remoteAddr,
+                    channelCount = it.size,
+                    source = "cache",
+                    pattern = pattern
+                )
                 return it
             }
         }
         
+        val startTime = System.currentTimeMillis()
         try {
             val result = when (properties.method.uppercase()) {
                 "GET" -> getChannelsByPatternWithGet(request, userId, pattern)
                 else -> getChannelsByPatternWithPost(request, userId, pattern)
             }
             
+            val duration = System.currentTimeMillis() - startTime
+            
             // Cache the result if enabled
             if (properties.cache.enabled) {
                 cache.cacheSubscribableChannelsByPattern(userId, pattern, result)
             }
             
+            auditService.logChannelListRetrieval(
+                username = userId,
+                ipAddress = request.remoteAddr,
+                channelCount = result.size,
+                source = "remote",
+                duration = duration,
+                pattern = pattern
+            )
+            
             return result
         } catch (e: Exception) {
             logger.error("Error getting channels by pattern from remote service: {}", e.message)
+            auditService.logRemoteAuthorizationError(
+                username = userId,
+                ipAddress = request.remoteAddr,
+                channelId = null,
+                error = "Channel list by pattern failed - ${e.javaClass.simpleName}: ${e.message ?: "Unknown error"} (pattern: $pattern)"
+            )
             return emptyList()
         }
     }

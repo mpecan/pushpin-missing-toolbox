@@ -137,4 +137,64 @@ class DefaultAuditLogService(
             details = details
         ))
     }
+    
+    /**
+     * Log a remote authorization check event.
+     */
+    override fun logRemoteAuthorizationCheck(
+        username: String,
+        ipAddress: String,
+        channelId: String,
+        authorized: Boolean,
+        source: String,
+        duration: Long?
+    ) {
+        val action = if (authorized) "authorized" else "denied"
+        val durationInfo = duration?.let { " (${it}ms)" } ?: ""
+        log(AuditEvent(
+            type = AuditEventType.AUTHORIZATION_FAILURE, // Reuse existing type or could be CHANNEL_ACCESS
+            username = username,
+            ipAddress = ipAddress,
+            details = "Remote authorization $action for channel '$channelId' from $source$durationInfo"
+        ))
+    }
+    
+    /**
+     * Log a remote authorization error event.
+     */
+    override fun logRemoteAuthorizationError(
+        username: String,
+        ipAddress: String,
+        channelId: String?,
+        error: String
+    ) {
+        val channelInfo = channelId?.let { " for channel '$it'" } ?: ""
+        log(AuditEvent(
+            type = AuditEventType.AUTHORIZATION_FAILURE,
+            username = username,
+            ipAddress = ipAddress,
+            details = "Remote authorization error$channelInfo: $error"
+        ))
+    }
+    
+    /**
+     * Log a channel list retrieval event.
+     */
+    override fun logChannelListRetrieval(
+        username: String,
+        ipAddress: String,
+        channelCount: Int,
+        source: String,
+        duration: Long?,
+        pattern: String?
+    ) {
+        val patternInfo = pattern?.let { " matching pattern '$it'" } ?: ""
+        val durationInfo = duration?.let { " (${it}ms)" } ?: ""
+        log(AuditEvent(
+            type = AuditEventType.CHANNEL_ACCESS,
+            username = username,
+            ipAddress = ipAddress,
+            details = "Retrieved $channelCount channels$patternInfo from $source$durationInfo"
+        ))
+    }
 }
