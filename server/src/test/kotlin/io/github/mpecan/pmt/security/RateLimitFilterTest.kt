@@ -2,7 +2,7 @@ package io.github.mpecan.pmt.security
 
 import io.github.bucket4j.Bucket
 import io.github.mpecan.pmt.config.PushpinProperties
-import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -24,7 +24,7 @@ class RateLimitFilterTest {
     private lateinit var mockResponse: HttpServletResponse
     private lateinit var mockFilterChain: FilterChain
     private lateinit var mockPrintWriter: PrintWriter
-    private lateinit var mockAuditLogService: AuditLogService
+    private lateinit var mockAuditService: AuditService
     private lateinit var properties: PushpinProperties
     private lateinit var buckets: ConcurrentHashMap<String, Bucket>
 
@@ -38,7 +38,7 @@ class RateLimitFilterTest {
         mockResponse = mock()
         mockFilterChain = mock()
         mockPrintWriter = mock()
-        mockAuditLogService = mock()
+        mockAuditService = mock()
         buckets = spy(ConcurrentHashMap<String, Bucket>())
 
         // Set up response writer
@@ -63,7 +63,7 @@ class RateLimitFilterTest {
         }
 
         // Create rate limit filter with mocked buckets
-        rateLimitFilter = RateLimitFilter(properties, mockAuditLogService, buckets)
+        rateLimitFilter = RateLimitFilter(properties, mockAuditService, buckets)
     }
 
     @Test
@@ -166,7 +166,7 @@ class RateLimitFilterTest {
         verify(mockResponse).contentType = "application/json"
         verify(mockResponse.writer).write(any<String>())
         verify(mockFilterChain, never()).doFilter(any(), any()) // Filter chain should not be called
-        verify(mockAuditLogService).logRateLimitExceeded(eq(null), any<String>()   )
+        verify(mockAuditService).logRateLimitExceeded(eq(null), any<String>()   )
     }
 
     @Test
@@ -223,7 +223,7 @@ class RateLimitFilterTest {
 
         // Arrange - Create a real filter with a real bucket map
         val realBuckets = ConcurrentHashMap<String, Bucket>()
-        val filterWithRealBuckets = RateLimitFilter(properties, mockAuditLogService,realBuckets)
+        val filterWithRealBuckets = RateLimitFilter(properties, mockAuditService,realBuckets)
 
         // Act
         filterWithRealBuckets.doFilter(mockRequest, mockResponse, mockFilterChain)

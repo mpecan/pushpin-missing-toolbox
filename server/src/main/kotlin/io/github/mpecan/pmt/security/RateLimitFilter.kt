@@ -4,7 +4,7 @@ import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.bucket4j.Bandwidth
 import io.github.bucket4j.Bucket
 import io.github.bucket4j.Refill
-import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class RateLimitFilter(
     private val properties: PushpinProperties,
-    private val auditLogService: AuditLogService,
+    private val auditService: AuditService,
     private val buckets: ConcurrentHashMap<String, Bucket> = ConcurrentHashMap()
 ) : OncePerRequestFilter() {
 
@@ -49,7 +49,7 @@ class RateLimitFilter(
             filterChain.doFilter(request, response)
         } else {
             // Rate limit exceeded, return 429 Too Many Requests
-            auditLogService.logRateLimitExceeded(key.username, key.ip)
+            auditService.logRateLimitExceeded(key.username, key.ip)
             response.status = HttpStatus.TOO_MANY_REQUESTS.value()
             response.setHeader("X-Rate-Limit-Exceeded", "true")
             response.contentType = "application/json"

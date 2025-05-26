@@ -6,7 +6,7 @@ import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.model.PushpinHttpMessage
 import io.github.mpecan.pmt.model.PushpinServer
-import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.encryption.ChannelEncryptionService
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.slf4j.LoggerFactory
@@ -31,7 +31,7 @@ class PushpinService(
     private val messageSerializer: MessageSerializer,
     private val zmqPublisher: ZmqPublisher,
     private val channelEncryptionService: ChannelEncryptionService,
-    private val auditLogService: AuditLogService
+    private val auditService: AuditService
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
     private val webClient = WebClient.builder().build()
@@ -70,7 +70,7 @@ class PushpinService(
         // Log publishing activity for audit purposes
         val authentication = SecurityContextHolder.getContext().authentication
         if (authentication != null) {
-            auditLogService.logChannelAccess(
+            auditService.logChannelAccess(
                 authentication.name,
                 "backend-service",
                 message.channel,

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":discovery-kubernetes"))
     implementation(project(":pushpin-security-core"))
     implementation(project(":pushpin-security-remote"))
+    implementation(project(":pushpin-security-audit"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")

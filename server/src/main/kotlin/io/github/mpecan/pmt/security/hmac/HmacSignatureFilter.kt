@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.security.hmac
 
 import io.github.mpecan.pmt.config.PushpinProperties
-import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -15,7 +15,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper
 class HmacSignatureFilter(
     private val properties: PushpinProperties,
     private val hmacSignatureService: HmacSignatureService,
-    private val auditLogService: AuditLogService
+    private val auditService: AuditService
 ) : OncePerRequestFilter() {
     
     // Request paths that are excluded from HMAC verification
@@ -50,7 +50,7 @@ class HmacSignatureFilter(
         
         if (signature == null || timestamp == null) {
             // Missing required headers
-            auditLogService.logAuthorizationFailure(
+            auditService.logAuthorizationFailure(
                 "server-to-server",
                 request.remoteAddr,
                 request.requestURI,
@@ -80,7 +80,7 @@ class HmacSignatureFilter(
         
         if (!isValid) {
             // Invalid signature, log the event
-            auditLogService.logAuthorizationFailure(
+            auditService.logAuthorizationFailure(
                 "server-to-server",
                 request.remoteAddr,
                 request.requestURI,

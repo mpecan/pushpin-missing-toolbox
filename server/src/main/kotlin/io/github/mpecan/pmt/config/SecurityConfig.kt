@@ -2,7 +2,7 @@ package io.github.mpecan.pmt.config
 
 import io.github.mpecan.pmt.security.JwtDecoderProvider
 import io.github.mpecan.pmt.security.RateLimitFilter
-import io.github.mpecan.pmt.security.audit.AuditLogService
+import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.hmac.HmacSignatureFilter
 import io.github.mpecan.pmt.security.hmac.HmacSignatureService
 import jakarta.servlet.FilterChain
@@ -37,7 +37,7 @@ class SecurityConfig(
     private val jwtDecoderProvider: JwtDecoderProvider,
     private val jwtAuthenticationConverter: Converter<Jwt, AbstractAuthenticationToken>,
     private val hmacSignatureService: HmacSignatureService,
-    private val auditLogService: AuditLogService
+    private val auditService: AuditService
 ) {
     /**
      * Configures the security filter chain.
@@ -59,7 +59,7 @@ class SecurityConfig(
         // Add rate limiting if enabled
         if (pushpinProperties.security.rateLimit.enabled) {
             http.addFilterBefore(
-                RateLimitFilter(pushpinProperties, auditLogService),
+                RateLimitFilter(pushpinProperties, auditService),
                 UsernamePasswordAuthenticationFilter::class.java
             )
         }
@@ -67,7 +67,7 @@ class SecurityConfig(
         // Add HMAC signature verification if enabled
         if (pushpinProperties.security.hmac.enabled) {
             http.addFilterBefore(
-                HmacSignatureFilter(pushpinProperties, hmacSignatureService, auditLogService),
+                HmacSignatureFilter(pushpinProperties, hmacSignatureService, auditService),
                 UsernamePasswordAuthenticationFilter::class.java
             )
         }
@@ -85,7 +85,7 @@ class SecurityConfig(
             } else {
                 // Legacy token-based authentication
                 http.addFilterBefore(
-                    PushpinAuthFilter(pushpinProperties.authSecret, auditLogService),
+                    PushpinAuthFilter(pushpinProperties.authSecret, auditService),
                     UsernamePasswordAuthenticationFilter::class.java
                 )
             }
@@ -132,7 +132,7 @@ class SecurityConfig(
  */
 class PushpinAuthFilter(
     private val authSecret: String,
-    private val auditLogService: AuditLogService
+    private val auditService: AuditService
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -149,14 +149,14 @@ class PushpinAuthFilter(
             SecurityContextHolder.getContext().authentication = auth
 
             // Log successful authentication
-            auditLogService.logAuthSuccess(
+            auditService.logAuthSuccess(
                 "pushpin",
                 request.remoteAddr,
                 "Legacy token authentication"
             )
         } else if (authHeader != null) {
             // Log failed authentication
-            auditLogService.logAuthFailure(
+            auditService.logAuthFailure(
                 "unknown",
                 request.remoteAddr,
                 "Invalid legacy token"

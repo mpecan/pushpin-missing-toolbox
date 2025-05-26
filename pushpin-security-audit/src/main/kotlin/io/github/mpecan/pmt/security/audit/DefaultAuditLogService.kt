@@ -1,17 +1,16 @@
 package io.github.mpecan.pmt.security.audit
 
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.core.AuditEvent
 import io.github.mpecan.pmt.security.core.AuditEventType
 import io.github.mpecan.pmt.security.core.AuditService
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 
 /**
- * Service for logging security-related audit events.
+ * Default implementation of AuditService that logs to SLF4J.
  */
-@Service
-class AuditLogService(private val properties: PushpinProperties) : AuditService {
+class DefaultAuditLogService(
+    private val properties: AuditProperties
+) : AuditService {
     
     private val logger = LoggerFactory.getLogger("audit")
     
@@ -19,15 +18,36 @@ class AuditLogService(private val properties: PushpinProperties) : AuditService 
      * Log an audit event.
      */
     override fun log(event: AuditEvent) {
-        if (!properties.security.auditLogging.enabled) {
+        if (!properties.enabled) {
             return
         }
         
-        when (properties.security.auditLogging.level.uppercase()) {
-            "DEBUG" -> logger.debug(formatEvent(event))
-            "WARN" -> logger.warn(formatEvent(event))
-            "ERROR" -> logger.error(formatEvent(event))
-            else -> logger.info(formatEvent(event))
+        // Filter events based on configuration
+        when (event.type) {
+            AuditEventType.AUTHENTICATION_SUCCESS -> {
+                if (!properties.logSuccessfulAuth) return
+            }
+            AuditEventType.AUTHENTICATION_FAILURE -> {
+                if (!properties.logFailedAuth) return
+            }
+            AuditEventType.CHANNEL_ACCESS -> {
+                if (!properties.logChannelAccess) return
+            }
+            AuditEventType.SECURITY_CONFIG_CHANGE -> {
+                if (!properties.logAdminActions) return
+            }
+            else -> {
+                // Always log other types (authorization failures, rate limits, etc.)
+            }
+        }
+        
+        val message = formatEvent(event)
+        
+        when (properties.level.uppercase()) {
+            "DEBUG" -> logger.debug(message)
+            "WARN" -> logger.warn(message)
+            "ERROR" -> logger.error(message)
+            else -> logger.info(message)
         }
     }
     
@@ -35,7 +55,15 @@ class AuditLogService(private val properties: PushpinProperties) : AuditService 
      * Format an audit event as a string.
      */
     private fun formatEvent(event: AuditEvent): String {
-        return "AUDIT: ${event.type} | User: ${event.username} | ${event.details} | IP: ${event.ipAddress} | Time: ${event.timestamp}"
+        val builder = StringBuilder()
+        builder.append("AUDIT: ${event.type}")
+        
+        event.username?.let { builder.append(" | User: $it") }
+        builder.append(" | ${event.details}")
+        builder.append(" | IP: ${event.ipAddress}")
+        builder.append(" | Time: ${event.timestamp}")
+        
+        return builder.toString()
     }
     
     /**
@@ -46,7 +74,7 @@ class AuditLogService(private val properties: PushpinProperties) : AuditService 
             type = AuditEventType.AUTHENTICATION_SUCCESS,
             username = username,
             ipAddress = ipAddress,
-            details = details
+            details = details.ifEmpty { "Authentication successful" }
         ))
     }
     
@@ -58,7 +86,7 @@ class AuditLogService(private val properties: PushpinProperties) : AuditService 
             type = AuditEventType.AUTHENTICATION_FAILURE,
             username = username,
             ipAddress = ipAddress,
-            details = details
+            details = details.ifEmpty { "Authentication failed" }
         ))
     }
     
