@@ -2,8 +2,6 @@ package io.github.mpecan.pmt.security.remote
 
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.audit.AuditLogService
-import io.github.mpecan.pmt.security.model.ChannelPermission
-import io.github.mpecan.pmt.security.model.ChannelPermissions
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -19,135 +17,126 @@ import java.net.URI
 
 /**
  * Implementation of RemoteAuthorizationClient that uses HTTP to communicate with a remote
- * authorization service.
+ * authorization service for channel subscriptions.
  */
 @Component
 @ConditionalOnProperty(name = ["pushpin.security.jwt.remoteAuthorization.enabled"], havingValue = "true")
-class HttpRemoteAuthorizationClient(
+class HttpRemoteSubscriptionClient(
     private val properties: PushpinProperties,
-    private val cache: AuthorizationCache,
+    private val cache: SubscriptionAuthorizationCache,
     private val auditLogService: AuditLogService,
     private val restTemplate: RestTemplate
 ) : RemoteAuthorizationClient {
-    private val logger = LoggerFactory.getLogger(HttpRemoteAuthorizationClient::class.java)
+    private val logger = LoggerFactory.getLogger(HttpRemoteSubscriptionClient::class.java)
 
-    override fun hasPermission(
-        request: HttpServletRequest,
-        channelId: String,
-        permission: ChannelPermission
-    ): Boolean {
+    override fun canSubscribe(request: HttpServletRequest, channelId: String): Boolean {
         val userId = getCurrentUserId() ?: return false
         
         // Check cache first if enabled
         if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
-            cache.getPermissionCheck(userId, channelId, permission)?.let {
-                logger.debug("Cache hit for permission check: user={}, channel={}, permission={}, result={}", 
-                    userId, channelId, permission, it)
+            cache.getSubscriptionCheck(userId, channelId)?.let {
+                logger.debug("Cache hit for subscription check: user={}, channel={}, result={}", 
+                    userId, channelId, it)
                 return it
             }
         }
         
         try {
             val result = when (properties.security.jwt.remoteAuthorization.method.uppercase()) {
-                "GET" -> checkPermissionWithGet(request, userId, channelId, permission)
-                else -> checkPermissionWithPost(request, userId, channelId, permission)
+                "GET" -> checkSubscriptionWithGet(request, userId, channelId)
+                else -> checkSubscriptionWithPost(request, userId, channelId)
             }
             
             // Cache the result if enabled
             if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
-                cache.cachePermissionCheck(userId, channelId, permission, result)
+                cache.cacheSubscriptionCheck(userId, channelId, result)
             }
             
             // Audit log the result
             if (!result) {
-                auditLogService.logAuthorizationFailure(userId, "remote-request", channelId, permission.name)
+                auditLogService.logChannelAccess(userId, request.remoteAddr, channelId, "subscription denied")
             }
             
             return result
         } catch (e: Exception) {
-            logger.error("Error checking permission with remote service: {}", e.message)
-            auditLogService.logAuthorizationFailure(userId, "remote-request", channelId, 
-                "ERROR: ${e.message ?: "Unknown error"}")
+            logger.error("Error checking subscription with remote service: {}", e.message)
+            auditLogService.logChannelAccess(userId, request.remoteAddr, channelId, 
+                "subscription error: ${e.message ?: "Unknown error"}")
             return false
         }
     }
 
-    override fun getChannelsWithPermission(
-        request: HttpServletRequest,
-        permission: ChannelPermission
-    ): List<String> {
+    override fun getSubscribableChannels(request: HttpServletRequest): List<String> {
         val userId = getCurrentUserId() ?: return emptyList()
         
         // Check cache first if enabled
         if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
-            cache.getChannelsWithPermission(userId, permission)?.let {
-                logger.debug("Cache hit for channels with permission: user={}, permission={}, channels={}", 
-                    userId, permission, it)
+            cache.getSubscribableChannels(userId)?.let {
+                logger.debug("Cache hit for subscribable channels: user={}, channels={}", userId, it)
                 return it
             }
         }
         
         try {
             val result = when (properties.security.jwt.remoteAuthorization.method.uppercase()) {
-                "GET" -> getChannelsWithPermissionWithGet(request, userId, permission)
-                else -> getChannelsWithPermissionWithPost(request, userId, permission)
+                "GET" -> getSubscribableChannelsWithGet(request, userId)
+                else -> getSubscribableChannelsWithPost(request, userId)
             }
             
             // Cache the result if enabled
             if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
-                cache.cacheChannelsWithPermission(userId, permission, result)
+                cache.cacheSubscribableChannels(userId, result)
             }
             
             return result
         } catch (e: Exception) {
-            logger.error("Error getting channels with permission from remote service: {}", e.message)
+            logger.error("Error getting subscribable channels from remote service: {}", e.message)
             return emptyList()
         }
     }
 
-    override fun getAllChannelPermissions(request: HttpServletRequest): List<ChannelPermissions> {
+    override fun getSubscribableChannelsByPattern(request: HttpServletRequest, pattern: String): List<String> {
         val userId = getCurrentUserId() ?: return emptyList()
         
         // Check cache first if enabled
         if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
-            cache.getAllChannelPermissions(userId)?.let {
-                logger.debug("Cache hit for all channel permissions: user={}, permissions={}", userId, it)
+            cache.getSubscribableChannelsByPattern(userId, pattern)?.let {
+                logger.debug("Cache hit for channels by pattern: user={}, pattern={}, channels={}", 
+                    userId, pattern, it)
                 return it
             }
         }
         
         try {
             val result = when (properties.security.jwt.remoteAuthorization.method.uppercase()) {
-                "GET" -> getAllChannelPermissionsWithGet(request, userId)
-                else -> getAllChannelPermissionsWithPost(request, userId)
+                "GET" -> getChannelsByPatternWithGet(request, userId, pattern)
+                else -> getChannelsByPatternWithPost(request, userId, pattern)
             }
             
             // Cache the result if enabled
             if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
-                cache.cacheAllChannelPermissions(userId, result)
+                cache.cacheSubscribableChannelsByPattern(userId, pattern, result)
             }
             
             return result
         } catch (e: Exception) {
-            logger.error("Error getting all channel permissions from remote service: {}", e.message)
+            logger.error("Error getting channels by pattern from remote service: {}", e.message)
             return emptyList()
         }
     }
     
     /**
-     * Check permission using HTTP GET.
+     * Check subscription using HTTP GET.
      */
-    private fun checkPermissionWithGet(
+    private fun checkSubscriptionWithGet(
         request: HttpServletRequest,
         userId: String,
-        channelId: String,
-        permission: ChannelPermission
+        channelId: String
     ): Boolean {
         val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
-            .path("/check")
+            .path("/subscribe/check")
             .queryParam("userId", userId)
             .queryParam("channelId", channelId)
-            .queryParam("permission", permission.name)
             .build()
             .toUri()
             
@@ -156,54 +145,50 @@ class HttpRemoteAuthorizationClient(
             uri,
             HttpMethod.GET,
             HttpEntity<Void>(headers),
-            AuthorizationResponse::class.java
+            SubscriptionResponse::class.java
         )
         
         return response.body?.allowed ?: false
     }
     
     /**
-     * Check permission using HTTP POST.
+     * Check subscription using HTTP POST.
      */
-    private fun checkPermissionWithPost(
+    private fun checkSubscriptionWithPost(
         request: HttpServletRequest,
         userId: String,
-        channelId: String,
-        permission: ChannelPermission
+        channelId: String
     ): Boolean {
-        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/check")
+        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/subscribe/check")
         
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
         
         val body = mapOf(
             "userId" to userId,
-            "channelId" to channelId,
-            "permission" to permission.name
+            "channelId" to channelId
         )
         
         val response = restTemplate.exchange(
             uri,
             HttpMethod.POST,
             HttpEntity(body, headers),
-            AuthorizationResponse::class.java
+            SubscriptionResponse::class.java
         )
         
         return response.body?.allowed ?: false
     }
     
     /**
-     * Get channels with permission using HTTP GET.
+     * Get subscribable channels using HTTP GET.
      */
-    private fun getChannelsWithPermissionWithGet(
+    private fun getSubscribableChannelsWithGet(
         request: HttpServletRequest,
-        userId: String,
-        permission: ChannelPermission
+        userId: String
     ): List<String> {
         val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
-            .path("/channels")
+            .path("/subscribe/channels")
             .queryParam("userId", userId)
-            .queryParam("permission", permission.name)
             .build()
             .toUri()
             
@@ -219,21 +204,71 @@ class HttpRemoteAuthorizationClient(
     }
     
     /**
-     * Get channels with permission using HTTP POST.
+     * Get subscribable channels using HTTP POST.
      */
-    private fun getChannelsWithPermissionWithPost(
+    private fun getSubscribableChannelsWithPost(
+        request: HttpServletRequest,
+        userId: String
+    ): List<String> {
+        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/subscribe/channels")
+        
+        val headers = createHeaders(request)
+        headers.contentType = MediaType.APPLICATION_JSON
+        
+        val body = mapOf("userId" to userId)
+        
+        val response = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            HttpEntity(body, headers),
+            ChannelsResponse::class.java
+        )
+        
+        return response.body?.channels ?: emptyList()
+    }
+    
+    /**
+     * Get channels by pattern using HTTP GET.
+     */
+    private fun getChannelsByPatternWithGet(
         request: HttpServletRequest,
         userId: String,
-        permission: ChannelPermission
+        pattern: String
     ): List<String> {
-        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/channels")
+        val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
+            .path("/subscribe/channels/pattern")
+            .queryParam("userId", userId)
+            .queryParam("pattern", pattern)
+            .build()
+            .toUri()
+            
+        val headers = createHeaders(request)
+        val response = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            HttpEntity<Void>(headers),
+            ChannelsResponse::class.java
+        )
+        
+        return response.body?.channels ?: emptyList()
+    }
+    
+    /**
+     * Get channels by pattern using HTTP POST.
+     */
+    private fun getChannelsByPatternWithPost(
+        request: HttpServletRequest,
+        userId: String,
+        pattern: String
+    ): List<String> {
+        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/subscribe/channels/pattern")
         
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
         
         val body = mapOf(
             "userId" to userId,
-            "permission" to permission.name
+            "pattern" to pattern
         )
         
         val response = restTemplate.exchange(
@@ -244,78 +279,6 @@ class HttpRemoteAuthorizationClient(
         )
         
         return response.body?.channels ?: emptyList()
-    }
-    
-    /**
-     * Get all channel permissions using HTTP GET.
-     */
-    private fun getAllChannelPermissionsWithGet(
-        request: HttpServletRequest,
-        userId: String
-    ): List<ChannelPermissions> {
-        val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
-            .path("/permissions")
-            .queryParam("userId", userId)
-            .build()
-            .toUri()
-            
-        val headers = createHeaders(request)
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            HttpEntity<Void>(headers),
-            PermissionsResponse::class.java
-        )
-        
-        return response.body?.permissions?.map { (channelId, permissions) ->
-            ChannelPermissions(
-                channelId,
-                permissions.mapNotNull {
-                    try {
-                        ChannelPermission.valueOf(it.uppercase())
-                    } catch (e: IllegalArgumentException) {
-                        null
-                    }
-                }.toSet()
-            )
-        } ?: emptyList()
-    }
-    
-    /**
-     * Get all channel permissions using HTTP POST.
-     */
-    private fun getAllChannelPermissionsWithPost(
-        request: HttpServletRequest,
-        userId: String
-    ): List<ChannelPermissions> {
-        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/permissions")
-        
-        val headers = createHeaders(request)
-        headers.contentType = MediaType.APPLICATION_JSON
-        
-        val body = mapOf(
-            "userId" to userId
-        )
-        
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.POST,
-            HttpEntity(body, headers),
-            PermissionsResponse::class.java
-        )
-        
-        return response.body?.permissions?.map { (channelId, permissions) ->
-            ChannelPermissions(
-                channelId,
-                permissions.mapNotNull {
-                    try {
-                        ChannelPermission.valueOf(it.uppercase())
-                    } catch (e: IllegalArgumentException) {
-                        null
-                    }
-                }.toSet()
-            )
-        } ?: emptyList()
     }
     
     /**
@@ -349,17 +312,15 @@ class HttpRemoteAuthorizationClient(
     }
     
     /**
-     * Response from the authorization service for permission checks.
+     * Response from the authorization service for subscription checks.
      */
-    internal data class AuthorizationResponse(val allowed: Boolean)
+    internal data class SubscriptionResponse(
+        val allowed: Boolean,
+        val metadata: Map<String, Any>? = null
+    )
     
     /**
      * Response from the authorization service for channel lists.
      */
     internal data class ChannelsResponse(val channels: List<String>)
-    
-    /**
-     * Response from the authorization service for all permissions.
-     */
-    internal data class PermissionsResponse(val permissions: Map<String, List<String>>)
 }

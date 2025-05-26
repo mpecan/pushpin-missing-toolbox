@@ -1,7 +1,5 @@
 package io.github.mpecan.pmt.security.remote
 
-import io.github.mpecan.pmt.security.model.ChannelPermission
-import io.github.mpecan.pmt.security.model.ChannelPermissions
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
@@ -17,24 +15,17 @@ import org.springframework.stereotype.Component
 )
 class NoopRemoteAuthorizationClient : RemoteAuthorizationClient {
     
-    override fun hasPermission(
-        request: HttpServletRequest, 
-        channelId: String, 
-        permission: ChannelPermission
-    ): Boolean {
+    override fun canSubscribe(request: HttpServletRequest, channelId: String): Boolean {
         // Always return false, rely on local authorization service
         return false
     }
     
-    override fun getChannelsWithPermission(
-        request: HttpServletRequest, 
-        permission: ChannelPermission
-    ): List<String> {
+    override fun getSubscribableChannels(request: HttpServletRequest): List<String> {
         // Return empty list, rely on local authorization service
         return emptyList()
     }
     
-    override fun getAllChannelPermissions(request: HttpServletRequest): List<ChannelPermissions> {
+    override fun getSubscribableChannelsByPattern(request: HttpServletRequest, pattern: String): List<String> {
         // Return empty list, rely on local authorization service
         return emptyList()
     }

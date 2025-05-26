@@ -8,9 +8,9 @@ This module provides the foundational interfaces and data models for implementin
 
 ## Features
 
-- **Authorization Interface**: Core `AuthorizationService` interface for implementing custom authorization strategies
+- **Channel Subscription Interface**: Core `ChannelSubscriptionService` interface for determining which channels users can subscribe to
 - **Audit Interface**: Core `AuditService` interface for security event logging
-- **Channel Permissions**: Model classes for managing channel-based permissions (`ChannelPermission`, `ChannelPermissions`)
+- **Channel Subscription Models**: Simple model classes for managing channel subscriptions (`ChannelSubscription`, `ChannelSubscriptions`)
 - **Security Context**: Thread-local security context holder for maintaining security state
 - **Security Exceptions**: Base exception hierarchy for security-related errors
 
@@ -26,35 +26,46 @@ dependencies {
 
 ## Usage
 
-### Channel Permissions
+### Channel Subscriptions
 
 ```kotlin
-// Define permissions for a channel
-val permissions = ChannelPermissions(
+// Define channel subscriptions for a user
+val subscription = ChannelSubscription(
     channelId = "news-updates",
-    permissions = setOf(ChannelPermission.READ, ChannelPermission.WRITE)
+    allowed = true,
+    metadata = mapOf("expiresAt" to "2024-12-31")
 )
 
-// Check permissions
-if (permissions.hasWritePermission()) {
-    // User can publish to this channel
+// Check if user can subscribe
+val subscriptions = ChannelSubscriptions(
+    principal = "user123",
+    subscriptions = listOf(
+        ChannelSubscription("news", allowed = true),
+        ChannelSubscription("admin", allowed = false)
+    ),
+    defaultAllow = false
+)
+
+if (subscriptions.canSubscribe("news")) {
+    // User can subscribe to this channel
 }
 ```
 
-### Implementing Authorization
+### Implementing Channel Subscription Service
 
 ```kotlin
-class MyAuthorizationService : AuthorizationService {
-    override fun hasPermission(
-        principal: Any?, 
-        channelId: String, 
-        permission: ChannelPermission
-    ): Boolean {
-        // Your authorization logic here
-        return true
+class MyChannelSubscriptionService : ChannelSubscriptionService {
+    override fun canSubscribe(principal: Any?, channelId: String): Boolean {
+        // Your subscription logic here
+        // For example, check JWT claims, database, or external service
+        return channelId.startsWith("public.") || 
+               channelId == "user.$principal"
     }
     
-    // Implement other methods...
+    override fun getSubscribableChannels(principal: Any?): List<String> {
+        // Return list of channels this user can subscribe to
+        return listOf("public.news", "user.$principal")
+    }
 }
 ```
 

@@ -8,12 +8,9 @@ import io.github.mpecan.pmt.model.PushpinHttpMessage
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.security.audit.AuditLogService
 import io.github.mpecan.pmt.security.encryption.ChannelEncryptionService
-import io.github.mpecan.pmt.security.model.ChannelPermission
-import io.github.mpecan.pmt.security.service.ChannelAuthorizationService
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -33,7 +30,6 @@ class PushpinService(
     private val discoveryManager: PushpinDiscoveryManager,
     private val messageSerializer: MessageSerializer,
     private val zmqPublisher: ZmqPublisher,
-    private val channelAuthorizationService: ChannelAuthorizationService,
     private val channelEncryptionService: ChannelEncryptionService,
     private val auditLogService: AuditLogService
 ) {
@@ -66,29 +62,17 @@ class PushpinService(
      * If ZMQ is enabled, it will publish to all active servers via ZMQ.
      * Otherwise, it will publish to a single server via HTTP using round-robin selection.
      *
-     * Before publishing, the method checks if the user has permission to publish to the channel
-     * and encrypts the message content if encryption is enabled.
+     * Publishing is typically done by backend services and should be authenticated
+     * through other mechanisms (e.g., HMAC signing, API keys, service-to-service auth).
+     * End users subscribe to channels but don't publish directly.
      */
     fun publishMessage(message: Message): Mono<Boolean> {
-        // Check if user has permission to publish to this channel
+        // Log publishing activity for audit purposes
         val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication != null && pushpinProperties.authEnabled) {
-            // Check channel authorization
-            if (!hasPermissionToPublish(authentication, message.channel)) {
-                val username = authentication.name
-                auditLogService.logAuthorizationFailure(
-                    username,
-                    "unknown",
-                    "channel:${message.channel}",
-                    "WRITE"
-                )
-                return Mono.error(AccessDeniedException("No permission to publish to channel ${message.channel}"))
-            }
-
-            // Log channel access
+        if (authentication != null) {
             auditLogService.logChannelAccess(
                 authentication.name,
-                "unknown",
+                "backend-service",
                 message.channel,
                 "publish message"
             )
@@ -115,13 +99,6 @@ class PushpinService(
                 return publishViaHttp(message)
             }
         }
-    }
-
-    /**
-     * Checks if the user has permission to publish to the specified channel.
-     */
-    private fun hasPermissionToPublish(authentication: Authentication, channelId: String): Boolean {
-        return channelAuthorizationService.hasPermission(authentication, channelId, ChannelPermission.WRITE)
     }
 
     /**
