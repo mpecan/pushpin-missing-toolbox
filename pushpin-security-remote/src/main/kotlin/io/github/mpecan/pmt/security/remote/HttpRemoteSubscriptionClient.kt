@@ -39,7 +39,8 @@ class HttpRemoteSubscriptionClient(
         if (properties.cache.enabled) {
             cache.getSubscriptionCheck(userId, channelId)?.let {
                 logger.debug(
-                    "Cache hit for subscription check: user={}, channel={}, result={}", userId,
+                    "Cache hit for subscription check: user={}, channel={}, result={}",
+                    userId,
                     channelId,
                     it,
                 )
@@ -165,7 +166,8 @@ class HttpRemoteSubscriptionClient(
         if (properties.cache.enabled) {
             cache.getSubscribableChannelsByPattern(userId, pattern)?.let {
                 logger.debug(
-                    "Cache hit for channels by pattern: user={}, pattern={}, channels={}", userId,
+                    "Cache hit for channels by pattern: user={}, pattern={}, channels={}",
+                    userId,
                     pattern,
                     it,
                 )
