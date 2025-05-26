@@ -3,16 +3,15 @@ package io.github.mpecan.pmt.security.jwt
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.PathNotFoundException
 import com.jayway.jsonpath.ReadContext
+import io.github.mpecan.pmt.security.core.ClaimExtractorService
 import org.slf4j.LoggerFactory
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.stereotype.Component
 
 /**
- * Implementation of ClaimExtractor that uses JsonPath to extract claims from JWT tokens.
+ * Implementation of ClaimExtractorService that uses JsonPath to extract claims from JWT tokens.
  */
-@Component
-class JsonPathClaimExtractor : ClaimExtractor {
-    private val logger = LoggerFactory.getLogger(JsonPathClaimExtractor::class.java)
+class JsonPathClaimExtractorService : ClaimExtractorService {
+    private val logger = LoggerFactory.getLogger(JsonPathClaimExtractorService::class.java)
 
     override fun extractStringClaim(jwt: Jwt, claimPath: String): String? {
         val context = createJsonContext(jwt)

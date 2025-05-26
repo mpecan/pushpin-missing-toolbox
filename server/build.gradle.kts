@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":pushpin-security-audit"))
     implementation(project(":pushpin-security-encryption"))
     implementation(project(":pushpin-security-hmac"))
+    implementation(project(":pushpin-security-jwt"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")

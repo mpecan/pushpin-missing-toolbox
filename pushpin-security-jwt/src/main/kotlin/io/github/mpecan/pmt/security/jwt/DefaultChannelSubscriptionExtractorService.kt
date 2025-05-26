@@ -1,52 +1,23 @@
 package io.github.mpecan.pmt.security.jwt
 
-import io.github.mpecan.pmt.config.PushpinProperties
+import io.github.mpecan.pmt.security.core.ChannelSubscriptionExtractorService
+import io.github.mpecan.pmt.security.core.ClaimExtractorService
 import io.github.mpecan.pmt.security.model.ChannelSubscription
 import io.github.mpecan.pmt.security.model.ChannelSubscriptions
 import org.slf4j.LoggerFactory
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.stereotype.Component
 
 /**
- * Extracts channel subscriptions from JWT tokens using the configured extraction paths.
+ * Default implementation for extracting channel subscriptions from JWT tokens.
  */
-@Component
-class JwtChannelSubscriptionsExtractor(
-    private val claimExtractor: ClaimExtractor,
-    private val pushpinProperties: PushpinProperties
-) {
-    private val logger = LoggerFactory.getLogger(JwtChannelSubscriptionsExtractor::class.java)
+class DefaultChannelSubscriptionExtractorService(
+    private val claimExtractorService: ClaimExtractorService,
+    private val properties: JwtProperties
+) : ChannelSubscriptionExtractorService {
+    private val logger = LoggerFactory.getLogger(DefaultChannelSubscriptionExtractorService::class.java)
 
-    /**
-     * Path to the channels claim in the JWT token.
-     *
-     * Format can be in the following forms depending on JWT structure:
-     * - directPath
-     * - $.path.to.channels (JsonPath syntax)
-     */
-    val channelsClaimPath: String
-        get() = pushpinProperties.security.jwt.claimExtraction.extractClaims.find { 
-            it.contains("channel") || it.contains("subscription") 
-        } ?: "$.channels"
-
-    /**
-     * Extract channel subscriptions from the JWT token.
-     *
-     * The expected format in the JWT can be either:
-     * 1. An array of channel IDs (user can subscribe to all listed channels):
-     *    { "channels": ["channel1", "channel2", "news.*"] }
-     * 
-     * 2. An array of channel objects with metadata:
-     *    { "channels": [{ "id": "channel1", "expires": "2024-12-31" }] }
-     *
-     * 3. A map of channel IDs to metadata:
-     *    { "channels": { "channel1": { "expires": "2024-12-31" }, "channel2": {} } }
-     *
-     * @param jwt The JWT token
-     * @return ChannelSubscriptions object or null if no channels found
-     */
-    fun extractChannelSubscriptions(jwt: Jwt): ChannelSubscriptions? {
-        if (!pushpinProperties.security.jwt.claimExtraction.enabled) {
+    override fun extractChannelSubscriptions(jwt: Jwt): ChannelSubscriptions? {
+        if (!properties.claimExtraction.enabled) {
             return null
         }
 
@@ -54,7 +25,7 @@ class JwtChannelSubscriptionsExtractor(
         
         try {
             // First try simple array format: ["channel1", "channel2"]
-            val channelsList = claimExtractor.extractListClaim(jwt, channelsClaimPath)
+            val channelsList = claimExtractorService.extractListClaim(jwt, getChannelsClaimPath())
             if (channelsList.isNotEmpty()) {
                 val subscriptions = channelsList.map { channelId ->
                     ChannelSubscription(
@@ -70,7 +41,7 @@ class JwtChannelSubscriptionsExtractor(
             }
             
             // Try map format: { "channel1": {}, "channel2": { "expires": "2024-12-31" } }
-            val channelsMap = claimExtractor.extractMapClaim(jwt, channelsClaimPath)
+            val channelsMap = claimExtractorService.extractMapClaim(jwt, getChannelsClaimPath())
             if (channelsMap.isNotEmpty()) {
                 val subscriptions = channelsMap.map { (channelId, metadata) ->
                     val metadataMap = when (metadata) {
@@ -108,6 +79,14 @@ class JwtChannelSubscriptionsExtractor(
         return null
     }
     
+    override fun getChannelsClaimPath(): String {
+        return properties.claimExtraction.extractClaims.find { 
+            it.contains("channel") || it.contains("subscription") 
+        } ?: "$.channels"
+    }
+    
+    override fun isClaimExtractionEnabled(): Boolean = properties.claimExtraction.enabled
+    
     /**
      * Try to parse channel objects in the format: [{ "id": "channel1", "expires": "2024-12-31" }]
      */
@@ -117,7 +96,7 @@ class JwtChannelSubscriptionsExtractor(
             var index = 0
             
             while (true) {
-                val channelObject = claimExtractor.extractMapClaim(jwt, "$channelsClaimPath[$index]")
+                val channelObject = claimExtractorService.extractMapClaim(jwt, "${getChannelsClaimPath()}[$index]")
                 if (channelObject.isEmpty()) break
                 
                 val channelId = channelObject["id"] as? String 
@@ -128,7 +107,7 @@ class JwtChannelSubscriptionsExtractor(
                 // Extract metadata (everything except the channel ID)
                 val metadata = channelObject
                     .filterKeys { it !in setOf("id", "channelId", "channel") }
-                    .mapValues { it.value?.toString() ?: "" }
+                    .mapValues { it.value.toString() }
                 
                 results.add(ChannelSubscription(
                     channelId = channelId,

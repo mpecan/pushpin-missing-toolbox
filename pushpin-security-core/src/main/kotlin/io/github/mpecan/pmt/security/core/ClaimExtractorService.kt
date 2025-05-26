@@ -1,11 +1,11 @@
-package io.github.mpecan.pmt.security.jwt
+package io.github.mpecan.pmt.security.core
 
 import org.springframework.security.oauth2.jwt.Jwt
 
 /**
- * Interface for extracting claims from JWT tokens.
+ * Service for extracting claims from JWT tokens.
  */
-interface ClaimExtractor {
+interface ClaimExtractorService {
     /**
      * Extract a string claim from the JWT token.
      *

@@ -22,6 +22,9 @@ dependencies {
     // Jakarta Servlet API for request handling (optional)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     
+    // Spring Security OAuth2 for JWT support (optional)
+    compileOnly("org.springframework.security:spring-security-oauth2-jose")
+    
     // Logging
     implementation("org.slf4j:slf4j-api")
     

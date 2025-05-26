@@ -1,8 +1,8 @@
 package io.github.mpecan.pmt.config
 
-import io.github.mpecan.pmt.security.JwtDecoderProvider
 import io.github.mpecan.pmt.security.RateLimitFilter
 import io.github.mpecan.pmt.security.core.AuditService
+import io.github.mpecan.pmt.security.core.JwtDecoderService
 import io.github.mpecan.pmt.security.hmac.HmacSignatureFilter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -34,7 +34,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 @EnableWebSecurity
 class SecurityConfig(
     private val pushpinProperties: PushpinProperties,
-    private val jwtDecoderProvider: JwtDecoderProvider,
+    private val jwtDecoderService: JwtDecoderService,
     private val jwtAuthenticationConverter: Converter<Jwt, AbstractAuthenticationToken>,
     private val auditService: AuditService
 ) {
@@ -79,7 +79,7 @@ class SecurityConfig(
                 // OAuth2 Resource Server with JWT
                 http.oauth2ResourceServer { oauth2 ->
                     oauth2.jwt { jwt ->
-                        jwt.decoder(jwtDecoderProvider.getDecoder())
+                        jwt.decoder(jwtDecoderService.getDecoder())
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)
                     }
                 }
