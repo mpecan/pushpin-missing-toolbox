@@ -7,6 +7,7 @@ import io.github.mpecan.pmt.security.hmac.HmacSignatureFilter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,7 +36,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 class SecurityConfig(
     private val pushpinProperties: PushpinProperties,
     private val jwtDecoderService: JwtDecoderService,
-    private val jwtAuthenticationConverter: Converter<Jwt, AbstractAuthenticationToken>,
+    private val jwtAuthenticationConverterProvider: ObjectProvider<Converter<Jwt, AbstractAuthenticationToken>>,
     private val auditService: AuditService
 ) {
     @Autowired(required = false)
@@ -75,12 +76,14 @@ class SecurityConfig(
 
         // Add appropriate authentication method
         if (pushpinProperties.authEnabled) {
-            if (pushpinProperties.security.jwt.enabled) {
+            if (pushpinProperties.security.jwt.enabled ) {
                 // OAuth2 Resource Server with JWT
                 http.oauth2ResourceServer { oauth2 ->
                     oauth2.jwt { jwt ->
                         jwt.decoder(jwtDecoderService.getDecoder())
-                        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)
+                        jwtAuthenticationConverterProvider.ifAvailable {
+                            jwt.jwtAuthenticationConverter(it)
+                        }
                     }
                 }
             } else {
