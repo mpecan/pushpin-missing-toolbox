@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.integration
 
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
@@ -22,7 +23,7 @@ import java.util.*
 class HttpResponseIntegrationTest : PushpinIntegrationTest() {
 
     companion object {
-        val definedPort = Random().nextInt(10000, 12000)
+        val definedPort = PortProvider.getPort()
 
         /**
          * Create and start a Pushpin container
@@ -60,8 +61,8 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
         StepVerifier.create(responseFlux)
             .expectNextMatches { response ->
                 response["success"] == true &&
-                        response["message"] == "This is a non-streaming HTTP response" &&
-                        response["channel"] == channel
+                    response["message"] == "This is a non-streaming HTTP response" &&
+                    response["channel"] == channel
             }
             .expectComplete()
             .verify(Duration.ofSeconds(10))

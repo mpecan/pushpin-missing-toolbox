@@ -1,6 +1,7 @@
 package io.github.mpecan.pmt.integration
 
 import io.github.mpecan.pmt.client.SseClient
+import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinIntegrationTest
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.Test
@@ -22,7 +23,7 @@ import java.util.*
 @AutoConfigureWebTestClient
 class SseIntegrationTest : PushpinIntegrationTest() {
     companion object {
-        val definedPort = Random().nextInt(10000, 12000)
+        val definedPort = PortProvider.getPort()
 
         /**
          * Create and start a Pushpin container
@@ -60,11 +61,11 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val stepVerifier = StepVerifier.create(sseFlux)
             .expectNext(
                 ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
+                    "Successfully subscribed to channel: $channel",
+                ).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(messageText).build()
+                ServerSentEvent.builder(messageText).build(),
             )
             .thenCancel()
             .verifyLater()
@@ -98,17 +99,17 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val stepVerifier = StepVerifier.create(sseFlux)
             .expectNext(
                 ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
+                    "Successfully subscribed to channel: $channel",
+                ).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(message1.replace("", "")).build()
+                ServerSentEvent.builder(message1.replace("", "")).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(message2.replace("", "")).build()
+                ServerSentEvent.builder(message2.replace("", "")).build(),
             )
             .expectNext(
-                ServerSentEvent.builder(message3.replace("", "")).build()
+                ServerSentEvent.builder(message3.replace("", "")).build(),
             )
             .thenCancel()
             .verifyLater()
@@ -143,13 +144,13 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val stepVerifier = StepVerifier.create(sseFlux)
             .expectNext(
                 ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel"
-                ).build()
+                    "Successfully subscribed to channel: $channel",
+                ).build(),
             )
             .expectNext(
                 ServerSentEvent.builder(messageText)
                     .event(eventType)
-                    .build()
+                    .build(),
             )
             .thenCancel()
             .verifyLater()

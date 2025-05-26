@@ -14,5 +14,5 @@ data class HttpResponseFormat(
     val body: String? = null,
     @get:JsonProperty("body-bin")
     val bodyBin: String? = null,
-    val action: String = "send"
+    val action: String = "send",
 ) : PushpinFormat

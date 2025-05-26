@@ -5,21 +5,21 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
 class KubernetesClientProviderTest {
-    
+
     private val provider = KubernetesClientProvider()
 
     @Test
     fun `should create CoreV1Api client with default configuration`() {
         // Given
         val properties = KubernetesDiscoveryProperties()
-        
+
         // When
         val coreApi = provider.getCoreApi(properties)
-        
+
         // Then
         assertNotNull(coreApi)
     }
-    
+
     @Test
     fun `should create CoreV1Api client with specific kubeconfig path`() {
         // Given
@@ -27,7 +27,7 @@ class KubernetesClientProviderTest {
         // we'll just test that no exception is thrown with a non-existent path
         // This is a "loose" test that just ensures the code path is covered
         val properties = KubernetesDiscoveryProperties(
-            kubeConfigPath = "/path/that/does/not/exist"
+            kubeConfigPath = "/path/that/does/not/exist",
         )
 
         try {

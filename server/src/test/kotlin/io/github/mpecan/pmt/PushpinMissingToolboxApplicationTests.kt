@@ -9,5 +9,4 @@ class PushpinMissingToolboxApplicationTests {
     @Test
     fun contextLoads() {
     }
-
 }

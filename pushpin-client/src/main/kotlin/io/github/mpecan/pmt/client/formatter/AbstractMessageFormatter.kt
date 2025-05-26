@@ -11,7 +11,7 @@ import io.github.mpecan.pmt.model.PushpinFormat
  */
 abstract class AbstractMessageFormatter<T : PushpinFormat>(
     protected val serializationService: MessageSerializationService,
-    protected val options: FormatterOptions = FormatterOptions()
+    protected val options: FormatterOptions = FormatterOptions(),
 ) {
     /**
      * Formats a message for a specific transport.
@@ -83,29 +83,29 @@ data class FormatterOptions(
      * Whether to apply custom pre-processors. Default is false.
      */
     val applyCustomPreProcessors: Boolean = false,
-    
+
     /**
      * Whether to apply custom post-processors. Default is false.
      */
     val applyCustomPostProcessors: Boolean = false,
-    
+
     /**
      * Custom pre-processors to apply to messages before formatting.
      * Each processor takes a Message and returns a Message.
      */
     val preProcessors: List<(Message) -> Message> = emptyList(),
-    
+
     /**
      * Custom post-processors to apply to results after formatting.
      * Each processor takes a PushpinFormat and the original Message,
      * and returns a PushpinFormat.
      */
     val postProcessors: List<(PushpinFormat, Message) -> PushpinFormat> = emptyList(),
-    
+
     /**
      * Additional options specific to the formatter.
      */
-    val additionalOptions: Map<String, Any> = emptyMap()
+    val additionalOptions: Map<String, Any> = emptyMap(),
 ) {
     /**
      * Creates a new options instance with an additional pre-processor.
@@ -113,26 +113,26 @@ data class FormatterOptions(
     fun withPreProcessor(processor: (Message) -> Message): FormatterOptions {
         return copy(
             applyCustomPreProcessors = true,
-            preProcessors = preProcessors + processor
+            preProcessors = preProcessors + processor,
         )
     }
-    
+
     /**
      * Creates a new options instance with an additional post-processor.
      */
     fun withPostProcessor(processor: (PushpinFormat, Message) -> PushpinFormat): FormatterOptions {
         return copy(
             applyCustomPostProcessors = true,
-            postProcessors = postProcessors + processor
+            postProcessors = postProcessors + processor,
         )
     }
-    
+
     /**
      * Creates a new options instance with an additional option.
      */
     fun withOption(key: String, value: Any): FormatterOptions {
         return copy(
-            additionalOptions = additionalOptions + (key to value)
+            additionalOptions = additionalOptions + (key to value),
         )
     }
 }

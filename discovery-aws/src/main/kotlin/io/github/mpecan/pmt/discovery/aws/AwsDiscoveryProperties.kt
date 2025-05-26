@@ -35,5 +35,5 @@ data class AwsDiscoveryProperties(
     val controlPort: Int = 5564,
     val publishPort: Int = 5560,
     val healthCheckPath: String = "/api/health/check",
-    val privateIp: Boolean = true
+    val privateIp: Boolean = true,
 )

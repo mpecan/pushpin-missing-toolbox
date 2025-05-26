@@ -42,7 +42,7 @@ class DefaultInstanceHealthCheckerTest {
         healthChecker = DefaultInstanceHealthChecker(ec2ClientProvider)
         properties = AwsDiscoveryProperties(
             enabled = true,
-            instanceHealthCheckEnabled = true
+            instanceHealthCheckEnabled = true,
         )
     }
 
@@ -65,7 +65,7 @@ class DefaultInstanceHealthCheckerTest {
     fun `should check EC2 status when health check is enabled`() {
         // Setup EC2 client provider
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
-        
+
         // Create mock status response with healthy status
         val healthyStatus = InstanceStatus.builder()
             .instanceId("i-running")
@@ -78,7 +78,9 @@ class DefaultInstanceHealthCheckerTest {
             .build()
 
         // Mock EC2 client response
-        `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(statusResponse)
+        `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(
+            statusResponse,
+        )
 
         // Verify that the instance is considered healthy
         assertTrue(healthChecker.isHealthy(runningInstance, properties))
@@ -91,7 +93,7 @@ class DefaultInstanceHealthCheckerTest {
     fun `should return false for unhealthy instances`() {
         // Setup EC2 client provider
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
-        
+
         // Create mock status response with impaired status
         val impairedStatus = InstanceStatus.builder()
             .instanceId("i-running")
@@ -104,7 +106,9 @@ class DefaultInstanceHealthCheckerTest {
             .build()
 
         // Mock EC2 client response
-        `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(statusResponse)
+        `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(
+            statusResponse,
+        )
 
         // Verify that the instance is considered unhealthy
         assertFalse(healthChecker.isHealthy(runningInstance, properties))
@@ -117,14 +121,16 @@ class DefaultInstanceHealthCheckerTest {
     fun `should handle empty status response`() {
         // Setup EC2 client provider
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
-        
+
         // Create empty status response
         val emptyStatusResponse = DescribeInstanceStatusResponse.builder()
             .instanceStatuses(emptyList())
             .build()
 
         // Mock EC2 client response
-        `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(emptyStatusResponse)
+        `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(
+            emptyStatusResponse,
+        )
 
         // Verify that instances with no status information are considered running
         // This is the default behavior when no status is available
@@ -138,7 +144,7 @@ class DefaultInstanceHealthCheckerTest {
     fun `should handle exceptions when checking status`() {
         // Setup EC2 client provider
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
-        
+
         // Mock EC2 client to throw an exception
         `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>()))
             .thenThrow(RuntimeException("Test exception"))

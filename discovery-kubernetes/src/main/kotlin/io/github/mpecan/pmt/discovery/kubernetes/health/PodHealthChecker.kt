@@ -26,27 +26,27 @@ class DefaultPodHealthChecker : PodHealthChecker {
 
     override fun isHealthy(pod: V1Pod, properties: KubernetesDiscoveryProperties): Boolean {
         val podName = pod.metadata?.name ?: "unknown-pod"
-        
+
         // If health checks are disabled, just check if the pod is running
         if (!properties.healthCheckEnabled) {
             return isPodRunning(pod)
         }
-        
+
         // Check if pod is running
         if (!isPodRunning(pod)) {
             logger.debug("Pod $podName is not running")
             return false
         }
-        
+
         // Check if pod is ready
         if (!isPodReady(pod)) {
             logger.debug("Pod $podName is running but not ready")
             return false
         }
-        
+
         return true
     }
-    
+
     /**
      * Check if a pod is in the "Running" phase.
      */
@@ -54,18 +54,18 @@ class DefaultPodHealthChecker : PodHealthChecker {
         val phase = pod.status?.phase
         return phase == "Running"
     }
-    
+
     /**
      * Check if a pod is ready based on its ready condition.
      */
     private fun isPodReady(pod: V1Pod): Boolean {
         val conditions = pod.status?.conditions ?: return false
-        
+
         // Find the "Ready" condition
         val readyCondition = conditions.find { condition ->
             condition.type == "Ready"
         }
-        
+
         // Check if the "Ready" condition is true
         return readyCondition?.status == "True"
     }

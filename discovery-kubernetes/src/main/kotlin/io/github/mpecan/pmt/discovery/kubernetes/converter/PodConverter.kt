@@ -31,7 +31,7 @@ class DefaultPodConverter : PodConverter {
         val namespace = pod.metadata?.namespace ?: "default"
         val hostIp = pod.status?.hostIP
         val podIp = pod.status?.podIP
-        
+
         // Get appropriate IP address based on configuration
         val host = when {
             // If using NodePort, use the host IP
@@ -44,23 +44,23 @@ class DefaultPodConverter : PodConverter {
                 "localhost"
             }
         }
-        
+
         // Extract custom port values from annotations if present
         val annotations = pod.metadata?.annotations ?: emptyMap()
         val httpPort = annotations["pushpin.io/http-port"]?.toIntOrNull() ?: properties.port
         val controlPort = annotations["pushpin.io/control-port"]?.toIntOrNull() ?: properties.controlPort
         val publishPort = annotations["pushpin.io/publish-port"]?.toIntOrNull() ?: properties.publishPort
-        
+
         // Generate a unique server ID
         val serverId = "$namespace-$podName"
-        
+
         return PushpinServer(
             id = serverId,
             host = host,
             port = httpPort,
             controlPort = controlPort,
             publishPort = publishPort,
-            healthCheckPath = properties.healthCheckPath
+            healthCheckPath = properties.healthCheckPath,
         )
     }
 }

@@ -8,7 +8,7 @@ import io.github.mpecan.pmt.model.HttpStreamFormat
  * Implementation of SSEStreamMessageFormatter for Server-Sent Events (SSE).
  */
 class HttpSSEStreamMessageFormatter(
-    private val serializationService: MessageSerializationService
+    private val serializationService: MessageSerializationService,
 ) : SSEStreamMessageFormatter {
     override fun format(message: Message): HttpStreamFormat {
         // Handle string data differently to avoid extra quotes
@@ -17,13 +17,16 @@ class HttpSSEStreamMessageFormatter(
             else -> serializationService.serialize(message.data)
         }
 
-        val content = listOf(message.eventType?.let {
-            "event: ${message.eventType}\n"
-        } ?: "", "data: $data\n\n").joinToString("")
+        val content = listOf(
+            message.eventType?.let {
+                "event: ${message.eventType}\n"
+            } ?: "",
+            "data: $data\n\n",
+        ).joinToString("")
 
         return HttpStreamFormat(
             content = content,
-            action = "send"
+            action = "send",
         )
     }
 }

@@ -59,7 +59,7 @@ class JacksonMessageSerializationServiceTest {
             "name" to "John Doe",
             "age" to 30,
             "isActive" to true,
-            "hobbies" to listOf("reading", "coding", "hiking")
+            "hobbies" to listOf("reading", "coding", "hiking"),
         )
 
         // When

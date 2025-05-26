@@ -85,7 +85,7 @@ class MessageSerializerBuilder {
                 sseFormatter,
                 httpStreamFormatter,
                 httpResponseFormatter,
-                longPollingFormatter
+                longPollingFormatter,
             )
         }
 
@@ -111,7 +111,7 @@ class MessageSerializerBuilder {
             httpSseStreamFormatter!!,
             httpStreamMessageFormatter!!,
             httpResponseFormatter!!,
-            longPollingFormatter!!
+            longPollingFormatter!!,
         )
     }
 

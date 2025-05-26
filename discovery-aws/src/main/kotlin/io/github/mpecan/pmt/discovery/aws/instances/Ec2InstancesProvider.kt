@@ -12,4 +12,3 @@ interface Ec2InstancesProvider {
      */
     fun getInstances(properties: AwsDiscoveryProperties): List<Instance>
 }
-

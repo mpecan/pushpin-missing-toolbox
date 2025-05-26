@@ -21,7 +21,7 @@ class DefaultInstanceConverterTest {
             controlPort = 5564,
             publishPort = 5560,
             healthCheckPath = "/test/health",
-            privateIp = true
+            privateIp = true,
         )
     }
 
@@ -123,7 +123,7 @@ class DefaultInstanceConverterTest {
             port = 8000,
             controlPort = 6000,
             publishPort = 7000,
-            healthCheckPath = "/custom/health"
+            healthCheckPath = "/custom/health",
         )
 
         // Create an instance

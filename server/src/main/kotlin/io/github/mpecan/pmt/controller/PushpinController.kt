@@ -17,7 +17,7 @@ import java.util.*
 @RequestMapping("/api/pushpin")
 class PushpinController(
     private val pushpinService: PushpinService,
-    private val pushpinHealthChecker: PushpinHealthChecker
+    private val pushpinHealthChecker: PushpinHealthChecker,
 ) {
 
     /**
@@ -29,17 +29,21 @@ class PushpinController(
         return pushpinService.publishMessage(message)
             .map { success ->
                 if (success) {
-                    ResponseEntity.ok(mapOf(
-                        "success" to true,
-                        "message" to "Message published successfully",
-                        "timestamp" to Date()
-                    ))
+                    ResponseEntity.ok(
+                        mapOf(
+                            "success" to true,
+                            "message" to "Message published successfully",
+                            "timestamp" to Date(),
+                        ),
+                    )
                 } else {
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(
-                        "success" to false,
-                        "message" to "Failed to publish message",
-                        "timestamp" to Date()
-                    ))
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                        mapOf(
+                            "success" to false,
+                            "message" to "Failed to publish message",
+                            "timestamp" to Date(),
+                        ),
+                    )
                 }
             }
     }
@@ -51,7 +55,7 @@ class PushpinController(
     fun publishToChannel(
         @PathVariable channel: String,
         @RequestParam(required = false) event: String?,
-        @RequestBody data: Any
+        @RequestBody data: Any,
     ): Mono<ResponseEntity<Map<String, Any>>> {
         val message = if (event != null) {
             Message.event(channel, event, data)
@@ -66,7 +70,7 @@ class PushpinController(
     fun publishToChannelText(
         @PathVariable channel: String,
         @RequestParam(required = false) event: String?,
-        @RequestBody data: String
+        @RequestBody data: String,
     ): Mono<ResponseEntity<Map<String, Any>>> {
         return publishToChannel(channel, event, data)
     }

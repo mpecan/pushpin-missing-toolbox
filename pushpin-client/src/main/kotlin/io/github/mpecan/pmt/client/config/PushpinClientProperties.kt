@@ -36,7 +36,7 @@ data class PushpinClientProperties(
      * Long polling formatter configuration.
      */
     @NestedConfigurationProperty
-    val longPolling: LongPollingProperties = LongPollingProperties()
+    val longPolling: LongPollingProperties = LongPollingProperties(),
 )
 
 /**
@@ -47,11 +47,11 @@ data class WebSocketProperties(
      * WebSocket message type.
      */
     val type: String? = null,
-    
+
     /**
      * WebSocket message action.
      */
-    val action: String? = null
+    val action: String? = null,
 )
 
 /**
@@ -61,7 +61,7 @@ data class HttpStreamProperties(
     /**
      * HTTP Stream action.
      */
-    val action: String? = null
+    val action: String? = null,
 )
 
 /**
@@ -72,16 +72,16 @@ data class HttpResponseProperties(
      * HTTP Response code.
      */
     val code: Int? = null,
-    
+
     /**
      * HTTP Response reason.
      */
     val reason: String? = null,
-    
+
     /**
      * HTTP Response headers.
      */
-    val headers: Map<String, String> = emptyMap()
+    val headers: Map<String, String> = emptyMap(),
 )
 
 /**
@@ -91,7 +91,7 @@ data class SSEProperties(
     /**
      * SSE event name.
      */
-    val eventName: String? = null
+    val eventName: String? = null,
 )
 
 /**
@@ -102,14 +102,14 @@ data class LongPollingProperties(
      * Long polling code.
      */
     val code: Int? = null,
-    
+
     /**
      * Long polling reason.
      */
     val reason: String? = null,
-    
+
     /**
      * Long polling headers.
      */
-    val headers: Map<String, String> = emptyMap()
+    val headers: Map<String, String> = emptyMap(),
 )

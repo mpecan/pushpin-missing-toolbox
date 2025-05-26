@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean
 @AutoConfiguration
 @EnableConfigurationProperties(PushpinClientProperties::class)
 class PushpinClientAutoConfiguration(
-    private val properties: PushpinClientProperties
+    private val properties: PushpinClientProperties,
 ) {
 
     /**
@@ -39,12 +39,26 @@ class PushpinClientAutoConfiguration(
     fun webSocketMessageFormatter(serializationService: MessageSerializationService): WebSocketMessageFormatter {
         // Create formatter options from properties
         val options = FormatterOptions()
-            .let { if (properties.webSocket.type != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_TYPE,
-                properties.webSocket.type
-            ) else it }
-            .let { if (properties.webSocket.action != null) it.withOption(DefaultWebSocketMessageFormatter.OPTION_WS_ACTION,
-                properties.webSocket.action
-            ) else it }
+            .let {
+                if (properties.webSocket.type != null) {
+                    it.withOption(
+                        DefaultWebSocketMessageFormatter.OPTION_WS_TYPE,
+                        properties.webSocket.type,
+                    )
+                } else {
+                    it
+                }
+            }
+            .let {
+                if (properties.webSocket.action != null) {
+                    it.withOption(
+                        DefaultWebSocketMessageFormatter.OPTION_WS_ACTION,
+                        properties.webSocket.action,
+                    )
+                } else {
+                    it
+                }
+            }
 
         return DefaultWebSocketMessageFormatter(serializationService, options)
     }
@@ -90,9 +104,7 @@ class PushpinClientAutoConfiguration(
      */
     @Bean
     @ConditionalOnMissingBean
-    fun messageSerializer(
-        formatterFactory: FormatterFactory
-    ): MessageSerializer {
+    fun messageSerializer(formatterFactory: FormatterFactory): MessageSerializer {
         return MessageSerializerBuilder.defaultSerializer(formatterFactory)
     }
 

@@ -69,7 +69,7 @@ object TestcontainersUtils {
     fun configureMultiplePushpinProperties(
         registry: DynamicPropertyRegistry,
         pushpinContainers: List<PushpinContainer>,
-        zmqEnabled: Boolean = true
+        zmqEnabled: Boolean = true,
     ) {
         // Configure multiple Pushpin servers
         pushpinContainers.forEachIndexed { index, container ->
@@ -85,8 +85,10 @@ object TestcontainersUtils {
             registry.add("pushpin.servers[$index].httpPort") { container.getHttpPublishPort() }
             registry.add("pushpin.servers[$index].active") { true }
 
-            println("Configured Pushpin server: $serverId with ports: HTTP=${container.getHttpPort()}, " +
-                    "Publish=${container.getPublishPort()}, Control=${container.getControlPort()}")
+            println(
+                "Configured Pushpin server: $serverId with ports: HTTP=${container.getHttpPort()}, " +
+                    "Publish=${container.getPublishPort()}, Control=${container.getControlPort()}",
+            )
         }
 
         // Enable health checks

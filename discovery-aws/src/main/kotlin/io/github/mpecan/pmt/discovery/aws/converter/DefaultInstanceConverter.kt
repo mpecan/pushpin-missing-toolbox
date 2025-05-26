@@ -26,7 +26,7 @@ class DefaultInstanceConverter : InstanceConverter {
             port = properties.port,
             controlPort = properties.controlPort,
             publishPort = properties.publishPort,
-            healthCheckPath = properties.healthCheckPath
+            healthCheckPath = properties.healthCheckPath,
         )
     }
 }
