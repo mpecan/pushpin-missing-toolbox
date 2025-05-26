@@ -60,7 +60,6 @@ jobs:
       uses: gradle/gradle-build-action@v3
       with:
         arguments: ktlintCheck
-      continue-on-error: true
       
     - name: Upload lint reports
       uses: actions/upload-artifact@v4
