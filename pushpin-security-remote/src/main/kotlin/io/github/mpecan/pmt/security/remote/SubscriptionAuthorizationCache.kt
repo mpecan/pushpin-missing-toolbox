@@ -2,19 +2,19 @@ package io.github.mpecan.pmt.security.remote
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import io.github.mpecan.pmt.config.PushpinProperties
-import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 /**
  * Cache for channel subscription authorization decisions to reduce load on remote authorization service.
  */
-@Component
-class SubscriptionAuthorizationCache(properties: PushpinProperties) {
+class SubscriptionAuthorizationCache(
+    cacheMaxSize: Long = 10000,
+    cacheTtl: Long = 300000 // 5 minutes default
+) {
     
     private val cache: Cache<CacheKey, CacheValue> = Caffeine.newBuilder()
-        .maximumSize(properties.security.jwt.remoteAuthorization.cacheMaxSize)
-        .expireAfterWrite(properties.security.jwt.remoteAuthorization.cacheTtl, TimeUnit.MILLISECONDS)
+        .maximumSize(cacheMaxSize)
+        .expireAfterWrite(cacheTtl, TimeUnit.MILLISECONDS)
         .build()
     
     /**

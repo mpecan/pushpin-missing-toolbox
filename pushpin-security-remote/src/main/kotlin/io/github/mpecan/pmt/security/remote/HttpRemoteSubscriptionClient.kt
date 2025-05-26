@@ -1,16 +1,12 @@
 package io.github.mpecan.pmt.security.remote
 
-import io.github.mpecan.pmt.config.PushpinProperties
-import io.github.mpecan.pmt.security.audit.AuditLogService
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -19,12 +15,9 @@ import java.net.URI
  * Implementation of RemoteAuthorizationClient that uses HTTP to communicate with a remote
  * authorization service for channel subscriptions.
  */
-@Component
-@ConditionalOnProperty(name = ["pushpin.security.jwt.remoteAuthorization.enabled"], havingValue = "true")
 class HttpRemoteSubscriptionClient(
-    private val properties: PushpinProperties,
+    private val properties: RemoteAuthorizationProperties,
     private val cache: SubscriptionAuthorizationCache,
-    private val auditLogService: AuditLogService,
     private val restTemplate: RestTemplate
 ) : RemoteAuthorizationClient {
     private val logger = LoggerFactory.getLogger(HttpRemoteSubscriptionClient::class.java)
@@ -33,7 +26,7 @@ class HttpRemoteSubscriptionClient(
         val userId = getCurrentUserId() ?: return false
         
         // Check cache first if enabled
-        if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
+        if (properties.cache.enabled) {
             cache.getSubscriptionCheck(userId, channelId)?.let {
                 logger.debug("Cache hit for subscription check: user={}, channel={}, result={}", 
                     userId, channelId, it)
@@ -42,26 +35,19 @@ class HttpRemoteSubscriptionClient(
         }
         
         try {
-            val result = when (properties.security.jwt.remoteAuthorization.method.uppercase()) {
+            val result = when (properties.method.uppercase()) {
                 "GET" -> checkSubscriptionWithGet(request, userId, channelId)
                 else -> checkSubscriptionWithPost(request, userId, channelId)
             }
             
             // Cache the result if enabled
-            if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
+            if (properties.cache.enabled) {
                 cache.cacheSubscriptionCheck(userId, channelId, result)
-            }
-            
-            // Audit log the result
-            if (!result) {
-                auditLogService.logChannelAccess(userId, request.remoteAddr, channelId, "subscription denied")
             }
             
             return result
         } catch (e: Exception) {
             logger.error("Error checking subscription with remote service: {}", e.message)
-            auditLogService.logChannelAccess(userId, request.remoteAddr, channelId, 
-                "subscription error: ${e.message ?: "Unknown error"}")
             return false
         }
     }
@@ -70,7 +56,7 @@ class HttpRemoteSubscriptionClient(
         val userId = getCurrentUserId() ?: return emptyList()
         
         // Check cache first if enabled
-        if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
+        if (properties.cache.enabled) {
             cache.getSubscribableChannels(userId)?.let {
                 logger.debug("Cache hit for subscribable channels: user={}, channels={}", userId, it)
                 return it
@@ -78,13 +64,13 @@ class HttpRemoteSubscriptionClient(
         }
         
         try {
-            val result = when (properties.security.jwt.remoteAuthorization.method.uppercase()) {
+            val result = when (properties.method.uppercase()) {
                 "GET" -> getSubscribableChannelsWithGet(request, userId)
                 else -> getSubscribableChannelsWithPost(request, userId)
             }
             
             // Cache the result if enabled
-            if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
+            if (properties.cache.enabled) {
                 cache.cacheSubscribableChannels(userId, result)
             }
             
@@ -99,7 +85,7 @@ class HttpRemoteSubscriptionClient(
         val userId = getCurrentUserId() ?: return emptyList()
         
         // Check cache first if enabled
-        if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
+        if (properties.cache.enabled) {
             cache.getSubscribableChannelsByPattern(userId, pattern)?.let {
                 logger.debug("Cache hit for channels by pattern: user={}, pattern={}, channels={}", 
                     userId, pattern, it)
@@ -108,13 +94,13 @@ class HttpRemoteSubscriptionClient(
         }
         
         try {
-            val result = when (properties.security.jwt.remoteAuthorization.method.uppercase()) {
+            val result = when (properties.method.uppercase()) {
                 "GET" -> getChannelsByPatternWithGet(request, userId, pattern)
                 else -> getChannelsByPatternWithPost(request, userId, pattern)
             }
             
             // Cache the result if enabled
-            if (properties.security.jwt.remoteAuthorization.cacheEnabled) {
+            if (properties.cache.enabled) {
                 cache.cacheSubscribableChannelsByPattern(userId, pattern, result)
             }
             
@@ -133,7 +119,7 @@ class HttpRemoteSubscriptionClient(
         userId: String,
         channelId: String
     ): Boolean {
-        val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
+        val uri = UriComponentsBuilder.fromUriString(properties.url)
             .path("/subscribe/check")
             .queryParam("userId", userId)
             .queryParam("channelId", channelId)
@@ -159,7 +145,7 @@ class HttpRemoteSubscriptionClient(
         userId: String,
         channelId: String
     ): Boolean {
-        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/subscribe/check")
+        val uri = URI.create("${properties.url}/subscribe/check")
         
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
@@ -186,7 +172,7 @@ class HttpRemoteSubscriptionClient(
         request: HttpServletRequest,
         userId: String
     ): List<String> {
-        val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
+        val uri = UriComponentsBuilder.fromUriString(properties.url)
             .path("/subscribe/channels")
             .queryParam("userId", userId)
             .build()
@@ -210,7 +196,7 @@ class HttpRemoteSubscriptionClient(
         request: HttpServletRequest,
         userId: String
     ): List<String> {
-        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/subscribe/channels")
+        val uri = URI.create("${properties.url}/subscribe/channels")
         
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
@@ -235,7 +221,7 @@ class HttpRemoteSubscriptionClient(
         userId: String,
         pattern: String
     ): List<String> {
-        val uri = UriComponentsBuilder.fromUriString(properties.security.jwt.remoteAuthorization.url)
+        val uri = UriComponentsBuilder.fromUriString(properties.url)
             .path("/subscribe/channels/pattern")
             .queryParam("userId", userId)
             .queryParam("pattern", pattern)
@@ -261,7 +247,7 @@ class HttpRemoteSubscriptionClient(
         userId: String,
         pattern: String
     ): List<String> {
-        val uri = URI.create("${properties.security.jwt.remoteAuthorization.url}/subscribe/channels/pattern")
+        val uri = URI.create("${properties.url}/subscribe/channels/pattern")
         
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
@@ -288,7 +274,7 @@ class HttpRemoteSubscriptionClient(
         val headers = HttpHeaders()
         
         // Include configured headers from the original request
-        for (headerName in properties.security.jwt.remoteAuthorization.includeHeaders) {
+        for (headerName in properties.includeHeaders) {
             val headerValue = request.getHeader(headerName)
             if (headerValue != null) {
                 headers.add(headerName, headerValue)

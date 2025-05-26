@@ -3,4 +3,4 @@ plugins {
 }
 
 rootProject.name = "pushpin-missing-toolbox"
-include(":server", ":pushpin-api", ":discovery", ":discovery-aws", ":discovery-kubernetes", ":pushpin-client", ":pushpin-security-core")
+include(":server", ":pushpin-api", ":discovery", ":discovery-aws", ":discovery-kubernetes", ":pushpin-client", ":pushpin-security-core", ":pushpin-security-remote")

@@ -1,18 +1,10 @@
 package io.github.mpecan.pmt.security.remote
 
 import jakarta.servlet.http.HttpServletRequest
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Component
 
 /**
  * No-op implementation of RemoteAuthorizationClient used when remote authorization is disabled.
  */
-@Component
-@ConditionalOnProperty(
-    name = ["pushpin.security.jwt.remoteAuthorization.enabled"],
-    havingValue = "false",
-    matchIfMissing = true
-)
 class NoopRemoteAuthorizationClient : RemoteAuthorizationClient {
     
     override fun canSubscribe(request: HttpServletRequest, channelId: String): Boolean {
