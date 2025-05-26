@@ -13,8 +13,7 @@ interface ChannelSubscriptionExtractorService {
      * The expected format in the JWT can be either:
      * 1. An array of channel IDs (user can subscribe to all listed channels):
      *    { "channels": ["channel1", "channel2", "news.*"] }
-     * 
-     * 2. An array of channel objects with metadata:
+     * * 2. An array of channel objects with metadata:
      *    { "channels": [{ "id": "channel1", "expires": "2024-12-31" }] }
      *
      * 3. A map of channel IDs to metadata:
@@ -24,12 +23,12 @@ interface ChannelSubscriptionExtractorService {
      * @return ChannelSubscriptions object or null if no channels found
      */
     fun extractChannelSubscriptions(jwt: Jwt): ChannelSubscriptions?
-    
+
     /**
      * Get the configured path to the channels claim in the JWT token.
      */
     fun getChannelsClaimPath(): String
-    
+
     /**
      * Check if claim extraction is enabled.
      */

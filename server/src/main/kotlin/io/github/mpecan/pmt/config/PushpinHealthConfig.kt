@@ -17,8 +17,7 @@ class PushpinHealthConfig {
 
     /**
      * Creates a PushpinHealthChecker bean if none is provided.
-     * 
-     * This bean now supports multiple transport health checkers and will
+     * * This bean now supports multiple transport health checkers and will
      * select the appropriate one based on the configured transport type.
      */
     @Bean
@@ -27,13 +26,13 @@ class PushpinHealthConfig {
         transportHealthCheckers: List<TransportHealthChecker>,
         pushpinProperties: PushpinProperties,
         pushpinService: PushpinService,
-        @Value("\${pushpin.transport:http}") transportType: String
+        @Value("\${pushpin.transport:http}") transportType: String,
     ): PushpinHealthChecker {
         return DefaultPushpinHealthChecker(
             transportHealthCheckers,
             pushpinProperties.healthCheckEnabled,
             pushpinService,
-            transportType
+            transportType,
         )
     }
 }

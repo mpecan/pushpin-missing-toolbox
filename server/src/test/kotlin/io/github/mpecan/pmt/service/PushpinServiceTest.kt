@@ -29,29 +29,29 @@ class PushpinServiceTest {
             id = "test-server-1",
             host = "localhost",
             port = 7999,
-            active = true
+            active = true,
         )
 
         val serverProps2 = PushpinProperties.ServerProperties(
             id = "test-server-2",
             host = "localhost",
             port = 7998,
-            active = true
+            active = true,
         )
 
         pushpinProperties = PushpinProperties(
             servers = listOf(serverProps1, serverProps2),
-            healthCheckEnabled = false
+            healthCheckEnabled = false,
         )
 
         // Create security properties
         val securityProps = PushpinProperties.SecurityProperties(
-            encryption = PushpinProperties.EncryptionProperties(enabled = false)
+            encryption = PushpinProperties.EncryptionProperties(enabled = false),
         )
 
         // Update properties to include security settings
         pushpinProperties = pushpinProperties.copy(
-            security = securityProps
+            security = securityProps,
         )
 
         // Create service with mocked dependencies
@@ -59,7 +59,7 @@ class PushpinServiceTest {
             discoveryManager,
             encryptionService,
             auditService,
-            pushpinTransports = listOf(transport)
+            pushpinTransports = listOf(transport),
         )
     }
 
@@ -68,7 +68,7 @@ class PushpinServiceTest {
         whenever(discoveryManager.getAllServers()).thenReturn(
             pushpinProperties.servers.map {
                 it.toPushpinServer()
-            }
+            },
         )
         val servers = pushpinService.getAllServers()
 
@@ -79,7 +79,9 @@ class PushpinServiceTest {
 
     @Test
     fun `getServerById should return the correct server`() {
-        whenever(discoveryManager.getServerById("test-server-1")).thenReturn(pushpinProperties.servers[0].toPushpinServer())
+        whenever(discoveryManager.getServerById("test-server-1")).thenReturn(
+            pushpinProperties.servers[0].toPushpinServer(),
+        )
         val server = pushpinService.getServerById("test-server-1")
 
         assertTrue(server != null)

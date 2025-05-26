@@ -9,21 +9,21 @@ import java.util.UUID
  * It ensures that code using EncryptionService will not fail if no encryption module is included.
  */
 class NoOpEncryptionService : EncryptionService {
-    
+
     override fun encrypt(plaintext: String): String {
         // Pass through without encryption
         return plaintext
     }
-    
+
     override fun decrypt(encryptedData: String): String {
         // Pass through without decryption
         return encryptedData
     }
-    
+
     override fun isEncryptionEnabled(): Boolean {
         return false
     }
-    
+
     override fun generateSecretKey(): String {
         // Generate a dummy key that looks real but isn't used
         val randomBytes = UUID.randomUUID().toString().toByteArray()

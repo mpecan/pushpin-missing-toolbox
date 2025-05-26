@@ -26,7 +26,7 @@ data class PushpinProperties(
     val authSecret: String = "",
     val security: SecurityProperties = SecurityProperties(),
     val zmqEnabled: Boolean = false,
-    val testMode: Boolean = false
+    val testMode: Boolean = false,
 ) {
     /**
      * Configuration properties for a Pushpin server.
@@ -40,7 +40,7 @@ data class PushpinProperties(
         val httpPort: Int = 8080,
         val active: Boolean = true,
         val weight: Int = 100,
-        val healthCheckPath: String = "/api/health/check"
+        val healthCheckPath: String = "/api/health/check",
     ) {
         /**
          * Converts to a PushpinServer model.
@@ -54,7 +54,7 @@ data class PushpinProperties(
             httpPort = httpPort,
             active = active,
             weight = weight,
-            healthCheckPath = healthCheckPath
+            healthCheckPath = healthCheckPath,
         )
     }
 
@@ -71,7 +71,7 @@ data class PushpinProperties(
         val rateLimit: RateLimitProperties = RateLimitProperties(),
         val auditLogging: AuditLoggingProperties = AuditLoggingProperties(),
         val encryption: EncryptionProperties = EncryptionProperties(),
-        val hmac: HmacProperties = HmacProperties()
+        val hmac: HmacProperties = HmacProperties(),
     )
 
     /**
@@ -104,7 +104,7 @@ data class PushpinProperties(
         val authoritiesClaim: String = "roles",
         val authoritiesPrefix: String = "ROLE_",
         val claimExtraction: ClaimExtractionProperties = ClaimExtractionProperties(),
-        val remoteAuthorization: RemoteAuthorizationProperties = RemoteAuthorizationProperties()
+        val remoteAuthorization: RemoteAuthorizationProperties = RemoteAuthorizationProperties(),
     ) {
         /**
          * Configuration for extracting specific claims from JWT tokens and transforming
@@ -123,7 +123,7 @@ data class PushpinProperties(
             val extractClaims: List<String> = listOf("sub", "email"),
             val headerPrefix: String = "X-JWT-Claim-",
             val includeAllClaims: Boolean = false,
-            val transformations: Map<String, String> = emptyMap()
+            val transformations: Map<String, String> = emptyMap(),
         )
 
         /**
@@ -150,7 +150,7 @@ data class PushpinProperties(
             val cacheMaxSize: Long = 1000,
             val includeHeaders: List<String> = listOf("Authorization"),
             val includeQueryParams: Boolean = true,
-            val headerName: String = "X-Auth-Decision"
+            val headerName: String = "X-Auth-Decision",
         )
     }
 
@@ -164,7 +164,7 @@ data class PushpinProperties(
     data class RateLimitProperties(
         val enabled: Boolean = false,
         val capacity: Long = 100,
-        val refillTimeInMillis: Long = 60000 // 1 minute
+        val refillTimeInMillis: Long = 60000, // 1 minute
     )
 
     /**
@@ -175,7 +175,7 @@ data class PushpinProperties(
      */
     data class AuditLoggingProperties(
         val enabled: Boolean = false,
-        val level: String = "INFO"
+        val level: String = "INFO",
     )
 
     /**
@@ -188,7 +188,7 @@ data class PushpinProperties(
     data class EncryptionProperties(
         val enabled: Boolean = false,
         val algorithm: String = "AES/GCM/NoPadding",
-        val secretKey: String = ""
+        val secretKey: String = "",
     )
 
     /**
@@ -203,6 +203,6 @@ data class PushpinProperties(
         val enabled: Boolean = false,
         val algorithm: String = "HmacSHA256",
         val secretKey: String = "",
-        val headerName: String = "X-Pushpin-Signature"
+        val headerName: String = "X-Pushpin-Signature",
     )
 }

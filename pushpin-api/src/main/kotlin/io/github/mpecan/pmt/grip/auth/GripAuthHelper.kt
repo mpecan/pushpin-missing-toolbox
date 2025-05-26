@@ -10,8 +10,9 @@ import javax.crypto.SecretKey
 /**
  * Helper for GRIP authentication using JWT.
  */
+@Suppress("unused")
 object GripAuthHelper {
-    
+
     /**
      * Creates a GRIP signature JWT token.
      *
@@ -20,15 +21,11 @@ object GripAuthHelper {
      * @param expiresIn Expiration time in seconds from now (optional)
      * @return The JWT token string
      */
-    fun createGripSignature(
-        iss: String,
-        key: String,
-        expiresIn: Long? = null
-    ): String {
+    fun createGripSignature(iss: String, key: String, expiresIn: Long? = null): String {
         val secretKey = Keys.hmacShaKeyFor(key.toByteArray(StandardCharsets.UTF_8))
         return createGripSignature(iss, secretKey, expiresIn)
     }
-    
+
     /**
      * Creates a GRIP signature JWT token.
      *
@@ -37,24 +34,20 @@ object GripAuthHelper {
      * @param expiresIn Expiration time in seconds from now (optional)
      * @return The JWT token string
      */
-    fun createGripSignature(
-        iss: String,
-        key: SecretKey,
-        expiresIn: Long? = null
-    ): String {
+    fun createGripSignature(iss: String, key: SecretKey, expiresIn: Long? = null): String {
         val builder = Jwts.builder()
             .issuer(iss)
             .issuedAt(Date.from(Instant.now()))
-        
+
         if (expiresIn != null) {
             builder.expiration(Date.from(Instant.now().plusSeconds(expiresIn)))
         }
-        
+
         return builder
             .signWith(key)
             .compact()
     }
-    
+
     /**
      * Validates a GRIP signature JWT token.
      *
@@ -70,7 +63,7 @@ object GripAuthHelper {
             false
         }
     }
-    
+
     /**
      * Validates a GRIP signature JWT token.
      *
@@ -89,7 +82,7 @@ object GripAuthHelper {
             false
         }
     }
-    
+
     /**
      * Extracts the issuer from a GRIP signature JWT token.
      *
@@ -105,7 +98,7 @@ object GripAuthHelper {
             null
         }
     }
-    
+
     /**
      * Extracts the issuer from a GRIP signature JWT token.
      *

@@ -4,7 +4,6 @@ import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
-import io.github.mpecan.pmt.model.PushpinMessage
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.transport.PushpinTransport
 import jakarta.annotation.PreDestroy
@@ -32,7 +31,7 @@ class ZmqTransport(
     private val zmqProperties: ZmqTransportProperties,
     private val messageSerializer: MessageSerializer,
     private val messageSerializationService: MessageSerializationService,
-    private val discoveryManager: PushpinDiscoveryManager? = null
+    private val discoveryManager: PushpinDiscoveryManager? = null,
 ) : PushpinTransport {
     private val logger = LoggerFactory.getLogger(ZmqTransport::class.java)
     private val context = ZContext()
@@ -47,7 +46,9 @@ class ZmqTransport(
      * Initializes the ZMQ transport.
      */
     init {
-        logger.info("Initializing ZMQ transport with PUSH socket type and connection pool: ${zmqProperties.connectionPoolEnabled}")
+        logger.info(
+            "Initializing ZMQ transport with PUSH socket type and connection pool: ${zmqProperties.connectionPoolEnabled}",
+        )
     }
 
     /**
@@ -149,12 +150,16 @@ class ZmqTransport(
             val results = servers.map { server ->
                 try {
                     val socket = getSocket(server)
-                    logger.debug("Publishing to channel: '${message.channel}' via ZMQ PUSH socket to server: ${server.id}")
+                    logger.debug(
+                        "Publishing to channel: '${message.channel}' via ZMQ PUSH socket to server: ${server.id}",
+                    )
 
                     val sendResult = socket.send(data, 0)
 
                     if (sendResult) {
-                        logger.debug("Successfully published message to server ${server.id} on channel: ${message.channel}")
+                        logger.debug(
+                            "Successfully published message to server ${server.id} on channel: ${message.channel}",
+                        )
                         true
                     } else {
                         logger.error("Failed to send message to server ${server.id} on channel: ${message.channel}")

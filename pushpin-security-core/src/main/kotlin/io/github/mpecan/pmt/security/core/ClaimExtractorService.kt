@@ -32,7 +32,7 @@ interface ClaimExtractorService {
      * @return The extracted claim values as a map, or empty map if not found
      */
     fun extractMapClaim(jwt: Jwt, claimPath: String): Map<String, Any>
-    
+
     /**
      * Check if a claim exists in the JWT token.
      *

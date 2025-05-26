@@ -10,20 +10,18 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Default implementation of PushpinHealthChecker.
- * 
- * This implementation supports multiple transport health checkers and will
+ * * This implementation supports multiple transport health checkers and will
  * use the appropriate checker based on the configured transport type.
  */
 class DefaultPushpinHealthChecker(
     private val transportHealthCheckers: List<TransportHealthChecker>,
     private val healthCheckEnabled: Boolean,
     private val pushpinService: PushpinService,
-    private val defaultTransportType: String = "http"
+    private val defaultTransportType: String = "http",
 ) : PushpinHealthChecker {
     private val logger = LoggerFactory.getLogger(DefaultPushpinHealthChecker::class.java)
     private val healthyServers = ConcurrentHashMap<String, PushpinServer>()
-    private val healthCheckerMap: Map<String, TransportHealthChecker> = 
-        transportHealthCheckers.associateBy { it.getTransportType() }
+    private val healthCheckerMap: Map<String, TransportHealthChecker> = transportHealthCheckers.associateBy { it.getTransportType() }
 
     init {
         logger.info("Initialized health checker with transport types: ${healthCheckerMap.keys}")

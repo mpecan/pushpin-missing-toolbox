@@ -23,7 +23,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @ConditionalOnProperty(
     value = ["pushpin.transport"],
     havingValue = "zmq",
-    matchIfMissing = false
+    matchIfMissing = false,
 )
 class ZmqTransportAutoConfiguration {
 
@@ -33,11 +33,11 @@ class ZmqTransportAutoConfiguration {
         zmqTransportProperties: ZmqTransportProperties,
         messageSerializer: MessageSerializer,
         messageSerializationService: MessageSerializationService,
-        discoveryManager: PushpinDiscoveryManager
+        discoveryManager: PushpinDiscoveryManager,
     ): ZmqTransport {
         return ZmqTransport(zmqTransportProperties, messageSerializer, messageSerializationService, discoveryManager)
     }
-    
+
     @Bean
     @ConditionalOnMissingBean
     fun zmqHealthChecker(objectMapper: ObjectMapper): ZmqHealthChecker {

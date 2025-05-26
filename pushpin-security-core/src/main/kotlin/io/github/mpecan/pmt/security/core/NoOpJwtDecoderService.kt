@@ -13,12 +13,12 @@ class NoOpJwtDecoderService : JwtDecoderService {
         val secretKey = SecretKeySpec("default-secret-key-32-characters".toByteArray(), "HMAC")
         return NimbusJwtDecoder.withSecretKey(secretKey).build()
     }
-    
+
     override fun isJwtEnabled(): Boolean = false
-    
+
     override fun getProvider(): String = "none"
-    
+
     override fun getIssuer(): String = ""
-    
+
     override fun getAudience(): String = ""
 }

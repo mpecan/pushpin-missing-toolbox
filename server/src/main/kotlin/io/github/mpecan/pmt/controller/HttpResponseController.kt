@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 /**
  * Controller for non-streaming HTTP responses.
- * 
- * This controller handles regular HTTP requests and demonstrates
+ * * This controller handles regular HTTP requests and demonstrates
  * how Pushpin can be used for non-streaming HTTP responses.
  */
 @RestController
@@ -20,12 +19,10 @@ class HttpResponseController {
 
     /**
      * Returns a simple HTTP response for a channel.
-     * 
-     * This endpoint demonstrates how Pushpin can be used for regular HTTP responses.
+     * * This endpoint demonstrates how Pushpin can be used for regular HTTP responses.
      * It adds a Grip-Channel header to allow Pushpin to later publish to clients
      * that have made requests to this endpoint.
-     * 
-     * @param channel The channel to associate with this response
+     * * @param channel The channel to associate with this response
      * @return A simple HTTP response with Grip-Channel header
      */
     @GetMapping("/{channel}")
@@ -34,13 +31,13 @@ class HttpResponseController {
         val response = mapOf(
             "success" to true,
             "message" to "This is a non-streaming HTTP response",
-            "channel" to channel
+            "channel" to channel,
         )
-        
+
         // Return the response with GRIP headers using the new API
         return GripApi.headers()
             .channel(channel)
-            .applyTo<Map<String, Any>>(ResponseEntity.ok())
+            .applyTo(ResponseEntity.ok())
             .contentType(MediaType.APPLICATION_JSON)
             .body(response)
     }

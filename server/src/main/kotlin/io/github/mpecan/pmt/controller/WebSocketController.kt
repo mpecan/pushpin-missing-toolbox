@@ -36,11 +36,11 @@ class WebSocketController {
         @RequestHeader(
             "Content-Type",
             required = false,
-            defaultValue = "application/websocket-events"
+            defaultValue = "application/websocket-events",
         ) contentType: String,
         @RequestHeader("Sec-WebSocket-Key", required = true) secWebSocketAccept: String,
         @RequestHeader headers: HttpHeaders,
-        @RequestBody body: String
+        @RequestBody body: String,
     ): ResponseEntity<String> {
         // Process the incoming WebSocket events using GRIP API
         val events = GripApi.parseWebSocketEvents(body)
@@ -55,10 +55,12 @@ class WebSocketController {
                 .open()
                 .subscribe(channel)
                 .keepAlive(timeout = 30, content = "{}")
-                .message(mapOf(
-                    "success" to true,
-                    "message" to "Subscribed to channel: $channel"
-                ))
+                .message(
+                    mapOf(
+                        "success" to true,
+                        "message" to "Subscribed to channel: $channel",
+                    ),
+                )
         } else {
             // Process other event types
             for (event in events) {
@@ -104,7 +106,7 @@ class WebSocketController {
 
         // Build the response using GRIP API
         var responseBuilder = GripApi.websocketResponse(secWebSocketAccept)
-        
+
         // Apply meta headers using GRIP API
         responseBuilder = GripApi.applyMetaHeaders(responseBuilder, metaHeaders)
 

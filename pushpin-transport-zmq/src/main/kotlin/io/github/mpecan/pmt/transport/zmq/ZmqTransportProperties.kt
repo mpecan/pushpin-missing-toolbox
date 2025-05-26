@@ -40,5 +40,5 @@ data class ZmqTransportProperties(
     /**
      * Connection pool refresh interval in milliseconds.
      */
-    val connectionPoolRefreshInterval: Long = 60000L
+    val connectionPoolRefreshInterval: Long = 60000L,
 )

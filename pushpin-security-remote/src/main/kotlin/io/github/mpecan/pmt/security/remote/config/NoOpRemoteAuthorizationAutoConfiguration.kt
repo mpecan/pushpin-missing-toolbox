@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean
     prefix = "pushpin.security.remote",
     name = ["enabled"],
     havingValue = "false",
-    matchIfMissing = true
+    matchIfMissing = true,
 )
 class NoOpRemoteAuthorizationAutoConfiguration {
 

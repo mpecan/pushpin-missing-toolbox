@@ -12,22 +12,20 @@ import reactor.core.scheduler.Schedulers
 
 /**
  * ZMQ-based health checker for Pushpin servers.
- * 
- * Performs health checks by connecting to Pushpin's REQ/REP socket
+ * * Performs health checks by connecting to Pushpin's REQ/REP socket
  * and requesting stats information. This provides a more accurate
  * health check than just verifying socket connectivity.
  */
 class ZmqHealthChecker(
     private val objectMapper: ObjectMapper = ObjectMapper(),
-    private val defaultTimeout: Long = 5000L
+    private val defaultTimeout: Long = 5000L,
 ) : TransportHealthChecker {
     private val logger = LoggerFactory.getLogger(ZmqHealthChecker::class.java)
     private val context = ZContext()
-    
+
     /**
      * Checks the health of a single server via ZMQ REQ/REP socket.
-     * 
-     * Sends a {"method": "get-stats"} request to the Pushpin stats endpoint
+     * * Sends a {"method": "get-stats"} request to the Pushpin stats endpoint
      * and expects a valid response to consider the server healthy.
      */
     override fun checkHealth(server: PushpinServer): Mono<Boolean> {
@@ -36,26 +34,26 @@ class ZmqHealthChecker(
         }.subscribeOn(Schedulers.boundedElastic())
             .onErrorReturn(false)
     }
-    
+
     private fun checkHealthSync(server: PushpinServer): Boolean {
         var socket: ZMQ.Socket? = null
-        
+
         return try {
             // Create REQ socket for request-reply pattern
             socket = context.createSocket(SocketType.REQ)
             socket.setReceiveTimeOut(defaultTimeout.toInt())
             socket.setSendTimeOut(defaultTimeout.toInt())
-            
+
             // Construct stats URL using the server's control port
             val statsUrl = "tcp://${server.host}:${server.controlPort}"
             logger.debug("Connecting to ZMQ stats socket at: $statsUrl for server ${server.id}")
-            
+
             // Connect to the stats endpoint
             socket.connect(statsUrl)
-            
+
             // Create stats request
             val statsRequest = objectMapper.writeValueAsString(mapOf("method" to "get-stats"))
-            
+
             // Send the request
             val sendResult = socket.send(statsRequest.toByteArray(), 0)
             if (!sendResult) {
@@ -71,7 +69,7 @@ class ZmqHealthChecker(
             socket?.close()
         }
     }
-    
+
     /**
      * Alternative health check method using simple socket connectivity test.
      * This can be used if the stats endpoint is not available.
@@ -85,17 +83,17 @@ class ZmqHealthChecker(
                 socket.setHWM(1)
                 socket.linger = 0
                 socket.setSendTimeOut(500)
-                
+
                 val publishUrl = server.getPublishUrl()
                 logger.debug("Testing ZMQ connectivity to: $publishUrl for server ${server.id}")
-                
+
                 socket.connect(publishUrl)
-                
+
                 // Try to send a small test message to verify connectivity
                 // ZMQ connect is asynchronous, so we need to try sending to verify
                 val testMessage = "ping".toByteArray()
                 val sent = socket.send(testMessage, ZMQ.DONTWAIT)
-                
+
                 if (sent) {
                     logger.debug("ZMQ socket connected and operational for server ${server.id}")
                     true
@@ -112,12 +110,12 @@ class ZmqHealthChecker(
         }.subscribeOn(Schedulers.boundedElastic())
             .onErrorReturn(false)
     }
-    
+
     /**
      * Returns the transport type for this health checker.
      */
     override fun getTransportType(): String = "zmq"
-    
+
     /**
      * Cleanup resources when the health checker is destroyed.
      */

@@ -7,7 +7,7 @@ package io.github.mpecan.pmt.security.core
 data class SecurityContext(
     val principal: Any? = null,
     val authenticated: Boolean = false,
-    val attributes: Map<String, Any> = emptyMap()
+    val attributes: Map<String, Any> = emptyMap(),
 ) {
     /**
      * Get an attribute from the security context.
@@ -15,14 +15,14 @@ data class SecurityContext(
     inline fun <reified T> getAttribute(key: String): T? {
         return attributes[key] as? T
     }
-    
+
     /**
      * Create a new SecurityContext with an additional attribute.
      */
     fun withAttribute(key: String, value: Any): SecurityContext {
         return copy(attributes = attributes + (key to value))
     }
-    
+
     /**
      * Create a new SecurityContext with multiple additional attributes.
      */
@@ -37,21 +37,21 @@ data class SecurityContext(
  */
 object SecurityContextHolder {
     private val contextHolder = ThreadLocal<SecurityContext>()
-    
+
     /**
      * Get the current security context.
      */
     fun getContext(): SecurityContext {
         return contextHolder.get() ?: SecurityContext()
     }
-    
+
     /**
      * Set the security context.
      */
     fun setContext(context: SecurityContext) {
         contextHolder.set(context)
     }
-    
+
     /**
      * Clear the security context.
      */

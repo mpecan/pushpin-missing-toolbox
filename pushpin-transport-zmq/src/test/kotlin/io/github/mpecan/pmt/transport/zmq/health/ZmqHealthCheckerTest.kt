@@ -13,32 +13,32 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class ZmqHealthCheckerTest {
-    
+
     private lateinit var healthChecker: ZmqHealthChecker
     private lateinit var objectMapper: ObjectMapper
     private lateinit var mockServerContext: ZContext
     private var mockServerThread: Thread? = null
     private var mockServerRunning = false
-    
+
     @BeforeEach
     fun setUp() {
         objectMapper = ObjectMapper()
         healthChecker = ZmqHealthChecker(objectMapper, 2000L)
         mockServerContext = ZContext()
     }
-    
+
     @AfterEach
     fun tearDown() {
         // Stop mock server
         mockServerRunning = false
         mockServerThread?.interrupt()
         mockServerThread?.join(1000)
-        
+
         // Clean up
         healthChecker.close()
         mockServerContext.close()
     }
-    
+
     @Test
     fun `checkHealth should return true when server responds with valid stats`() {
         // Start a mock ZMQ REP server on control port
@@ -51,55 +51,55 @@ class ZmqHealthCheckerTest {
                 """{"error": "unknown method"}"""
             }
         }
-        
+
         // Wait for server to start
         serverReady.await(2, TimeUnit.SECONDS)
         Thread.sleep(100) // Give it a moment to fully initialize
-        
+
         // Given
         val server = PushpinServer(
             id = "server1",
             host = "localhost",
             port = 5561,
-            controlPort = controlPort
+            controlPort = controlPort,
         )
-        
+
         // When
         val result = healthChecker.checkHealth(server)
-        
+
         // Then
         StepVerifier.create(result)
             .expectNext(true)
             .verifyComplete()
     }
-    
+
     @Test
     fun `checkConnectivity should return true when socket can connect`() {
         // Start a mock ZMQ PULL server (simulating Pushpin's publish socket)
         val serverReady = CountDownLatch(1)
         startMockPullServer(5560)
-        
+
         // Wait for server to start
         serverReady.await(2, TimeUnit.SECONDS)
         Thread.sleep(100)
-        
+
         // Given
         val server = PushpinServer(
             id = "server1",
             host = "localhost",
             port = 5561,
-            publishPort = 5560
+            publishPort = 5560,
         )
-        
+
         // When
         val result = healthChecker.checkConnectivity(server)
-        
+
         // Then
         StepVerifier.create(result)
             .expectNext(true)
             .verifyComplete()
     }
-    
+
     @Test
     fun `checkConnectivity should return true even when no server is listening`() {
         // Given - no server running
@@ -109,31 +109,31 @@ class ZmqHealthCheckerTest {
             id = "server1",
             host = "localhost",
             port = 5561,
-            publishPort = 5560
+            publishPort = 5560,
         )
-        
+
         // When
         val result = healthChecker.checkConnectivity(server)
-        
+
         // Then
         StepVerifier.create(result)
             .expectNext(true) // ZMQ will return true even with no server
             .verifyComplete()
     }
-    
+
     @Test
     fun `getTransportType should return zmq`() {
         // When & Then
         assert(healthChecker.getTransportType() == "zmq")
     }
-    
+
     private fun startMockStatsServer(port: Int, responseHandler: (String) -> String) {
         mockServerRunning = true
         mockServerThread = Thread {
             val socket = mockServerContext.createSocket(SocketType.REP)
             try {
                 socket.bind("tcp://localhost:$port")
-                
+
                 while (mockServerRunning && !Thread.currentThread().isInterrupted) {
                     val request = socket.recv(ZMQ.DONTWAIT)
                     if (request != null) {
@@ -153,14 +153,14 @@ class ZmqHealthCheckerTest {
         }
         mockServerThread?.start()
     }
-    
+
     private fun startMockPullServer(port: Int) {
         mockServerRunning = true
         mockServerThread = Thread {
             val socket = mockServerContext.createSocket(SocketType.PULL)
             try {
                 socket.bind("tcp://localhost:$port")
-                
+
                 while (mockServerRunning && !Thread.currentThread().isInterrupted) {
                     // Just receive and discard messages
                     socket.recv(ZMQ.DONTWAIT)

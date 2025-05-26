@@ -12,10 +12,10 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:${rootProject.property("caffeineVersion")}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("jakarta.servlet:jakarta.servlet-api")
-    
+
     // Optional dependencies
     compileOnly("org.springframework.boot:spring-boot-configuration-processor")
-    
+
     // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:${rootProject.property("mockitoKotlinVersion")}")

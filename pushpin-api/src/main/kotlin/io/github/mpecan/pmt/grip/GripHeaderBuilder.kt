@@ -16,7 +16,7 @@ class GripHeaderBuilder {
     private var gripSig: String? = null
     private var lastEventId: String? = null
     private var previousId: String? = null
-    
+
     /**
      * Sets the GRIP hold mode (response or stream).
      */
@@ -24,21 +24,21 @@ class GripHeaderBuilder {
         holdMode = mode
         return this
     }
-    
+
     /**
      * Sets the GRIP hold mode to response.
      */
     fun holdResponse(): GripHeaderBuilder {
         return hold(GripConstants.HOLD_MODE_RESPONSE)
     }
-    
+
     /**
      * Sets the GRIP hold mode to stream.
      */
     fun holdStream(): GripHeaderBuilder {
         return hold(GripConstants.HOLD_MODE_STREAM)
     }
-    
+
     /**
      * Adds a channel to subscribe to.
      */
@@ -46,7 +46,7 @@ class GripHeaderBuilder {
         channels.add(channel)
         return this
     }
-    
+
     /**
      * Adds multiple channels to subscribe to.
      */
@@ -54,7 +54,7 @@ class GripHeaderBuilder {
         this.channels.addAll(channels)
         return this
     }
-    
+
     /**
      * Sets the connection timeout in seconds.
      */
@@ -62,7 +62,7 @@ class GripHeaderBuilder {
         timeout = seconds
         return this
     }
-    
+
     /**
      * Sets the keep-alive message content.
      */
@@ -70,7 +70,7 @@ class GripHeaderBuilder {
         keepAlive = content
         return this
     }
-    
+
     /**
      * Sets the keep-alive message format.
      */
@@ -78,7 +78,7 @@ class GripHeaderBuilder {
         keepAliveFormat = format
         return this
     }
-    
+
     /**
      * Sets the keep-alive timeout in seconds.
      */
@@ -86,7 +86,7 @@ class GripHeaderBuilder {
         keepAliveTimeout = seconds
         return this
     }
-    
+
     /**
      * Sets the GRIP signature for authentication.
      */
@@ -94,7 +94,7 @@ class GripHeaderBuilder {
         gripSig = signature
         return this
     }
-    
+
     /**
      * Sets the last event ID.
      */
@@ -102,7 +102,7 @@ class GripHeaderBuilder {
         lastEventId = id
         return this
     }
-    
+
     /**
      * Sets the previous ID for message sequencing.
      */
@@ -110,7 +110,7 @@ class GripHeaderBuilder {
         previousId = id
         return this
     }
-    
+
     /**
      * Adds a custom header.
      */
@@ -118,19 +118,19 @@ class GripHeaderBuilder {
         headers[name] = value
         return this
     }
-    
+
     /**
      * Builds the headers map.
      */
     fun build(): Map<String, String> {
         val result = mutableMapOf<String, String>()
-        
+
         holdMode?.let { result[GripConstants.HEADER_GRIP_HOLD] = it }
-        
+
         if (channels.isNotEmpty()) {
             result[GripConstants.HEADER_GRIP_CHANNEL] = channels.joinToString(", ")
         }
-        
+
         timeout?.let { result[GripConstants.HEADER_GRIP_TIMEOUT] = it.toString() }
         keepAlive?.let { result[GripConstants.HEADER_GRIP_KEEP_ALIVE] = it }
         keepAliveFormat?.let { result[GripConstants.HEADER_GRIP_KEEP_ALIVE_FORMAT] = it }
@@ -138,16 +138,16 @@ class GripHeaderBuilder {
         gripSig?.let { result[GripConstants.HEADER_GRIP_SIG] = it }
         lastEventId?.let { result[GripConstants.HEADER_GRIP_LAST] = it }
         previousId?.let { result[GripConstants.HEADER_GRIP_PREVIOUS_ID] = it }
-        
+
         result.putAll(headers)
-        
+
         return result
     }
-    
+
     /**
      * Applies the GRIP headers to a ResponseEntity.Builder.
      */
-    fun <T> applyTo(builder: ResponseEntity.BodyBuilder): ResponseEntity.BodyBuilder {
+    fun applyTo(builder: ResponseEntity.BodyBuilder): ResponseEntity.BodyBuilder {
         build().forEach { (key, value) ->
             builder.header(key, value)
         }

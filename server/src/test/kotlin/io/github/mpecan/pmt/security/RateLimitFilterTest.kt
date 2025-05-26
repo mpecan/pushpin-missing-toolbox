@@ -106,7 +106,9 @@ class RateLimitFilterTest {
         val expectedKey = "user:$username"
 
         val authentication = UsernamePasswordAuthenticationToken(
-            username, null, listOf(SimpleGrantedAuthority("ROLE_USER"))
+            username,
+            null,
+            listOf(SimpleGrantedAuthority("ROLE_USER")),
         )
         val securityContext = SecurityContextImpl(authentication)
         SecurityContextHolder.setContext(securityContext)
@@ -166,7 +168,7 @@ class RateLimitFilterTest {
         verify(mockResponse).contentType = "application/json"
         verify(mockResponse.writer).write(any<String>())
         verify(mockFilterChain, never()).doFilter(any(), any()) // Filter chain should not be called
-        verify(mockAuditService).logRateLimitExceeded(eq(null), any<String>()   )
+        verify(mockAuditService).logRateLimitExceeded(eq(null), any<String>())
     }
 
     @Test
@@ -223,7 +225,7 @@ class RateLimitFilterTest {
 
         // Arrange - Create a real filter with a real bucket map
         val realBuckets = ConcurrentHashMap<String, Bucket>()
-        val filterWithRealBuckets = RateLimitFilter(properties, mockAuditService,realBuckets)
+        val filterWithRealBuckets = RateLimitFilter(properties, mockAuditService, realBuckets)
 
         // Act
         filterWithRealBuckets.doFilter(mockRequest, mockResponse, mockFilterChain)

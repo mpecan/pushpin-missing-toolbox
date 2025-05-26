@@ -6,7 +6,6 @@ import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.core.EncryptionService
 import io.github.mpecan.pmt.transport.PushpinTransport
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -22,10 +21,9 @@ class PushpinService(
     pushpinTransports: List<PushpinTransport>,
 ) {
     private val transport = pushpinTransports.also {
-        check(it.isNotEmpty()) { "No Pushpin transport implementations found. Ensure you have the correct dependencies."}
+        check(it.isNotEmpty()) { "No Pushpin transport implementations found. Ensure you have the correct dependencies." }
         check(it.size == 1) { "Multiple Pushpin transport implementations found. Please ensure only one is configured." }
     }.first()
-    private val logger = LoggerFactory.getLogger(PushpinService::class.java)
 
     /**
      * Publishes a message to Pushpin servers.
@@ -45,22 +43,22 @@ class PushpinService(
                 authentication.name,
                 "backend-service",
                 message.channel,
-                "publish message"
+                "publish message",
             )
         }
 
         // Encrypt message data if needed
-       return if (encryptionService.isEncryptionEnabled()) {
+        return if (encryptionService.isEncryptionEnabled()) {
             // Convert data to string, encrypt it, and create a new message
             val dataStr = message.data.toString()
             val encryptedData = encryptionService.encrypt(dataStr)
             val encryptedMessage = message.copy(
-                data = encryptedData
+                data = encryptedData,
             )
 
             transport.publish(encryptedMessage)
         } else {
-           transport.publish(message)
+            transport.publish(message)
         }
     }
 

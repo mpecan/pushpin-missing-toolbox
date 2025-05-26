@@ -22,42 +22,39 @@ import java.time.Duration
 @ConditionalOnProperty(
     prefix = "pushpin.security.remote",
     name = ["enabled"],
-    havingValue = "true"
+    havingValue = "true",
 )
 class RemoteAuthorizationAutoConfiguration {
-    
+
     @Bean
     @ConditionalOnMissingBean
     fun remoteAuthorizationRestTemplate(
         properties: RemoteAuthorizationProperties,
-        builder: RestTemplateBuilder
+        builder: RestTemplateBuilder,
     ): RestTemplate {
         return builder
             .connectTimeout(Duration.ofMillis(properties.timeout))
             .readTimeout(Duration.ofMillis(properties.timeout))
             .build()
     }
-    
+
     @Bean
     @ConditionalOnMissingBean
-    fun subscriptionAuthorizationCache(
-        properties: RemoteAuthorizationProperties
-    ): SubscriptionAuthorizationCache {
+    fun subscriptionAuthorizationCache(properties: RemoteAuthorizationProperties): SubscriptionAuthorizationCache {
         return SubscriptionAuthorizationCache(
             cacheMaxSize = properties.cache.maxSize,
-            cacheTtl = properties.cache.ttl
+            cacheTtl = properties.cache.ttl,
         )
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(RemoteAuthorizationClient::class)
     fun remoteAuthorizationClient(
         properties: RemoteAuthorizationProperties,
         cache: SubscriptionAuthorizationCache,
         restTemplate: RestTemplate,
-        auditService: AuditService
+        auditService: AuditService,
     ): RemoteAuthorizationClient {
         return HttpRemoteSubscriptionClient(properties, cache, restTemplate, auditService)
     }
 }
-

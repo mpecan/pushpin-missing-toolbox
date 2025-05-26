@@ -14,17 +14,17 @@ import org.springframework.context.annotation.Configuration
 import kotlin.test.*
 
 class HmacAutoConfigurationTest {
-    
+
     private val contextRunner = ApplicationContextRunner()
         .withConfiguration(AutoConfigurations.of(HmacAutoConfiguration::class.java))
         .withUserConfiguration(TestConfiguration::class.java)
-    
+
     @Test
     fun `should create DefaultHmacService when enabled`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.hmac.enabled=true",
-                "pushpin.security.hmac.secret-key=test-secret"
+                "pushpin.security.hmac.secret-key=test-secret",
             )
             .run { context ->
                 val hmacService = context.getBean(HmacService::class.java)
@@ -33,7 +33,7 @@ class HmacAutoConfigurationTest {
                 assertTrue(hmacService.isHmacEnabled())
             }
     }
-    
+
     @Test
     fun `should create NoOpHmacService when disabled`() {
         contextRunner
@@ -45,20 +45,20 @@ class HmacAutoConfigurationTest {
                 assertTrue(!hmacService.isHmacEnabled())
             }
     }
-    
+
     @Test
     fun `should create HmacSignatureFilter when enabled`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.hmac.enabled=true",
-                "pushpin.security.hmac.secret-key=test-secret"
+                "pushpin.security.hmac.secret-key=test-secret",
             )
             .run { context ->
                 val filter = context.getBean(HmacSignatureFilter::class.java)
                 assertNotNull(filter)
             }
     }
-    
+
     @Test
     fun `should not create HmacSignatureFilter when disabled`() {
         contextRunner
@@ -67,21 +67,21 @@ class HmacAutoConfigurationTest {
                 assertTrue(!context.containsBean("hmacSignatureFilter"))
             }
     }
-    
+
     @Test
     fun `should use custom algorithm when configured`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.hmac.enabled=true",
                 "pushpin.security.hmac.secret-key=test-secret",
-                "pushpin.security.hmac.algorithm=HmacSHA512"
+                "pushpin.security.hmac.algorithm=HmacSHA512",
             )
             .run { context ->
                 val hmacService = context.getBean(HmacService::class.java)
                 assertEquals("HmacSHA512", hmacService.getAlgorithm())
             }
     }
-    
+
     @Configuration
     class TestConfiguration {
         @Bean

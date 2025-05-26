@@ -13,7 +13,7 @@ interface EncryptionService {
      * @return The encrypted data, typically Base64-encoded
      */
     fun encrypt(plaintext: String): String
-    
+
     /**
      * Decrypt data.
      *
@@ -21,18 +21,17 @@ interface EncryptionService {
      * @return The decrypted data
      */
     fun decrypt(encryptedData: String): String
-    
+
     /**
      * Check if encryption is enabled.
      *
      * @return true if encryption is enabled, false otherwise
      */
     fun isEncryptionEnabled(): Boolean
-    
+
     /**
      * Generate a new random secret key for encryption.
-     * 
-     * @return The Base64-encoded secret key
+     * * @return The Base64-encoded secret key
      */
     fun generateSecretKey(): String
 }

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
+    property = "type",
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = GripSubscribeControl::class, name = "subscribe"),
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(value = GripKeepAliveControl::class, name = "keep-alive"),
     JsonSubTypes.Type(value = GripSetHoldControl::class, name = "set-hold"),
     JsonSubTypes.Type(value = GripAckControl::class, name = "ack"),
-    JsonSubTypes.Type(value = GripCloseControl::class, name = "close")
+    JsonSubTypes.Type(value = GripCloseControl::class, name = "close"),
 )
 @JsonInclude(JsonInclude.Include.NON_NULL)
 sealed interface GripControl
@@ -33,7 +33,7 @@ data class GripSubscribeControl(
     val channel: String,
     val filters: List<String>? = null,
     @get:JsonProperty("prev-id")
-    val prevId: String? = null
+    val prevId: String? = null,
 ) : GripControl
 
 /**
@@ -41,7 +41,7 @@ data class GripSubscribeControl(
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class GripUnsubscribeControl(
-    val channel: String
+    val channel: String,
 ) : GripControl
 
 /**
@@ -59,7 +59,7 @@ data class GripKeepAliveControl(
     val content: String? = null,
     @get:JsonProperty("content-bin")
     val contentBin: String? = null,
-    val format: String? = null
+    val format: String? = null,
 ) : GripControl
 
 /**
@@ -69,7 +69,7 @@ data class GripKeepAliveControl(
 data class GripSetHoldControl(
     val mode: String,
     val timeout: Int? = null,
-    val channels: List<GripChannelConfig>? = null
+    val channels: List<GripChannelConfig>? = null,
 ) : GripControl
 
 /**
@@ -78,7 +78,7 @@ data class GripSetHoldControl(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class GripAckControl(
     val channel: String,
-    val id: String
+    val id: String,
 ) : GripControl
 
 /**
@@ -87,7 +87,7 @@ data class GripAckControl(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class GripCloseControl(
     val code: Int? = null,
-    val reason: String? = null
+    val reason: String? = null,
 ) : GripControl
 
 /**
@@ -98,5 +98,5 @@ data class GripChannelConfig(
     val name: String,
     val filters: List<String>? = null,
     @get:JsonProperty("prev-id")
-    val prevId: String? = null
+    val prevId: String? = null,
 )

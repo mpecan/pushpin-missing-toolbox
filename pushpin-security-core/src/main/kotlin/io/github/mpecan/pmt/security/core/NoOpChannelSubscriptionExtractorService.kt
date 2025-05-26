@@ -8,8 +8,8 @@ import org.springframework.security.oauth2.jwt.Jwt
  */
 class NoOpChannelSubscriptionExtractorService : ChannelSubscriptionExtractorService {
     override fun extractChannelSubscriptions(jwt: Jwt): ChannelSubscriptions? = null
-    
+
     override fun getChannelsClaimPath(): String = "$.channels"
-    
+
     override fun isClaimExtractionEnabled(): Boolean = false
 }

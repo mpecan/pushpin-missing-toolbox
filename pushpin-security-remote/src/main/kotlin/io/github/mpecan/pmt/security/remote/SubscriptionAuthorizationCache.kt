@@ -9,14 +9,14 @@ import java.util.concurrent.TimeUnit
  */
 class SubscriptionAuthorizationCache(
     cacheMaxSize: Long = 10000,
-    cacheTtl: Long = 300000 // 5 minutes default
+    cacheTtl: Long = 300000, // 5 minutes default
 ) {
-    
+
     private val cache: Cache<CacheKey, CacheValue> = Caffeine.newBuilder()
         .maximumSize(cacheMaxSize)
         .expireAfterWrite(cacheTtl, TimeUnit.MILLISECONDS)
         .build()
-    
+
     /**
      * Check if a subscription check is cached.
      *
@@ -29,7 +29,7 @@ class SubscriptionAuthorizationCache(
         val value = cache.getIfPresent(key)
         return value?.boolValue
     }
-    
+
     /**
      * Cache a subscription check result.
      *
@@ -41,7 +41,7 @@ class SubscriptionAuthorizationCache(
         val key = CacheKey.forSubscriptionCheck(userId, channelId)
         cache.put(key, CacheValue.ofBoolean(canSubscribe))
     }
-    
+
     /**
      * Get cached subscribable channels for a user.
      *
@@ -53,7 +53,7 @@ class SubscriptionAuthorizationCache(
         val value = cache.getIfPresent(key)
         return value?.listValue
     }
-    
+
     /**
      * Cache subscribable channels for a user.
      *
@@ -64,7 +64,7 @@ class SubscriptionAuthorizationCache(
         val key = CacheKey.forChannelsList(userId)
         cache.put(key, CacheValue.ofList(channels))
     }
-    
+
     /**
      * Get cached subscribable channels by pattern.
      *
@@ -77,7 +77,7 @@ class SubscriptionAuthorizationCache(
         val value = cache.getIfPresent(key)
         return value?.listValue
     }
-    
+
     /**
      * Cache subscribable channels by pattern.
      *
@@ -89,14 +89,15 @@ class SubscriptionAuthorizationCache(
         val key = CacheKey.forPatternChannels(userId, pattern)
         cache.put(key, CacheValue.ofList(channels))
     }
-    
+
     /**
      * Clear all cache entries for a user.
      */
+    @Suppress("unused")
     fun clearUserCache(userId: String) {
         cache.asMap().keys.removeIf { it.userId == userId }
     }
-    
+
     /**
      * Key for cache entries.
      */
@@ -104,44 +105,44 @@ class SubscriptionAuthorizationCache(
         val type: CacheType,
         val userId: String,
         val channelId: String? = null,
-        val pattern: String? = null
+        val pattern: String? = null,
     ) {
         companion object {
             fun forSubscriptionCheck(userId: String, channelId: String): CacheKey {
                 return CacheKey(CacheType.SUBSCRIPTION_CHECK, userId, channelId = channelId)
             }
-            
+
             fun forChannelsList(userId: String): CacheKey {
                 return CacheKey(CacheType.CHANNELS_LIST, userId)
             }
-            
+
             fun forPatternChannels(userId: String, pattern: String): CacheKey {
                 return CacheKey(CacheType.PATTERN_CHANNELS, userId, pattern = pattern)
             }
         }
     }
-    
+
     /**
      * Type of cache entry.
      */
     private enum class CacheType {
         SUBSCRIPTION_CHECK,
         CHANNELS_LIST,
-        PATTERN_CHANNELS
+        PATTERN_CHANNELS,
     }
-    
+
     /**
      * Value for cache entries.
      */
     private data class CacheValue(
         val boolValue: Boolean? = null,
-        val listValue: List<String>? = null
+        val listValue: List<String>? = null,
     ) {
         companion object {
             fun ofBoolean(value: Boolean): CacheValue {
                 return CacheValue(boolValue = value)
             }
-            
+
             fun ofList(value: List<String>): CacheValue {
                 return CacheValue(listValue = value)
             }

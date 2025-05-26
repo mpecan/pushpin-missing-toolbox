@@ -17,63 +17,63 @@ import org.springframework.security.oauth2.jwt.Jwt
 @Configuration
 @EnableConfigurationProperties(JwtProperties::class)
 class JwtAutoConfiguration {
-    
+
     @Bean
     @ConditionalOnProperty(
         prefix = "pushpin.security.jwt",
         name = ["enabled"],
-        havingValue = "true"
+        havingValue = "true",
     )
     fun jwtDecoderService(properties: JwtProperties): JwtDecoderService {
         return DefaultJwtDecoderService(properties)
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(JwtDecoderService::class)
     fun noOpJwtDecoderService(): JwtDecoderService {
         return NoOpJwtDecoderService()
     }
-    
+
     @Bean
     @ConditionalOnProperty(
         prefix = "pushpin.security.jwt",
         name = ["enabled"],
-        havingValue = "true"
+        havingValue = "true",
     )
     fun claimExtractorService(): ClaimExtractorService {
         return JsonPathClaimExtractorService()
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(ClaimExtractorService::class)
     fun noOpClaimExtractorService(): ClaimExtractorService {
         return NoOpClaimExtractorService()
     }
-    
+
     @Bean
     @ConditionalOnProperty(
         prefix = "pushpin.security.jwt",
         name = ["enabled"],
-        havingValue = "true"
+        havingValue = "true",
     )
     fun channelSubscriptionExtractorService(
         claimExtractorService: ClaimExtractorService,
-        properties: JwtProperties
+        properties: JwtProperties,
     ): ChannelSubscriptionExtractorService {
         return DefaultChannelSubscriptionExtractorService(claimExtractorService, properties)
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(ChannelSubscriptionExtractorService::class)
     fun noOpChannelSubscriptionExtractorService(): ChannelSubscriptionExtractorService {
         return NoOpChannelSubscriptionExtractorService()
     }
-    
+
     @Bean
     @ConditionalOnProperty(
         prefix = "pushpin.security.jwt",
         name = ["enabled"],
-        havingValue = "true"
+        havingValue = "true",
     )
     fun jwtAuthenticationConverter(properties: JwtProperties): Converter<Jwt, AbstractAuthenticationToken> {
         return JwtAuthenticationConverterFactory(properties).createAuthenticationConverter()

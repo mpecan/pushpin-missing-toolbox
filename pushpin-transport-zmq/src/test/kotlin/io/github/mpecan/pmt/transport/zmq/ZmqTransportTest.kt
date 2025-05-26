@@ -26,7 +26,7 @@ class ZmqTransportTest {
             linger = 1000,
             sendTimeout = 1000,
             reconnectIvl = 100,
-            reconnectIvlMax = 0
+            reconnectIvlMax = 0,
         )
         messageSerializer = mock()
         messageSerializationService = mock()
@@ -57,7 +57,9 @@ class ZmqTransportTest {
         val pushpinMessage = PushpinMessage("test-channel", formats = emptyMap())
 
         whenever(messageSerializer.serialize(message)).thenReturn(pushpinMessage)
-        whenever(messageSerializationService.serialize(pushpinMessage)).thenReturn("{\"channel\":\"test-channel\",\"formats\":[]}")
+        whenever(messageSerializationService.serialize(pushpinMessage)).thenReturn(
+            "{\"channel\":\"test-channel\",\"formats\":[]}",
+        )
         zmqTransport.setServersForTesting(listOf(server))
 
         // When & Then

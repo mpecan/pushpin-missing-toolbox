@@ -4,7 +4,7 @@ package io.github.mpecan.pmt.grip.websocket
  * Parser for WebSocket events in GRIP format.
  */
 object WebSocketEventParser {
-    
+
     /**
      * Parses WebSocket events from a GRIP WebSocket-over-HTTP request body.
      *
@@ -34,7 +34,7 @@ object WebSocketEventParser {
                 index = lineEnd + 2
                 continue
             }
-            
+
             val contentSize = if (parts.size > 1) {
                 try {
                     parts[1].toInt(16)
@@ -68,7 +68,7 @@ object WebSocketEventParser {
 
         return events
     }
-    
+
     /**
      * Encodes multiple WebSocket events into a single string.
      *

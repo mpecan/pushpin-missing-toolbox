@@ -9,13 +9,12 @@ import java.time.Duration
 
 /**
  * HTTP-based health checker for Pushpin servers.
- * 
- * Performs health checks by making HTTP GET requests to the server's
+ * * Performs health checks by making HTTP GET requests to the server's
  * health check endpoint (typically /api/health/check).
  */
 class HttpHealthChecker(
     private val webClient: WebClient,
-    private val defaultTimeout: Long = 5000L
+    private val defaultTimeout: Long = 5000L,
 ) : TransportHealthChecker {
     private val logger = LoggerFactory.getLogger(HttpHealthChecker::class.java)
 
@@ -37,7 +36,7 @@ class HttpHealthChecker(
             .map { true }
             .onErrorReturn(false)
     }
-    
+
     /**
      * Returns the transport type for this health checker.
      */

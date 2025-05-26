@@ -5,7 +5,7 @@ package io.github.mpecan.pmt.grip.websocket
  */
 data class WebSocketEvent(
     val type: WebSocketEventType,
-    val content: String = ""
+    val content: String = "",
 ) {
     /**
      * Encodes the event into GRIP WebSocket-over-HTTP format.
@@ -15,13 +15,15 @@ data class WebSocketEvent(
             WebSocketEventType.OPEN,
             WebSocketEventType.PING,
             WebSocketEventType.PONG,
-            WebSocketEventType.DISCONNECT -> {
+            WebSocketEventType.DISCONNECT,
+            -> {
                 // These events don't have content
                 "${type.value}\r\n"
             }
             WebSocketEventType.TEXT,
             WebSocketEventType.BINARY,
-            WebSocketEventType.CLOSE -> {
+            WebSocketEventType.CLOSE,
+            -> {
                 if (content.isEmpty()) {
                     "${type.value}\r\n"
                 } else {
@@ -43,11 +45,12 @@ enum class WebSocketEventType(val value: String) {
     PING("PING"),
     PONG("PONG"),
     CLOSE("CLOSE"),
-    DISCONNECT("DISCONNECT");
-    
+    DISCONNECT("DISCONNECT"),
+    ;
+
     companion object {
         fun fromString(value: String): WebSocketEventType? {
-            return values().find { it.value == value }
+            return entries.find { it.value == value }
         }
     }
 }

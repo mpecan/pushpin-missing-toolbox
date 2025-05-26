@@ -12,37 +12,37 @@ interface AuditService {
      * Log an audit event.
      */
     fun log(event: AuditEvent)
-    
+
     /**
      * Log an authentication success event.
      */
     fun logAuthSuccess(username: String, ipAddress: String, details: String = "")
-    
+
     /**
      * Log an authentication failure event.
      */
     fun logAuthFailure(username: String, ipAddress: String, details: String = "")
-    
+
     /**
      * Log an authorization failure event.
      */
     fun logAuthorizationFailure(username: String, ipAddress: String, resource: String, permission: String)
-    
+
     /**
      * Log a channel access event.
      */
     fun logChannelAccess(username: String, ipAddress: String, channelId: String, action: String)
-    
+
     /**
      * Log a rate limit exceeded event.
      */
     fun logRateLimitExceeded(username: String?, ipAddress: String)
-    
+
     /**
      * Log a security configuration change event.
      */
     fun logSecurityConfigChange(username: String, ipAddress: String, details: String)
-    
+
     /**
      * Log a remote authorization check event.
      */
@@ -52,19 +52,14 @@ interface AuditService {
         channelId: String,
         authorized: Boolean,
         source: String = "remote",
-        duration: Long? = null
+        duration: Long? = null,
     )
-    
+
     /**
      * Log a remote authorization error event.
      */
-    fun logRemoteAuthorizationError(
-        username: String,
-        ipAddress: String,
-        channelId: String?,
-        error: String
-    )
-    
+    fun logRemoteAuthorizationError(username: String, ipAddress: String, channelId: String?, error: String)
+
     /**
      * Log a channel list retrieval event.
      */
@@ -74,7 +69,7 @@ interface AuditService {
         channelCount: Int,
         source: String = "remote",
         duration: Long? = null,
-        pattern: String? = null
+        pattern: String? = null,
     )
 }
 
@@ -86,7 +81,7 @@ data class AuditEvent(
     val username: String?,
     val ipAddress: String,
     val details: String,
-    val timestamp: LocalDateTime = LocalDateTime.now()
+    val timestamp: LocalDateTime = LocalDateTime.now(),
 )
 
 /**
@@ -98,5 +93,5 @@ enum class AuditEventType {
     AUTHORIZATION_FAILURE,
     CHANNEL_ACCESS,
     RATE_LIMIT_EXCEEDED,
-    SECURITY_CONFIG_CHANGE
+    SECURITY_CONFIG_CHANGE,
 }

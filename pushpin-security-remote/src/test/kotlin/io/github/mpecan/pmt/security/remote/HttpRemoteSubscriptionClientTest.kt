@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.*
 import org.mockito.quality.Strictness
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.TestingAuthenticationToken
@@ -74,7 +73,7 @@ class HttpRemoteSubscriptionClientTest {
         authEnabled: Boolean = true,
         cacheEnabled: Boolean = true,
         method: String = "POST",
-        includeHeaders: List<String> = listOf("Authorization")
+        includeHeaders: List<String> = listOf("Authorization"),
     ) {
         properties = RemoteAuthorizationProperties(
             enabled = authEnabled,
@@ -85,8 +84,8 @@ class HttpRemoteSubscriptionClientTest {
             cache = RemoteAuthorizationProperties.CacheProperties(
                 enabled = cacheEnabled,
                 ttl = 300000,
-                maxSize = 1000
-            )
+                maxSize = 1000,
+            ),
         )
     }
 
@@ -106,7 +105,7 @@ class HttpRemoteSubscriptionClientTest {
             properties,
             mockCache,
             mockRestTemplate,
-            mockAuditService
+            mockAuditService,
         )
     }
 
@@ -141,8 +140,7 @@ class HttpRemoteSubscriptionClientTest {
 
         @Test
         fun `should return false when user is anonymous`() {
-            SecurityContextHolder.getContext().authentication = 
-                TestingAuthenticationToken("anonymousUser", null)
+            SecurityContextHolder.getContext().authentication = TestingAuthenticationToken("anonymousUser", null)
 
             val result = httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -157,12 +155,14 @@ class HttpRemoteSubscriptionClientTest {
             setupAuthenticatedUser()
 
             val response = HttpRemoteSubscriptionClient.SubscriptionResponse(allowed = true)
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(response))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(response))
 
             val result = httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -178,12 +178,14 @@ class HttpRemoteSubscriptionClientTest {
 
             whenever(mockRequest.getHeader("X-Request-ID")).thenReturn("req-123")
             val response = HttpRemoteSubscriptionClient.SubscriptionResponse(allowed = true)
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(response))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(response))
 
             httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -192,7 +194,7 @@ class HttpRemoteSubscriptionClientTest {
                 any<URI>(),
                 any(),
                 captor.capture(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
+                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
             )
 
             val headers = captor.value.headers
@@ -203,12 +205,14 @@ class HttpRemoteSubscriptionClientTest {
         @Test
         fun `should return false on HTTP client error`() {
             setupAuthenticatedUser()
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
-            )).thenThrow(HttpClientErrorException(HttpStatus.FORBIDDEN))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
+                ),
+            ).thenThrow(HttpClientErrorException(HttpStatus.FORBIDDEN))
 
             val result = httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -218,12 +222,14 @@ class HttpRemoteSubscriptionClientTest {
         @Test
         fun `should return false on timeout`() {
             setupAuthenticatedUser()
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
-            )).thenThrow(ResourceAccessException("Connection timeout", SocketTimeoutException()))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
+                ),
+            ).thenThrow(ResourceAccessException("Connection timeout", SocketTimeoutException()))
 
             val result = httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -233,12 +239,14 @@ class HttpRemoteSubscriptionClientTest {
         @Test
         fun `should return false when response body is null`() {
             setupAuthenticatedUser()
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(null))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(null))
 
             val result = httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -252,12 +260,14 @@ class HttpRemoteSubscriptionClientTest {
             setupAuthenticatedUser()
 
             val response = HttpRemoteSubscriptionClient.SubscriptionResponse(allowed = true)
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(response))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.SubscriptionResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(response))
 
             httpRemoteSubscriptionClient.canSubscribe(mockRequest, TEST_CHANNEL)
 
@@ -297,12 +307,14 @@ class HttpRemoteSubscriptionClientTest {
 
             val channels = listOf("channel1", "channel2", "channel3")
             val response = HttpRemoteSubscriptionClient.ChannelsResponse(channels)
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(response))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(response))
 
             val result = httpRemoteSubscriptionClient.getSubscribableChannels(mockRequest)
 
@@ -313,12 +325,14 @@ class HttpRemoteSubscriptionClientTest {
         @Test
         fun `should return empty list on error`() {
             setupAuthenticatedUser()
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java)
-            )).thenThrow(RuntimeException("Network error"))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java),
+                ),
+            ).thenThrow(RuntimeException("Network error"))
 
             val result = httpRemoteSubscriptionClient.getSubscribableChannels(mockRequest)
 
@@ -328,12 +342,14 @@ class HttpRemoteSubscriptionClientTest {
         @Test
         fun `should return empty list when response is null`() {
             setupAuthenticatedUser()
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(null))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(null))
 
             val result = httpRemoteSubscriptionClient.getSubscribableChannels(mockRequest)
 
@@ -366,12 +382,14 @@ class HttpRemoteSubscriptionClientTest {
 
             val channels = listOf("news.sports", "news.tech", "news.world")
             val response = HttpRemoteSubscriptionClient.ChannelsResponse(channels)
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(response))
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(response))
 
             val result = httpRemoteSubscriptionClient.getSubscribableChannelsByPattern(mockRequest, TEST_PATTERN)
 
@@ -385,13 +403,15 @@ class HttpRemoteSubscriptionClientTest {
             val pattern = "user.*.messages"
             val channels = listOf("user.123.messages", "user.456.messages")
             val response = HttpRemoteSubscriptionClient.ChannelsResponse(channels)
-            
-            whenever(mockRestTemplate.exchange(
-                any<URI>(),
-                any(),
-                any<HttpEntity<*>>(),
-                eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java)
-            )).thenReturn(ResponseEntity.ok(response))
+
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java),
+                ),
+            ).thenReturn(ResponseEntity.ok(response))
 
             val result = httpRemoteSubscriptionClient.getSubscribableChannelsByPattern(mockRequest, pattern)
 

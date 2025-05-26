@@ -14,7 +14,7 @@ import java.time.Duration
 data class DiscoveryProperties(
     val enabled: Boolean = true,
     val refreshInterval: Duration = Duration.ofMinutes(1),
-    val configuration: ConfigurationDiscoveryProperties = ConfigurationDiscoveryProperties()
+    val configuration: ConfigurationDiscoveryProperties = ConfigurationDiscoveryProperties(),
 )
 
 /**
@@ -23,5 +23,5 @@ data class DiscoveryProperties(
  * @property enabled Whether configuration-based discovery is enabled
  */
 data class ConfigurationDiscoveryProperties(
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
 )

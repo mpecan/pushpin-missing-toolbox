@@ -26,7 +26,6 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun extractListClaim(jwt: Jwt, claimPath: String): List<String> {
         val context = createJsonContext(jwt)
         return try {
@@ -46,15 +45,15 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun extractMapClaim(jwt: Jwt, claimPath: String): Map<String, Any> {
         val context = createJsonContext(jwt)
         return try {
             val result = context.read<Any>(validatePath(claimPath))
             when (result) {
-                is Map<*, *> -> result.entries
-                    .filter { it.key != null }
-                    .associate { it.key.toString() to (it.value ?: "") }
+                is Map<*, *> ->
+                    result.entries
+                        .filter { it.key != null }
+                        .associate { it.key.toString() to (it.value ?: "") }
                 null -> emptyMap()
                 else -> emptyMap()
             }

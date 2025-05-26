@@ -8,17 +8,17 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import kotlin.test.*
 
 class JwtAutoConfigurationTest {
-    
+
     private val contextRunner = ApplicationContextRunner()
         .withConfiguration(AutoConfigurations.of(JwtAutoConfiguration::class.java))
-    
+
     @Test
     fun `should create DefaultJwtDecoderService when enabled`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
-                "pushpin.security.jwt.secret=test-secret-key-32-characters-long"
+                "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
             )
             .run { context ->
                 val jwtDecoderService = context.getBean(JwtDecoderService::class.java)
@@ -27,7 +27,7 @@ class JwtAutoConfigurationTest {
                 assertTrue(jwtDecoderService.isJwtEnabled())
             }
     }
-    
+
     @Test
     fun `should create NoOpJwtDecoderService when disabled`() {
         contextRunner
@@ -39,14 +39,14 @@ class JwtAutoConfigurationTest {
                 assertFalse(jwtDecoderService.isJwtEnabled())
             }
     }
-    
+
     @Test
     fun `should create ClaimExtractorService when enabled`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
-                "pushpin.security.jwt.secret=test-secret-key-32-characters-long"
+                "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
             )
             .run { context ->
                 val claimExtractorService = context.getBean(ClaimExtractorService::class.java)
@@ -54,7 +54,7 @@ class JwtAutoConfigurationTest {
                 assertTrue(claimExtractorService is JsonPathClaimExtractorService)
             }
     }
-    
+
     @Test
     fun `should create NoOpClaimExtractorService when disabled`() {
         contextRunner
@@ -65,14 +65,14 @@ class JwtAutoConfigurationTest {
                 assertTrue(claimExtractorService is NoOpClaimExtractorService)
             }
     }
-    
+
     @Test
     fun `should create ChannelSubscriptionExtractorService when enabled`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
-                "pushpin.security.jwt.secret=test-secret-key-32-characters-long"
+                "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
             )
             .run { context ->
                 val extractorService = context.getBean(ChannelSubscriptionExtractorService::class.java)
@@ -80,14 +80,14 @@ class JwtAutoConfigurationTest {
                 assertTrue(extractorService is DefaultChannelSubscriptionExtractorService)
             }
     }
-    
+
     @Test
     fun `should create JWT authentication converter when enabled`() {
         contextRunner
             .withPropertyValues(
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
-                "pushpin.security.jwt.secret=test-secret-key-32-characters-long"
+                "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
             )
             .run { context ->
                 assertTrue(context.containsBean("jwtAuthenticationConverter"))

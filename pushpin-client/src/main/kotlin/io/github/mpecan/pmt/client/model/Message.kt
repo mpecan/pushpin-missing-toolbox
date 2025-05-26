@@ -111,7 +111,10 @@ data class Message(
             transports: List<Transport>? = null,
         ): Message {
             return Message(
-                channel = channel, data = data, eventType = eventType, meta = meta,
+                channel = channel,
+                data = data,
+                eventType = eventType,
+                meta = meta,
                 id = id,
                 prevId = prevId,
                 transports = transports ?: listOf(

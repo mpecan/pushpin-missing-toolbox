@@ -10,29 +10,29 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
  * Creates JWT authentication converters based on configuration.
  */
 class JwtAuthenticationConverterFactory(
-    private val properties: JwtProperties
+    private val properties: JwtProperties,
 ) {
-    
+
     /**
      * Creates a converter that extracts authorities from JWT claims.
      */
     fun createAuthenticationConverter(): Converter<Jwt, AbstractAuthenticationToken> {
         val jwtGrantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
-        
+
         // Configure the authorities claim name based on configuration
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName(
-            properties.authoritiesClaim
+            properties.authoritiesClaim,
         )
-        
+
         // Configure the authority prefix
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix(
-            properties.authoritiesPrefix
+            properties.authoritiesPrefix,
         )
-        
+
         // Create and configure the authentication converter
         val jwtAuthenticationConverter = JwtAuthenticationConverter()
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter)
-        
+
         return jwtAuthenticationConverter
     }
 }

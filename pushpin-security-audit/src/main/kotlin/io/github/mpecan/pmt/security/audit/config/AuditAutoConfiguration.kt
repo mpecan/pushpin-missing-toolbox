@@ -19,10 +19,10 @@ import org.springframework.context.annotation.Bean
 @ConditionalOnProperty(
     prefix = "pushpin.security.audit",
     name = ["enabled"],
-    havingValue = "true"
+    havingValue = "true",
 )
 class AuditAutoConfiguration {
-    
+
     @Bean
     @ConditionalOnMissingBean(AuditService::class)
     fun auditService(properties: AuditProperties): AuditService {

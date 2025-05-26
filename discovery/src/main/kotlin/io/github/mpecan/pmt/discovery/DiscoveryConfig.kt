@@ -20,17 +20,15 @@ class DiscoveryConfig {
     @Bean
     fun configurationBasedDiscovery(
         discoveryProperties: DiscoveryProperties,
-        pushpinProperties: PushpinProperties
+        pushpinProperties: PushpinProperties,
     ): ConfigurationBasedDiscovery {
         return ConfigurationBasedDiscovery(
             discoveryProperties.configuration,
-            pushpinProperties
+            pushpinProperties,
         )
     }
 
     // AwsDiscovery bean is now provided by discovery-aws module via auto-configuration
-
-
 
     /**
      * Creates a PushpinDiscoveryManager bean.
@@ -38,11 +36,11 @@ class DiscoveryConfig {
     @Bean
     fun pushpinDiscoveryManager(
         discoveryProperties: DiscoveryProperties,
-        discoveries: List<PushpinDiscovery>
+        discoveries: List<PushpinDiscovery>,
     ): PushpinDiscoveryManager {
         return PushpinDiscoveryManager(
             discoveryProperties,
-            discoveries
+            discoveries,
         )
     }
 
@@ -50,9 +48,7 @@ class DiscoveryConfig {
      * Creates a bean for the discovery properties to be used in the @Scheduled annotation.
      */
     @Bean
-    fun discoveryProperties(
-        discoveryProperties: DiscoveryProperties
-    ): DiscoveryProperties {
+    fun discoveryProperties(discoveryProperties: DiscoveryProperties): DiscoveryProperties {
         return discoveryProperties
     }
 }

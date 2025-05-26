@@ -17,10 +17,10 @@ import org.springframework.context.annotation.Bean
 @ConditionalOnProperty(
     prefix = "pushpin.security.encryption",
     name = ["enabled"],
-    havingValue = "true"
+    havingValue = "true",
 )
 class EncryptionAutoConfiguration {
-    
+
     @Bean
     @ConditionalOnMissingBean(EncryptionService::class)
     fun encryptionService(properties: EncryptionProperties): EncryptionService {

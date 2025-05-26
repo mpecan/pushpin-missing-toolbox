@@ -13,14 +13,14 @@ import javax.crypto.spec.SecretKeySpec
  * Default implementation of EncryptionService using AES/GCM for authenticated encryption.
  */
 class DefaultEncryptionService(
-    private val properties: EncryptionProperties
+    private val properties: EncryptionProperties,
 ) : EncryptionService {
-    
+
     companion object {
         private const val GCM_IV_LENGTH = 12
         private const val GCM_TAG_LENGTH = 128
     }
-    
+
     // The secret key used for encryption, derived from the configured secret
     private val secretKey: SecretKey by lazy {
         if (properties.secretKey.isNotBlank()) {
@@ -34,7 +34,7 @@ class DefaultEncryptionService(
             keyGenerator.generateKey()
         }
     }
-    
+
     /**
      * Encrypt data.
      *
@@ -45,32 +45,32 @@ class DefaultEncryptionService(
         if (!properties.enabled || plaintext.isBlank()) {
             return plaintext
         }
-        
+
         try {
             // Generate a random IV
             val iv = ByteArray(GCM_IV_LENGTH)
             SecureRandom().nextBytes(iv)
-            
+
             // Initialize the cipher
             val cipher = Cipher.getInstance(properties.algorithm)
             val parameterSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec)
-            
+
             // Encrypt the data
             val encryptedBytes = cipher.doFinal(plaintext.toByteArray())
-            
+
             // Combine IV and encrypted data
             val result = ByteArray(iv.size + encryptedBytes.size)
             System.arraycopy(iv, 0, result, 0, iv.size)
             System.arraycopy(encryptedBytes, 0, result, iv.size, encryptedBytes.size)
-            
+
             // Encode the result as Base64
             return Base64.getEncoder().encodeToString(result)
         } catch (e: Exception) {
             throw EncryptionException("Error encrypting data", e)
         }
     }
-    
+
     /**
      * Decrypt data.
      *
@@ -81,34 +81,34 @@ class DefaultEncryptionService(
         if (!properties.enabled || encryptedData.isBlank()) {
             return encryptedData
         }
-        
+
         try {
             // Decode the Base64 data
             val encryptedBytes = Base64.getDecoder().decode(encryptedData)
-            
+
             // Extract the IV
             val iv = ByteArray(GCM_IV_LENGTH)
             System.arraycopy(encryptedBytes, 0, iv, 0, iv.size)
-            
+
             // Extract the encrypted data
             val ciphertext = ByteArray(encryptedBytes.size - iv.size)
             System.arraycopy(encryptedBytes, iv.size, ciphertext, 0, ciphertext.size)
-            
+
             // Initialize the cipher
             val cipher = Cipher.getInstance(properties.algorithm)
             val parameterSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec)
-            
+
             // Decrypt the data
             val decryptedBytes = cipher.doFinal(ciphertext)
-            
+
             // Convert to string
             return String(decryptedBytes)
         } catch (e: Exception) {
             throw EncryptionException("Error decrypting data", e)
         }
     }
-    
+
     /**
      * Check if encryption is enabled.
      *
@@ -117,11 +117,10 @@ class DefaultEncryptionService(
     override fun isEncryptionEnabled(): Boolean {
         return properties.enabled
     }
-    
+
     /**
      * Generate a new random secret key for encryption.
-     * 
-     * @return The Base64-encoded secret key
+     * * @return The Base64-encoded secret key
      */
     override fun generateSecretKey(): String {
         val keyGenerator = KeyGenerator.getInstance("AES")

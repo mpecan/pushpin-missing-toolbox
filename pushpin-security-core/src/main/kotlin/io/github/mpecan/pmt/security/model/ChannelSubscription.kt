@@ -12,7 +12,7 @@ package io.github.mpecan.pmt.security.model
 data class ChannelSubscription(
     val channelId: String,
     val allowed: Boolean = true,
-    val metadata: Map<String, Any> = emptyMap()
+    val metadata: Map<String, Any> = emptyMap(),
 ) {
     /**
      * Get metadata value with type safety.
@@ -24,15 +24,14 @@ data class ChannelSubscription(
 
 /**
  * Represents a collection of channel subscriptions for a principal.
- * 
- * @property principal The principal (user) these subscriptions belong to
+ * * @property principal The principal (user) these subscriptions belong to
  * @property subscriptions The list of channel subscriptions
  * @property defaultAllow Whether to allow subscription to channels not explicitly listed
  */
 data class ChannelSubscriptions(
     val principal: String,
     val subscriptions: List<ChannelSubscription>,
-    val defaultAllow: Boolean = false
+    val defaultAllow: Boolean = false,
 ) {
     /**
      * Check if subscription to a specific channel is allowed.
@@ -41,7 +40,7 @@ data class ChannelSubscriptions(
         val subscription = subscriptions.find { it.channelId == channelId }
         return subscription?.allowed ?: defaultAllow
     }
-    
+
     /**
      * Get all allowed channel IDs.
      */

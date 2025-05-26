@@ -1,9 +1,9 @@
 package io.github.mpecan.pmt.security
 
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.bucket4j.Bandwidth
 import io.github.bucket4j.Bucket
 import io.github.bucket4j.Refill
+import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -23,13 +23,13 @@ import java.util.concurrent.ConcurrentHashMap
 class RateLimitFilter(
     private val properties: PushpinProperties,
     private val auditService: AuditService,
-    private val buckets: ConcurrentHashMap<String, Bucket> = ConcurrentHashMap()
+    private val buckets: ConcurrentHashMap<String, Bucket> = ConcurrentHashMap(),
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         // Skip rate limiting if disabled
         if (!properties.security.rateLimit.enabled) {

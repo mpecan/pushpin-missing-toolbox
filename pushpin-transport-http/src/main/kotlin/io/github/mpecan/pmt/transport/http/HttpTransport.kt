@@ -21,7 +21,7 @@ class HttpTransport(
     private val webClient: WebClient,
     private val messageSerializer: MessageSerializer,
     private val discoveryManager: PushpinDiscoveryManager? = null,
-    private val defaultTimeout: Long = 5000L
+    private val defaultTimeout: Long = 5000L,
 ) : PushpinTransport {
     private val logger = LoggerFactory.getLogger(HttpTransport::class.java)
 
@@ -50,13 +50,15 @@ class HttpTransport(
             .retrieve()
             .onStatus(
                 { status ->
-                    logger.info("Publishing message to server: ${server.id} at ${server.getBaseUrl()} - status: $status")
+                    logger.info(
+                        "Publishing message to server: ${server.id} at ${server.getBaseUrl()} - status: $status",
+                    )
                     status.isError
                 },
                 { clientResponse ->
                     logger.error("Failed to publish message to server: ${server.id} at ${server.getBaseUrl()}")
                     Mono.error(RuntimeException("Failed to publish message: ${clientResponse.statusCode()}"))
-                }
+                },
             )
             .bodyToMono<String>()
             .doOnSuccess {
@@ -80,9 +82,11 @@ class HttpTransport(
             return Mono.just(false)
         }
 
-        return Flux.merge(servers.map { server ->
-            publishToServer(server, message)
-        }).reduce { acc, value ->
+        return Flux.merge(
+            servers.map { server ->
+                publishToServer(server, message)
+            },
+        ).reduce { acc, value ->
             acc && value
         }
     }

@@ -37,10 +37,11 @@ class SecurityConfig(
     private val pushpinProperties: PushpinProperties,
     private val jwtDecoderService: JwtDecoderService,
     private val jwtAuthenticationConverterProvider: ObjectProvider<Converter<Jwt, AbstractAuthenticationToken>>,
-    private val auditService: AuditService
+    private val auditService: AuditService,
 ) {
     @Autowired(required = false)
     private var hmacSignatureFilter: HmacSignatureFilter? = null
+
     /**
      * Configures the security filter chain.
      */
@@ -62,7 +63,7 @@ class SecurityConfig(
         if (pushpinProperties.security.rateLimit.enabled) {
             http.addFilterBefore(
                 RateLimitFilter(pushpinProperties, auditService),
-                UsernamePasswordAuthenticationFilter::class.java
+                UsernamePasswordAuthenticationFilter::class.java,
             )
         }
 
@@ -70,13 +71,13 @@ class SecurityConfig(
         if (pushpinProperties.security.hmac.enabled && hmacSignatureFilter != null) {
             http.addFilterBefore(
                 hmacSignatureFilter!!,
-                UsernamePasswordAuthenticationFilter::class.java
+                UsernamePasswordAuthenticationFilter::class.java,
             )
         }
 
         // Add appropriate authentication method
         if (pushpinProperties.authEnabled) {
-            if (pushpinProperties.security.jwt.enabled ) {
+            if (pushpinProperties.security.jwt.enabled) {
                 // OAuth2 Resource Server with JWT
                 http.oauth2ResourceServer { oauth2 ->
                     oauth2.jwt { jwt ->
@@ -90,7 +91,7 @@ class SecurityConfig(
                 // Legacy token-based authentication
                 http.addFilterBefore(
                     PushpinAuthFilter(pushpinProperties.authSecret, auditService),
-                    UsernamePasswordAuthenticationFilter::class.java
+                    UsernamePasswordAuthenticationFilter::class.java,
                 )
             }
 
@@ -136,19 +137,21 @@ class SecurityConfig(
  */
 class PushpinAuthFilter(
     private val authSecret: String,
-    private val auditService: AuditService
+    private val auditService: AuditService,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         val authHeader = request.getHeader("X-Pushpin-Auth")
 
         if (authHeader != null && authHeader == authSecret) {
             // Create authentication token
             val auth = org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                "pushpin", null, listOf(SimpleGrantedAuthority("ROLE_PUSHPIN"))
+                "pushpin",
+                null,
+                listOf(SimpleGrantedAuthority("ROLE_PUSHPIN")),
             )
             SecurityContextHolder.getContext().authentication = auth
 
@@ -156,14 +159,14 @@ class PushpinAuthFilter(
             auditService.logAuthSuccess(
                 "pushpin",
                 request.remoteAddr,
-                "Legacy token authentication"
+                "Legacy token authentication",
             )
         } else if (authHeader != null) {
             // Log failed authentication
             auditService.logAuthFailure(
                 "unknown",
                 request.remoteAddr,
-                "Invalid legacy token"
+                "Invalid legacy token",
             )
         }
 

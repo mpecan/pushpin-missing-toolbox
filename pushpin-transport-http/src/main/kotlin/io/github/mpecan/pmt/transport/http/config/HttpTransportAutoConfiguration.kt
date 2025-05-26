@@ -28,7 +28,7 @@ class HttpTransportAutoConfiguration {
     fun httpTransport(
         webClient: WebClient,
         messageSerializer: MessageSerializer,
-        discoveryManager: PushpinDiscoveryManager
+        discoveryManager: PushpinDiscoveryManager,
     ): HttpTransport {
         return HttpTransport(webClient, messageSerializer, discoveryManager)
     }
