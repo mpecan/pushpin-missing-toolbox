@@ -1,22 +1,24 @@
 package io.github.mpecan.pmt.security.audit
 
 import io.github.mpecan.pmt.config.PushpinProperties
+import io.github.mpecan.pmt.security.core.AuditEvent
+import io.github.mpecan.pmt.security.core.AuditEventType
+import io.github.mpecan.pmt.security.core.AuditService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 /**
  * Service for logging security-related audit events.
  */
 @Service
-class AuditLogService(private val properties: PushpinProperties) {
+class AuditLogService(private val properties: PushpinProperties) : AuditService {
     
     private val logger = LoggerFactory.getLogger("audit")
     
     /**
      * Log an audit event.
      */
-    fun log(event: AuditEvent) {
+    override fun log(event: AuditEvent) {
         if (!properties.security.auditLogging.enabled) {
             return
         }
@@ -39,7 +41,7 @@ class AuditLogService(private val properties: PushpinProperties) {
     /**
      * Log an authentication success event.
      */
-    fun logAuthSuccess(username: String, ipAddress: String, details: String = "") {
+    override fun logAuthSuccess(username: String, ipAddress: String, details: String) {
         log(AuditEvent(
             type = AuditEventType.AUTHENTICATION_SUCCESS,
             username = username,
@@ -51,7 +53,7 @@ class AuditLogService(private val properties: PushpinProperties) {
     /**
      * Log an authentication failure event.
      */
-    fun logAuthFailure(username: String, ipAddress: String, details: String = "") {
+    override fun logAuthFailure(username: String, ipAddress: String, details: String) {
         log(AuditEvent(
             type = AuditEventType.AUTHENTICATION_FAILURE,
             username = username,
@@ -63,7 +65,7 @@ class AuditLogService(private val properties: PushpinProperties) {
     /**
      * Log an authorization failure event.
      */
-    fun logAuthorizationFailure(username: String, ipAddress: String, resource: String, permission: String) {
+    override fun logAuthorizationFailure(username: String, ipAddress: String, resource: String, permission: String) {
         log(AuditEvent(
             type = AuditEventType.AUTHORIZATION_FAILURE,
             username = username,
@@ -75,7 +77,7 @@ class AuditLogService(private val properties: PushpinProperties) {
     /**
      * Log a channel access event.
      */
-    fun logChannelAccess(username: String, ipAddress: String, channelId: String, action: String) {
+    override fun logChannelAccess(username: String, ipAddress: String, channelId: String, action: String) {
         log(AuditEvent(
             type = AuditEventType.CHANNEL_ACCESS,
             username = username,
@@ -87,7 +89,7 @@ class AuditLogService(private val properties: PushpinProperties) {
     /**
      * Log a rate limit exceeded event.
      */
-    fun logRateLimitExceeded(username: String?, ipAddress: String) {
+    override fun logRateLimitExceeded(username: String?, ipAddress: String) {
         log(AuditEvent(
             type = AuditEventType.RATE_LIMIT_EXCEEDED,
             username = username,
@@ -99,7 +101,7 @@ class AuditLogService(private val properties: PushpinProperties) {
     /**
      * Log a security configuration change event.
      */
-    fun logSecurityConfigChange(username: String, ipAddress: String, details: String) {
+    override fun logSecurityConfigChange(username: String, ipAddress: String, details: String) {
         log(AuditEvent(
             type = AuditEventType.SECURITY_CONFIG_CHANGE,
             username = username,
@@ -107,27 +109,4 @@ class AuditLogService(private val properties: PushpinProperties) {
             details = details
         ))
     }
-}
-
-/**
- * Represents a security audit event.
- */
-data class AuditEvent(
-    val type: AuditEventType,
-    val username: String?,
-    val ipAddress: String,
-    val details: String,
-    val timestamp: LocalDateTime = LocalDateTime.now()
-)
-
-/**
- * Types of security audit events.
- */
-enum class AuditEventType {
-    AUTHENTICATION_SUCCESS,
-    AUTHENTICATION_FAILURE,
-    AUTHORIZATION_FAILURE,
-    CHANNEL_ACCESS,
-    RATE_LIMIT_EXCEEDED,
-    SECURITY_CONFIG_CHANGE
 }

@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":discovery"))
     implementation(project(":discovery-aws"))
     implementation(project(":discovery-kubernetes"))
+    implementation(project(":pushpin-security-core"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
