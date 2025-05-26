@@ -4,7 +4,7 @@ import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.security.core.AuditService
-import io.github.mpecan.pmt.security.encryption.ChannelEncryptionService
+import io.github.mpecan.pmt.security.core.EncryptionService
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,7 +20,7 @@ class PushpinServiceTest {
     private val messageSerializer: MessageSerializer = mock()
     private val discoveryManager: PushpinDiscoveryManager = mock()
     private val zmqPublisher: ZmqPublisher = mock()
-    private val channelEncryptionService: ChannelEncryptionService = mock()
+    private val encryptionService: EncryptionService = mock()
     private val auditService: AuditService = mock()
 
     private lateinit var pushpinProperties: PushpinProperties
@@ -64,7 +64,7 @@ class PushpinServiceTest {
             discoveryManager,
             messageSerializer,
             zmqPublisher,
-            channelEncryptionService,
+            encryptionService,
             auditService
         )
 

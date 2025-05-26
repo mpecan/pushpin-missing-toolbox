@@ -7,7 +7,7 @@ import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.model.PushpinHttpMessage
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.security.core.AuditService
-import io.github.mpecan.pmt.security.encryption.ChannelEncryptionService
+import io.github.mpecan.pmt.security.core.EncryptionService
 import io.github.mpecan.pmt.service.zmq.ZmqPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
@@ -30,7 +30,7 @@ class PushpinService(
     private val discoveryManager: PushpinDiscoveryManager,
     private val messageSerializer: MessageSerializer,
     private val zmqPublisher: ZmqPublisher,
-    private val channelEncryptionService: ChannelEncryptionService,
+    private val encryptionService: EncryptionService,
     private val auditService: AuditService
 ) {
     private val logger = LoggerFactory.getLogger(PushpinService::class.java)
@@ -79,10 +79,10 @@ class PushpinService(
         }
 
         // Encrypt message data if needed
-        if (pushpinProperties.security.encryption.enabled) {
+        if (encryptionService.isEncryptionEnabled()) {
             // Convert data to string, encrypt it, and create a new message
             val dataStr = message.data.toString()
-            val encryptedData = channelEncryptionService.encrypt(dataStr)
+            val encryptedData = encryptionService.encrypt(dataStr)
             val encryptedMessage = message.copy(
                 data = encryptedData
             )

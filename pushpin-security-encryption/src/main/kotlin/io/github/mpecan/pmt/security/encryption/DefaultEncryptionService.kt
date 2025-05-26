@@ -1,7 +1,6 @@
 package io.github.mpecan.pmt.security.encryption
 
-import io.github.mpecan.pmt.config.PushpinProperties
-import org.springframework.stereotype.Service
+import io.github.mpecan.pmt.security.core.EncryptionService
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
@@ -11,10 +10,11 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Service for encrypting sensitive channel data.
+ * Default implementation of EncryptionService using AES/GCM for authenticated encryption.
  */
-@Service
-class ChannelEncryptionService(private val properties: PushpinProperties) {
+class DefaultEncryptionService(
+    private val properties: EncryptionProperties
+) : EncryptionService {
     
     companion object {
         private const val GCM_IV_LENGTH = 12
@@ -23,14 +23,14 @@ class ChannelEncryptionService(private val properties: PushpinProperties) {
     
     // The secret key used for encryption, derived from the configured secret
     private val secretKey: SecretKey by lazy {
-        if (properties.security.encryption.secretKey.isNotBlank()) {
+        if (properties.secretKey.isNotBlank()) {
             // Use the configured secret key
-            val decodedKey = Base64.getDecoder().decode(properties.security.encryption.secretKey)
+            val decodedKey = Base64.getDecoder().decode(properties.secretKey)
             SecretKeySpec(decodedKey, "AES")
         } else {
             // Generate a random key if none is provided
             val keyGenerator = KeyGenerator.getInstance("AES")
-            keyGenerator.init(256)
+            keyGenerator.init(properties.keySize)
             keyGenerator.generateKey()
         }
     }
@@ -41,8 +41,8 @@ class ChannelEncryptionService(private val properties: PushpinProperties) {
      * @param plaintext The data to encrypt
      * @return The encrypted data, Base64-encoded
      */
-    fun encrypt(plaintext: String): String {
-        if (!properties.security.encryption.enabled || plaintext.isBlank()) {
+    override fun encrypt(plaintext: String): String {
+        if (!properties.enabled || plaintext.isBlank()) {
             return plaintext
         }
         
@@ -52,7 +52,7 @@ class ChannelEncryptionService(private val properties: PushpinProperties) {
             SecureRandom().nextBytes(iv)
             
             // Initialize the cipher
-            val cipher = Cipher.getInstance(properties.security.encryption.algorithm)
+            val cipher = Cipher.getInstance(properties.algorithm)
             val parameterSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec)
             
@@ -77,8 +77,8 @@ class ChannelEncryptionService(private val properties: PushpinProperties) {
      * @param encryptedData The encrypted data, Base64-encoded
      * @return The decrypted data
      */
-    fun decrypt(encryptedData: String): String {
-        if (!properties.security.encryption.enabled || encryptedData.isBlank()) {
+    override fun decrypt(encryptedData: String): String {
+        if (!properties.enabled || encryptedData.isBlank()) {
             return encryptedData
         }
         
@@ -95,7 +95,7 @@ class ChannelEncryptionService(private val properties: PushpinProperties) {
             System.arraycopy(encryptedBytes, iv.size, ciphertext, 0, ciphertext.size)
             
             // Initialize the cipher
-            val cipher = Cipher.getInstance(properties.security.encryption.algorithm)
+            val cipher = Cipher.getInstance(properties.algorithm)
             val parameterSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec)
             
@@ -110,19 +110,23 @@ class ChannelEncryptionService(private val properties: PushpinProperties) {
     }
     
     /**
+     * Check if encryption is enabled.
+     *
+     * @return true if encryption is enabled, false otherwise
+     */
+    override fun isEncryptionEnabled(): Boolean {
+        return properties.enabled
+    }
+    
+    /**
      * Generate a new random secret key for encryption.
      * 
      * @return The Base64-encoded secret key
      */
-    fun generateSecretKey(): String {
+    override fun generateSecretKey(): String {
         val keyGenerator = KeyGenerator.getInstance("AES")
-        keyGenerator.init(256)
+        keyGenerator.init(properties.keySize)
         val key = keyGenerator.generateKey()
         return Base64.getEncoder().encodeToString(key.encoded)
     }
 }
-
-/**
- * Exception thrown when there is an error during encryption or decryption.
- */
-class EncryptionException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
