@@ -1,6 +1,6 @@
 package io.github.mpecan.pmt.controller
 
-import org.springframework.http.MediaType
+import io.github.mpecan.pmt.grip.GripApi
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -34,11 +34,8 @@ class HttpStreamingController {
         // Create a Flux that never completes to keep the connection open
         val flux = Flux.just<String>("Successfully subscribed to channel: $channel\n")
         
-        // Return the response with GRIP headers
-        return ResponseEntity.ok()
-            .contentType(MediaType.TEXT_PLAIN)  // Use plain text instead of SSE
-            .header("Grip-Hold", "stream")
-            .header("Grip-Channel", channel)
+        // Return the response with GRIP headers using the new API
+        return GripApi.streamingResponse(channel)
             .body(flux)
     }
 }

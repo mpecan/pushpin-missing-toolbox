@@ -4,24 +4,28 @@ import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.audit.AuditLogService
 import io.github.mpecan.pmt.security.model.ChannelPermission
 import io.github.mpecan.pmt.security.service.ChannelAuthorizationService
+import io.github.mpecan.pmt.security.service.EnhancedChannelAuthorizationService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Controller for authentication and authorization.
+ * Enhanced controller for authentication and authorization.
+ * This controller extends the original AuthController with additional capabilities:
+ * - Access to JWT-based permissions
+ * - Integration with remote authorization API
+ * - New endpoints for revoking permissions
  */
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
     private val pushpinProperties: PushpinProperties,
     private val channelAuthorizationService: ChannelAuthorizationService,
+    private val enhancedChannelAuthorizationService: EnhancedChannelAuthorizationService,
     private val auditLogService: AuditLogService
 ) {
 
@@ -50,15 +54,26 @@ class AuthController(
             "HMAC"
         )
 
-        val token = Jwts.builder()
+        // Build token with sample channel permissions if enabled
+        val builder = Jwts.builder()
             .setSubject(request.username)
             .claim(pushpinProperties.security.jwt.authoritiesClaim, roles)
             .setIssuer(pushpinProperties.security.jwt.issuer)
             .setAudience(pushpinProperties.security.jwt.audience)
             .setIssuedAt(now)
             .setExpiration(expiration)
-            .signWith(secretKey, SignatureAlgorithm.HS256)
-            .compact()
+        
+        // Add channel permissions if claim extraction is enabled
+        if (pushpinProperties.security.jwt.claimExtraction.enabled) {
+            // Add sample channel permissions for development/testing
+            val channelPermissions = mapOf(
+                "public" to listOf("READ", "WRITE"),
+                "private" to listOf("READ")
+            )
+            builder.claim("channels", channelPermissions)
+        }
+
+        val token = builder.signWith(secretKey, SignatureAlgorithm.HS256).compact()
 
         // Log the authentication event
         auditLogService.logAuthSuccess(
@@ -100,6 +115,35 @@ class AuthController(
     }
     
     /**
+     * Revokes channel permissions from a user.
+     */
+    @DeleteMapping("/permissions/user")
+    fun revokeUserPermissions(
+        @RequestBody request: PermissionRequest,
+        servletRequest: HttpServletRequest
+    ): ResponseEntity<Map<String, Boolean>> {
+        val permissions = request.permissions.map { ChannelPermission.valueOf(it.uppercase()) }
+        
+        channelAuthorizationService.revokeUserPermissions(
+            request.username,
+            request.channelId,
+            *permissions.toTypedArray()
+        )
+        
+        // Log the permission change
+        val authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().authentication
+        val adminUsername = authentication?.name ?: "system"
+        
+        auditLogService.logSecurityConfigChange(
+            adminUsername,
+            servletRequest.remoteAddr,
+            "Revoked permissions ${permissions.joinToString(", ")} from user ${request.username} for channel ${request.channelId}"
+        )
+        
+        return ResponseEntity.ok(mapOf("success" to true))
+    }
+    
+    /**
      * Grants channel permissions to a role.
      */
     @PostMapping("/permissions/role")
@@ -129,7 +173,40 @@ class AuthController(
     }
     
     /**
+     * Revokes channel permissions from a role.
+     */
+    @DeleteMapping("/permissions/role")
+    fun revokeRolePermissions(
+        @RequestBody request: RolePermissionRequest,
+        servletRequest: HttpServletRequest
+    ): ResponseEntity<Map<String, Boolean>> {
+        val permissions = request.permissions.map { ChannelPermission.valueOf(it.uppercase()) }
+        
+        channelAuthorizationService.revokeRolePermissions(
+            request.role,
+            request.channelId,
+            *permissions.toTypedArray()
+        )
+        
+        // Log the permission change
+        val authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().authentication
+        val adminUsername = authentication?.name ?: "system"
+        
+        auditLogService.logSecurityConfigChange(
+            adminUsername,
+            servletRequest.remoteAddr,
+            "Revoked permissions ${permissions.joinToString(", ")} from role ${request.role} for channel ${request.channelId}"
+        )
+        
+        return ResponseEntity.ok(mapOf("success" to true))
+    }
+    
+    /**
      * Gets all channels the current user has access to with the given permission.
+     * This uses the enhanced authorization service to check permissions from multiple sources:
+     * - JWT token claims
+     * - Remote authorization API
+     * - Local permissions
      */
     @GetMapping("/permissions/channels")
     fun getChannelsWithPermission(
@@ -141,38 +218,13 @@ class AuthController(
         
         val channelPermission = ChannelPermission.valueOf(permission.uppercase())
         
-        // Get all channels the user has access to
-        val allChannels = channelAuthorizationService.getChannelsWithPermission(
+        // Get all channels the user has access to using the enhanced service
+        val allChannels = enhancedChannelAuthorizationService.getChannelsWithPermission(
             authentication,
-            channelPermission
+            channelPermission,
+            servletRequest
         )
         
         return ResponseEntity.ok(allChannels)
     }
 }
-
-/**
- * Request for generating a JWT token.
- */
-data class AuthRequest(
-    val username: String,
-    val password: String
-)
-
-/**
- * Request for granting channel permissions to a user.
- */
-data class PermissionRequest(
-    val username: String,
-    val channelId: String,
-    val permissions: List<String>
-)
-
-/**
- * Request for granting channel permissions to a role.
- */
-data class RolePermissionRequest(
-    val role: String,
-    val channelId: String,
-    val permissions: List<String>
-)

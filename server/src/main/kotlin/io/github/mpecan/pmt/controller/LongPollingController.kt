@@ -1,6 +1,6 @@
 package io.github.mpecan.pmt.controller
 
-import org.springframework.http.MediaType
+import io.github.mpecan.pmt.grip.GripApi
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -37,12 +37,8 @@ class LongPollingController {
             "channel" to channel
         ))
 
-        // Return the response with GRIP headers
-        return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Grip-Hold", "response")  // Use "response" for long-polling
-            .header("Grip-Channel", channel)
-            .header("Grip-Timeout", "20")  // 20 seconds timeout
+        // Return the response with GRIP headers using the new API
+        return GripApi.longPollingResponse<Mono<Map<String, Any>>>(channel, timeout = 20)
             .body(response)
     }
 }

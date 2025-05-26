@@ -10,6 +10,9 @@ import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
 import java.util.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 
 /**
  * Integration tests for WebSocket functionality.
@@ -25,6 +28,8 @@ import java.util.*
  * - Protocol-specific features (ping/pong)
  */
 class WebSocketIntegrationTest : PushpinIntegrationTest() {
+    
+    private val objectMapper: ObjectMapper = jacksonObjectMapper()
 
     companion object {
         val definedPort = Random().nextInt(10000, 12000)
@@ -64,7 +69,11 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
         // Use StepVerifier to test the WebSocket stream
         val stepVerifier = StepVerifier.create(wsFlux)
-            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            .expectNextMatches { json ->
+                val response: Map<String, Any> = objectMapper.readValue(json)
+                response["success"] == true && 
+                response["message"] == "Subscribed to channel: $channel"
+            }
             .expectNextMatches {
                 it.contains(messageText)
             }
@@ -99,7 +108,11 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
         // Use StepVerifier to test the WebSocket stream
         val stepVerifier = StepVerifier.create(wsFlux)
-            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            .expectNextMatches { json ->
+                val response: Map<String, Any> = objectMapper.readValue(json)
+                response["success"] == true && 
+                response["message"] == "Subscribed to channel: $channel"
+            }
             .expectNextMatches{
                 it.contains("First WebSocket message")
             }
@@ -141,7 +154,11 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
         // Use StepVerifier to test the WebSocket stream
         val stepVerifier = StepVerifier.create(wsFlux)
-            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            .expectNextMatches { json ->
+                val response: Map<String, Any> = objectMapper.readValue(json)
+                response["success"] == true && 
+                response["message"] == "Subscribed to channel: $channel"
+            }
             .expectNextMatches {
                 it.contains(messageText)
             }
@@ -176,7 +193,11 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
         // Use StepVerifier to test the WebSocket stream
         val stepVerifier = StepVerifier.create(wsFlux)
-            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            .expectNextMatches { json ->
+                val response: Map<String, Any> = objectMapper.readValue(json)
+                response["success"] == true && 
+                response["message"] == "Subscribed to channel: $channel"
+            }
             .expectNextMatches {
                 it.contains(encodedData)
             }
@@ -208,7 +229,11 @@ class WebSocketIntegrationTest : PushpinIntegrationTest() {
 
         // Use StepVerifier to test the WebSocket stream
         val stepVerifier = StepVerifier.create(wsFlux)
-            .expectNext("""{"success": true, "message": "Subscribed to channel: $channel"}""")
+            .expectNextMatches { json ->
+                val response: Map<String, Any> = objectMapper.readValue(json)
+                response["success"] == true && 
+                response["message"] == "Subscribed to channel: $channel"
+            }
             // The ping/pong is handled at a lower level and we don't see the actual messages
             // But we can verify the connection stays alive
             .thenCancel()

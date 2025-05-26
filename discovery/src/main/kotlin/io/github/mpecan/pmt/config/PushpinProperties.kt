@@ -101,6 +101,8 @@ data class PushpinProperties(
      * @property clientSecret Client secret for OAuth2 providers (when applicable)
      * @property authoritiesClaim The name of the claim containing the user roles/authorities
      * @property authoritiesPrefix Prefix to add to authorities extracted from the JWT
+     * @property claimExtraction Configuration for extracting specific claims from the JWT token
+     * @property remoteAuthorization Configuration for remote authorization API
      */
     data class JwtProperties(
         val enabled: Boolean = false,
@@ -113,8 +115,57 @@ data class PushpinProperties(
         val clientId: String = "",
         val clientSecret: String = "",
         val authoritiesClaim: String = "roles",
-        val authoritiesPrefix: String = "ROLE_"
-    )
+        val authoritiesPrefix: String = "ROLE_",
+        val claimExtraction: ClaimExtractionProperties = ClaimExtractionProperties(),
+        val remoteAuthorization: RemoteAuthorizationProperties = RemoteAuthorizationProperties()
+    ) {
+        /**
+         * Configuration for extracting specific claims from JWT tokens and transforming
+         * them for use in downstream services or authorization decisions.
+         *
+         * @property enabled Whether claim extraction is enabled
+         * @property userIdClaim The claim to use as the user identifier
+         * @property extractClaims List of specific claims to extract from the JWT
+         * @property headerPrefix Prefix to add to header names when including claims in headers
+         * @property includeAllClaims Whether to include all available claims from the JWT
+         * @property transformations Custom transformations to apply to extracted claims
+         */
+        data class ClaimExtractionProperties(
+            val enabled: Boolean = false,
+            val userIdClaim: String = "sub",
+            val extractClaims: List<String> = listOf("sub", "email"),
+            val headerPrefix: String = "X-JWT-Claim-",
+            val includeAllClaims: Boolean = false,
+            val transformations: Map<String, String> = emptyMap()
+        )
+
+        /**
+         * Configuration for using a remote authorization API to validate access to resources.
+         *
+         * @property enabled Whether remote authorization is enabled
+         * @property url The URL of the remote authorization API
+         * @property method HTTP method to use for the authorization request (GET, POST)
+         * @property timeout Timeout for the authorization request in milliseconds
+         * @property cacheEnabled Whether to cache authorization results
+         * @property cacheTtl Time-to-live for cached authorization results in milliseconds
+         * @property cacheMaxSize Maximum number of entries in the authorization cache
+         * @property includeHeaders List of request headers to include in the authorization request
+         * @property includeQueryParams Whether to include query parameters in the authorization request
+         * @property headerName Header name for conveying the authorization decision to downstream services
+         */
+        data class RemoteAuthorizationProperties(
+            val enabled: Boolean = false,
+            val url: String = "",
+            val method: String = "POST",
+            val timeout: Long = 5000,
+            val cacheEnabled: Boolean = true,
+            val cacheTtl: Long = 300000, // 5 minutes
+            val cacheMaxSize: Long = 1000,
+            val includeHeaders: List<String> = listOf("Authorization"),
+            val includeQueryParams: Boolean = true,
+            val headerName: String = "X-Auth-Decision"
+        )
+    }
 
     /**
      * Rate limiting properties.

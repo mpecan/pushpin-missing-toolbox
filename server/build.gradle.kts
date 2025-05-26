@@ -34,6 +34,12 @@ dependencies {
     // Rate limiting
     implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0")
 
+    // JsonPath for JWT claim extraction
+    implementation("com.jayway.jsonpath:json-path:2.8.0")
+
+    // Caffeine for caching
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+
     // ZeroMQ for multi-server support
     implementation("org.zeromq:jeromq:0.5.4")
 
@@ -45,7 +51,7 @@ dependencies {
     testImplementation("org.apache.commons:commons-compress")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("javax.servlet:javax.servlet-api")
-    testImplementation("org.mockito.kotlin:mockito-kotlin")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
 }
