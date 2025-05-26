@@ -25,7 +25,7 @@ class PushpinServerTest {
             controlPort = 5564,
         )
 
-        assertEquals("http://localhost:5564", server.getControlUrl())
+        assertEquals("http://localhost:8080", server.getHttpUrl())
     }
 
     @Test

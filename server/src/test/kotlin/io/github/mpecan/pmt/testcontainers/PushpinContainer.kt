@@ -23,7 +23,8 @@ class PushpinContainer(
         const val PUBLISH_PORT = 5560
         const val XPUB_PORT = 5561
         const val ROUTER_PORT = 5562
-        const val SUB_PORT = 5563
+        const val CONTROL_PORT = 5563
+
         private val logger = LoggerFactory.getLogger(PushpinContainer::class.java)
     }
 
@@ -36,7 +37,7 @@ class PushpinContainer(
 
     init {
         // Expose all required ports
-        withExposedPorts(HTTP_PORT, PUBLISH_PORT, XPUB_PORT, SUB_PORT, ROUTER_PORT)
+        withExposedPorts(HTTP_PORT, PUBLISH_PORT, XPUB_PORT, ROUTER_PORT, CONTROL_PORT)
         withAccessToHost(true)
 
         // Log container output
@@ -60,6 +61,7 @@ class PushpinContainer(
                 // ZMQ publish socket config - ensure socket binding works correctly
                 "sed -i 's/push_in_spec=.*/push_in_spec=tcp:\\/\\/*:$PUBLISH_PORT/' /etc/pushpin/pushpin.conf && " +
                 "sed -i 's/push_in_http_port=.*/push_in_http_port=$XPUB_PORT/' /etc/pushpin/pushpin.conf && " +
+                "sed -i 's/command_spec=.*/command_spec=tcp:\\/\\/*:$CONTROL_PORT/' /etc/pushpin/pushpin.conf && " +
                 // Enable ZMQ for message handling
                 "sed -i 's/zmq_publish=.*/zmq_publish=true/' /etc/pushpin/pushpin.conf && " +
                 // Configure handler section for ZMQ
@@ -106,20 +108,10 @@ class PushpinContainer(
     /**
      * Gets the mapped control port.
      */
-    fun getControlPort(): Int = getMappedPort(XPUB_PORT)
+    fun getControlPort(): Int = getMappedPort(CONTROL_PORT)
 
     /**
-     * Gets the base URL for HTTP requests.
+     * Gets the mapped XPUB port.
      */
-    fun getBaseUrl(): String = "http://$host:${getHttpPort()}"
-
-    /**
-     * Gets the control URL for publishing messages.
-     */
-    fun getControlUrl(): String = "http://$host:${getControlPort()}"
-
-    /**
-     * Gets the publish URL for ZMQ connections.
-     */
-    fun getPublishUrl(): String = "tcp://$host:${getPublishPort()}"
+    fun getHttpPublishPort(): Int = getMappedPort(XPUB_PORT)
 }

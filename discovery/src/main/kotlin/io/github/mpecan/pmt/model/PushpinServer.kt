@@ -19,6 +19,7 @@ data class PushpinServer(
     val host: String,
     val port: Int,
     val controlPort: Int = 5564,
+    val httpPort: Int = 8080,
     val publishPort: Int = 5560,
     val active: Boolean = true,
     val weight: Int = 100,
@@ -32,7 +33,7 @@ data class PushpinServer(
     /**
      * Returns the control URL for the server.
      */
-    fun getControlUrl(): String = "http://$host:$controlPort"
+    fun getHttpUrl(): String = "http://$host:$httpPort"
 
     /**
      * Returns the publish URL for the server.

@@ -4,7 +4,6 @@ import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.service.PushpinService
-import io.github.mpecan.pmt.test.PortProvider
 import io.github.mpecan.pmt.testcontainers.PushpinContainer
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.AfterEach
@@ -20,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.random.Random
 
 /**
  * This test class is an initial effort to test ZMQ communication with multiple Pushpin servers.
@@ -49,7 +49,7 @@ class ZmqMultiServerIntegrationTest {
 
     companion object {
         private val network = Network.newNetwork()
-        private val serverPort = PortProvider.getPort()
+        private val serverPort = Random.nextInt(12000, 13000)
 
         // Create individual Pushpin containers with shared network
         @Container
@@ -85,6 +85,9 @@ class ZmqMultiServerIntegrationTest {
             // Enable test mode for better diagnostics
             registry.add("pushpin.test-mode") { true }
 
+            // Enable ZMQ for message publishing
+            registry.add("pushpin.transport") { "zmq" }
+
             // Set ZMQ HWM and linger
             registry.add("pushpin.zmq-hwm") { 1000 }
             registry.add("pushpin.zmq-linger") { 0 }
@@ -110,7 +113,7 @@ class ZmqMultiServerIntegrationTest {
             println("Server: ${server.id}")
             println("  Active: ${server.active}")
             println("  HTTP URL: ${server.getBaseUrl()}")
-            println("  Control URL: ${server.getControlUrl()}")
+            println("  Control URL: ${server.getHttpUrl()}")
             println("  Publish URL: ${server.getPublishUrl()}")
         }
     }

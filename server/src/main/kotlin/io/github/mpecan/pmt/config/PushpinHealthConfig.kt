@@ -3,10 +3,11 @@ package io.github.mpecan.pmt.config
 import io.github.mpecan.pmt.health.DefaultPushpinHealthChecker
 import io.github.mpecan.pmt.health.PushpinHealthChecker
 import io.github.mpecan.pmt.service.PushpinService
+import io.github.mpecan.pmt.transport.health.TransportHealthChecker
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
 
 /**
  * Configuration for Pushpin health checking.
@@ -15,29 +16,23 @@ import org.springframework.web.reactive.function.client.WebClient
 class PushpinHealthConfig {
 
     /**
-     * Creates a WebClient bean if none is provided.
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    fun webClient(): WebClient {
-        return WebClient.builder().build()
-    }
-
-    /**
      * Creates a PushpinHealthChecker bean if none is provided.
+     * * This bean now supports multiple transport health checkers and will
+     * select the appropriate one based on the configured transport type.
      */
     @Bean
     @ConditionalOnMissingBean
     fun pushpinHealthChecker(
-        webClient: WebClient,
+        transportHealthCheckers: List<TransportHealthChecker>,
         pushpinProperties: PushpinProperties,
         pushpinService: PushpinService,
+        @Value("\${pushpin.transport:http}") transportType: String,
     ): PushpinHealthChecker {
         return DefaultPushpinHealthChecker(
-            webClient,
+            transportHealthCheckers,
             pushpinProperties.healthCheckEnabled,
-            pushpinProperties.defaultTimeout,
             pushpinService,
+            transportType,
         )
     }
 }

@@ -31,16 +31,6 @@ class DiscoveryConfig {
     // AwsDiscovery bean is now provided by discovery-aws module via auto-configuration
 
     /**
-     * Creates a KubernetesDiscovery bean.
-     */
-    @Bean
-    fun kubernetesDiscovery(discoveryProperties: DiscoveryProperties): KubernetesDiscovery {
-        return KubernetesDiscovery(
-            discoveryProperties.kubernetes,
-        )
-    }
-
-    /**
      * Creates a PushpinDiscoveryManager bean.
      */
     @Bean

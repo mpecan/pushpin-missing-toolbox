@@ -1,5 +1,6 @@
 package io.github.mpecan.pmt.controller
 
+import io.github.mpecan.pmt.grip.GripApi
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -33,10 +34,11 @@ class HttpResponseController {
             "channel" to channel,
         )
 
-        // Return the response with Grip-Channel header
-        return ResponseEntity.ok()
+        // Return the response with GRIP headers using the new API
+        return GripApi.headers()
+            .channel(channel)
+            .applyTo(ResponseEntity.ok())
             .contentType(MediaType.APPLICATION_JSON)
-            .header("Grip-Channel", channel) // Associate this response with the channel
             .body(response)
     }
 }
