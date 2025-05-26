@@ -1,6 +1,9 @@
 package io.github.mpecan.pmt.security.remote.config
 
-import io.github.mpecan.pmt.security.remote.*
+import io.github.mpecan.pmt.security.remote.HttpRemoteSubscriptionClient
+import io.github.mpecan.pmt.security.remote.RemoteAuthorizationClient
+import io.github.mpecan.pmt.security.remote.RemoteAuthorizationProperties
+import io.github.mpecan.pmt.security.remote.SubscriptionAuthorizationCache
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -29,8 +32,8 @@ class RemoteAuthorizationAutoConfiguration {
         builder: RestTemplateBuilder
     ): RestTemplate {
         return builder
-            .setConnectTimeout(Duration.ofMillis(properties.timeout))
-            .setReadTimeout(Duration.ofMillis(properties.timeout))
+            .connectTimeout(Duration.ofMillis(properties.timeout))
+            .readTimeout(Duration.ofMillis(properties.timeout))
             .build()
     }
     
@@ -56,21 +59,3 @@ class RemoteAuthorizationAutoConfiguration {
     }
 }
 
-/**
- * Auto-configuration for no-op remote authorization client when disabled.
- */
-@AutoConfiguration
-@ConditionalOnProperty(
-    prefix = "pushpin.security.remote",
-    name = ["enabled"],
-    havingValue = "false",
-    matchIfMissing = true
-)
-class NoOpRemoteAuthorizationAutoConfiguration {
-    
-    @Bean
-    @ConditionalOnMissingBean(RemoteAuthorizationClient::class)
-    fun noopRemoteAuthorizationClient(): RemoteAuthorizationClient {
-        return NoopRemoteAuthorizationClient()
-    }
-}
