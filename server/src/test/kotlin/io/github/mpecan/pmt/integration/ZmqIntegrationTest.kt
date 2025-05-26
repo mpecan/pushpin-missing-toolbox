@@ -47,7 +47,7 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             registry.add("server.port") { definedPort }
 
             // Enable ZMQ for message publishing
-            registry.add("pushpin.zmq-enabled") { true }
+            registry.add("pushpin.transport") { "zmq" }
 
             // Note: Socket type is now fixed to PUSH in code and not configurable
 

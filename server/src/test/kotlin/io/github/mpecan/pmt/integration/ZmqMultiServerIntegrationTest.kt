@@ -4,7 +4,6 @@ package io.github.mpecan.pmt.integration
 
 import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.service.PushpinService
 import io.github.mpecan.pmt.testcontainers.PushpinContainer
@@ -84,9 +83,12 @@ class ZmqMultiServerIntegrationTest {
             
             // Set server port
             registry.add("server.port") { serverPort }
-            
+
             // Enable test mode for better diagnostics
             registry.add("pushpin.test-mode") { true }
+
+            // Enable ZMQ for message publishing
+            registry.add("pushpin.transport") { "zmq" }
             
             // Set ZMQ HWM and linger
             registry.add("pushpin.zmq-hwm") { 1000 }
@@ -113,7 +115,7 @@ class ZmqMultiServerIntegrationTest {
             println("Server: ${server.id}")
             println("  Active: ${server.active}")
             println("  HTTP URL: ${server.getBaseUrl()}")
-            println("  Control URL: ${server.getControlUrl()}")
+            println("  Control URL: ${server.getHttpUrl()}")
             println("  Publish URL: ${server.getPublishUrl()}")
         }
     }

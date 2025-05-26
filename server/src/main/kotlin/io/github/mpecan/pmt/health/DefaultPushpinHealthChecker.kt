@@ -2,43 +2,55 @@ package io.github.mpecan.pmt.health
 
 import io.github.mpecan.pmt.model.PushpinServer
 import io.github.mpecan.pmt.service.PushpinService
+import io.github.mpecan.pmt.transport.health.TransportHealthChecker
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
-import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Default implementation of PushpinHealthChecker.
+ * 
+ * This implementation supports multiple transport health checkers and will
+ * use the appropriate checker based on the configured transport type.
  */
 class DefaultPushpinHealthChecker(
-    private val webClient: WebClient,
+    private val transportHealthCheckers: List<TransportHealthChecker>,
     private val healthCheckEnabled: Boolean,
-    private val defaultTimeout: Long,
-    private val pushpinService: PushpinService
+    private val pushpinService: PushpinService,
+    private val defaultTransportType: String = "http"
 ) : PushpinHealthChecker {
     private val logger = LoggerFactory.getLogger(DefaultPushpinHealthChecker::class.java)
     private val healthyServers = ConcurrentHashMap<String, PushpinServer>()
+    private val healthCheckerMap: Map<String, TransportHealthChecker> = 
+        transportHealthCheckers.associateBy { it.getTransportType() }
+
+    init {
+        logger.info("Initialized health checker with transport types: ${healthCheckerMap.keys}")
+    }
 
     /**
-     * Checks the health of a single server.
+     * Checks the health of a single server using the appropriate transport health checker.
      */
     override fun checkHealth(server: PushpinServer): Mono<Boolean> {
-        return webClient.get()
-            .uri(server.getHealthCheckUrl())
-            .retrieve()
-            .bodyToMono<String>()
-            .doOnSuccess { response ->
-                logger.debug("Health check response from server ${server.id}: $response")
-            }
-            .doOnError{
-                logger.error("Error checking health of server ${server.id}: ${it.message}")
-            }
-            .map { true }
-            .onErrorReturn(false)
-            .timeout(Duration.ofMillis(defaultTimeout))
+        val healthChecker = getHealthChecker()
+        return if (healthChecker != null) {
+            healthChecker.checkHealth(server)
+        } else {
+            logger.warn("No health checker available for transport type: $defaultTransportType")
+            Mono.just(false)
+        }
+    }
+
+    /**
+     * Gets the appropriate health checker based on the configured transport type.
+     */
+    private fun getHealthChecker(): TransportHealthChecker? {
+        return healthCheckerMap[defaultTransportType] ?: run {
+            logger.warn("No health checker found for transport type: $defaultTransportType")
+            // Fallback to first available health checker
+            transportHealthCheckers.firstOrNull()
+        }
     }
 
     /**

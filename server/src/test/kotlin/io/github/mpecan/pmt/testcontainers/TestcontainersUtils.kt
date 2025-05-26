@@ -41,7 +41,8 @@ object TestcontainersUtils {
         registry.add("pushpin.servers[0].host") { "localhost" } // Always use localhost for tests
         registry.add("pushpin.servers[0].port") { pushpinContainer.getMappedPort(PushpinContainer.HTTP_PORT) }
         registry.add("pushpin.servers[0].publishPort") { pushpinContainer.getMappedPort(PushpinContainer.PUBLISH_PORT) }
-        registry.add("pushpin.servers[0].controlPort") { pushpinContainer.getMappedPort(PushpinContainer.XPUB_PORT) }
+        registry.add("pushpin.servers[0].controlPort") { pushpinContainer.getMappedPort(PushpinContainer.CONTROL_PORT) }
+        registry.add("pushpin.servers[0].httpPort") { pushpinContainer.getMappedPort(PushpinContainer.XPUB_PORT) }
         registry.add("pushpin.servers[0].active") { true }
 
         // Enable health checks
@@ -81,6 +82,7 @@ object TestcontainersUtils {
             registry.add("pushpin.servers[$index].port") { container.getHttpPort() }
             registry.add("pushpin.servers[$index].publishPort") { container.getPublishPort() }
             registry.add("pushpin.servers[$index].controlPort") { container.getControlPort() }
+            registry.add("pushpin.servers[$index].httpPort") { container.getHttpPublishPort() }
             registry.add("pushpin.servers[$index].active") { true }
 
             println("Configured Pushpin server: $serverId with ports: HTTP=${container.getHttpPort()}, " +

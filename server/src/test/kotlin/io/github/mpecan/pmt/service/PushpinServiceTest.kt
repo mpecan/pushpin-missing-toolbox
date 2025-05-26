@@ -1,25 +1,21 @@
 package io.github.mpecan.pmt.service
 
-import io.github.mpecan.pmt.client.serialization.MessageSerializer
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.core.EncryptionService
-import io.github.mpecan.pmt.service.zmq.ZmqPublisher
+import io.github.mpecan.pmt.transport.PushpinTransport
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.springframework.web.reactive.function.client.WebClient
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PushpinServiceTest {
 
-    private val webClient: WebClient = mock()
-    private val messageSerializer: MessageSerializer = mock()
     private val discoveryManager: PushpinDiscoveryManager = mock()
-    private val zmqPublisher: ZmqPublisher = mock()
+    private val transport: PushpinTransport = mock()
     private val encryptionService: EncryptionService = mock()
     private val auditService: AuditService = mock()
 
@@ -60,18 +56,11 @@ class PushpinServiceTest {
 
         // Create service with mocked dependencies
         pushpinService = PushpinService(
-            pushpinProperties,
             discoveryManager,
-            messageSerializer,
-            zmqPublisher,
             encryptionService,
-            auditService
+            auditService,
+            pushpinTransports = listOf(transport)
         )
-
-        // Use reflection to replace the webClient with our mock
-        val webClientField = PushpinService::class.java.getDeclaredField("webClient")
-        webClientField.isAccessible = true
-        webClientField.set(pushpinService, webClient)
     }
 
     @Test

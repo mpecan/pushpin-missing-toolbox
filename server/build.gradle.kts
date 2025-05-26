@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":pushpin-security-encryption"))
     implementation(project(":pushpin-security-hmac"))
     implementation(project(":pushpin-security-jwt"))
+    implementation(project(":pushpin-transport-http"))
+    implementation(project(":pushpin-transport-zmq"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -46,8 +48,6 @@ dependencies {
     // Caffeine for caching
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    // ZeroMQ for multi-server support
-    implementation("org.zeromq:jeromq:0.5.4")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
