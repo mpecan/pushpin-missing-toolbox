@@ -1,7 +1,7 @@
 package io.github.mpecan.pmt.security.hmac
 
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.core.AuditService
+import io.github.mpecan.pmt.security.core.HmacService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -12,28 +12,21 @@ import org.springframework.web.util.ContentCachingRequestWrapper
 /**
  * Filter for verifying HMAC signatures on server-to-server requests.
  */
-class HmacSignatureFilter(
-    private val properties: PushpinProperties,
-    private val hmacSignatureService: HmacSignatureService,
+open class HmacSignatureFilter(
+    private val hmacService: HmacService,
+    private val properties: HmacProperties,
     private val auditService: AuditService
 ) : OncePerRequestFilter() {
     
-    // Request paths that are excluded from HMAC verification
-    private val excludedPaths = listOf(
-        "/api/public/",
-        "/actuator/",
-        "/api/pushpin/auth"
-    )
-    
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         // Skip HMAC verification if disabled
-        if (!properties.security.hmac.enabled) {
+        if (!hmacService.isHmacEnabled()) {
             return true
         }
         
         // Skip HMAC verification for excluded paths
         val path = request.requestURI
-        return excludedPaths.any { path.startsWith(it) }
+        return properties.excludedPaths.any { path.startsWith(it) }
     }
     
     override fun doFilterInternal(
@@ -45,7 +38,7 @@ class HmacSignatureFilter(
         val cachedBodyRequest = ContentCachingRequestWrapper(request)
         
         // Get the required headers
-        val signature = request.getHeader(properties.security.hmac.headerName)
+        val signature = request.getHeader(hmacService.getHeaderName())
         val timestamp = request.getHeader("X-Pushpin-Timestamp")?.toLongOrNull()
         
         if (signature == null || timestamp == null) {
@@ -71,11 +64,12 @@ class HmacSignatureFilter(
         val path = cachedBodyRequest.requestURI
         
         // Verify the signature
-        val isValid = hmacSignatureService.verifyRequestSignature(
+        val isValid = hmacService.verifyRequestSignature(
             body,
             timestamp,
             path,
-            signature
+            signature,
+            properties.maxAgeMs
         )
         
         if (!isValid) {

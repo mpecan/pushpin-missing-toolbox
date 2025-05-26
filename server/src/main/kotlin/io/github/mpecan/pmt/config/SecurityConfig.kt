@@ -4,10 +4,10 @@ import io.github.mpecan.pmt.security.JwtDecoderProvider
 import io.github.mpecan.pmt.security.RateLimitFilter
 import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.hmac.HmacSignatureFilter
-import io.github.mpecan.pmt.security.hmac.HmacSignatureService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
@@ -36,9 +36,10 @@ class SecurityConfig(
     private val pushpinProperties: PushpinProperties,
     private val jwtDecoderProvider: JwtDecoderProvider,
     private val jwtAuthenticationConverter: Converter<Jwt, AbstractAuthenticationToken>,
-    private val hmacSignatureService: HmacSignatureService,
     private val auditService: AuditService
 ) {
+    @Autowired(required = false)
+    private var hmacSignatureFilter: HmacSignatureFilter? = null
     /**
      * Configures the security filter chain.
      */
@@ -64,10 +65,10 @@ class SecurityConfig(
             )
         }
 
-        // Add HMAC signature verification if enabled
-        if (pushpinProperties.security.hmac.enabled) {
+        // Add HMAC signature verification if available and enabled
+        if (pushpinProperties.security.hmac.enabled && hmacSignatureFilter != null) {
             http.addFilterBefore(
-                HmacSignatureFilter(pushpinProperties, hmacSignatureService, auditService),
+                hmacSignatureFilter!!,
                 UsernamePasswordAuthenticationFilter::class.java
             )
         }
