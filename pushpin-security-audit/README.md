@@ -8,6 +8,7 @@ This module provides audit logging capabilities for Pushpin security events.
 - Default implementation with SLF4J logging
 - Structured audit events for security-related actions
 - Spring Boot auto-configuration
+- Replaces the default NoOpAuditService from pushpin-security-core when enabled
 
 ## Usage
 

@@ -16,6 +16,9 @@ dependencies {
     // Spring Context for annotations (optional dependency)
     compileOnly("org.springframework:spring-context")
     
+    // Spring Boot AutoConfiguration support
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
+    
     // Jakarta Servlet API for request handling (optional)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     

@@ -9,10 +9,11 @@ This module provides the foundational interfaces and data models for implementin
 ## Features
 
 - **Channel Subscription Interface**: Core `ChannelSubscriptionService` interface for determining which channels users can subscribe to
-- **Audit Interface**: Core `AuditService` interface for security event logging
+- **Audit Interface**: Core `AuditService` interface for security event logging with default no-op implementation
 - **Channel Subscription Models**: Simple model classes for managing channel subscriptions (`ChannelSubscription`, `ChannelSubscriptions`)
 - **Security Context**: Thread-local security context holder for maintaining security state
 - **Security Exceptions**: Base exception hierarchy for security-related errors
+- **Default Implementations**: NoOpAuditService ensures code using AuditService won't fail when no audit module is included
 
 ## Installation
 

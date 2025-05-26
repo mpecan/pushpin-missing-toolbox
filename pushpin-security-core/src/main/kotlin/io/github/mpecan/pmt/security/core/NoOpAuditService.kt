@@ -1,11 +1,9 @@
-package io.github.mpecan.pmt.security.audit
-
-import io.github.mpecan.pmt.security.core.AuditEvent
-import io.github.mpecan.pmt.security.core.AuditService
+package io.github.mpecan.pmt.security.core
 
 /**
  * No-op implementation of AuditService that does nothing.
- * Used when audit logging is disabled.
+ * This is the default implementation when no other AuditService bean is provided.
+ * It ensures that code using AuditService will not fail if no audit module is included.
  */
 class NoOpAuditService : AuditService {
     

@@ -2,7 +2,6 @@ package io.github.mpecan.pmt.security.audit.config
 
 import io.github.mpecan.pmt.security.audit.AuditProperties
 import io.github.mpecan.pmt.security.audit.DefaultAuditLogService
-import io.github.mpecan.pmt.security.audit.NoOpAuditService
 import io.github.mpecan.pmt.security.core.AuditService
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -12,6 +11,8 @@ import org.springframework.context.annotation.Bean
 
 /**
  * Spring Boot auto-configuration for audit logging.
+ * When audit is enabled, this configuration will replace the default NoOpAuditService
+ * from pushpin-security-core with a real implementation.
  */
 @AutoConfiguration
 @EnableConfigurationProperties(AuditProperties::class)
@@ -26,24 +27,5 @@ class AuditAutoConfiguration {
     @ConditionalOnMissingBean(AuditService::class)
     fun auditService(properties: AuditProperties): AuditService {
         return DefaultAuditLogService(properties)
-    }
-}
-
-/**
- * Auto-configuration for no-op audit service when disabled.
- */
-@AutoConfiguration
-@ConditionalOnProperty(
-    prefix = "pushpin.security.audit",
-    name = ["enabled"],
-    havingValue = "false",
-    matchIfMissing = true
-)
-class NoOpAuditAutoConfiguration {
-    
-    @Bean
-    @ConditionalOnMissingBean(AuditService::class)
-    fun noOpAuditService(): AuditService {
-        return NoOpAuditService()
     }
 }
