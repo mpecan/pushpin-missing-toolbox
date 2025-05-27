@@ -7,9 +7,9 @@ plugins {
 dependencies {
     implementation(project(":pushpin-api"))
     implementation(project(":pushpin-client"))
-    implementation(project(":discovery"))
-    implementation(project(":discovery-aws"))
-    implementation(project(":discovery-kubernetes"))
+    implementation(project(":pushpin-discovery"))
+    implementation(project(":pushpin-discovery-aws"))
+    implementation(project(":pushpin-discovery-kubernetes"))
     implementation(project(":pushpin-metrics-core"))
     implementation(project(":pushpin-security-core"))
     implementation(project(":pushpin-security-remote"))
@@ -65,4 +65,5 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
+    testImplementation(project(":pushpin-testcontainers"))
 }

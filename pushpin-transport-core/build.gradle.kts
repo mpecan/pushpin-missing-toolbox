@@ -7,6 +7,6 @@ plugins {
 dependencies {
     api(project(":pushpin-api"))
     api(project(":pushpin-client"))
-    api(project(":discovery"))
+    api(project(":pushpin-discovery"))
     implementation("org.springframework:spring-webflux")
 }

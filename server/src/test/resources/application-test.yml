@@ -1,0 +1,61 @@
+# Test properties for enhanced security features
+spring:
+  application:
+    name: pushpin-missing-toolbox-test
+
+# Server configuration
+server:
+  port: 8080
+
+# Pushpin configuration
+pushpin:
+  # Pushpin servers configuration
+  servers:
+    - id: pushpin-test
+      host: localhost
+      port: 7999
+      active: true
+  
+  # Pushpin authentication configuration
+  authEnabled: true
+  authSecret: test-secret
+  
+  # Enhanced security configuration
+  security:
+    # JWT Authentication
+    jwt:
+      enabled: true
+      secret: testsecrettestsecrettestsecrettestsecret
+      issuer: test-issuer
+      audience: test-audience
+      expirationMs: 3600000
+    
+    # Rate limiting
+    rateLimit:
+      enabled: true
+      capacity: 100
+      refillTimeInMillis: 60000
+    
+    # Audit logging
+    auditLogging:
+      enabled: true
+      level: INFO
+    
+    # HMAC request signing for server-to-server communication
+    hmac:
+      enabled: true
+      algorithm: HmacSHA256
+      secretKey: test-hmac-secret
+      headerName: X-Pushpin-Signature
+    
+    # Encryption for sensitive channel data
+    encryption:
+      enabled: true
+      algorithm: AES/GCM/NoPadding
+      secretKey: 
+
+# Logging configuration
+logging:
+  level:
+    io.github.mpecan: DEBUG
+    org.springframework.security: DEBUG

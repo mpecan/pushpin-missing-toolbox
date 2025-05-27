@@ -592,9 +592,10 @@ docker-compose up -d
 
 - [API Reference](docs/API.md) - Complete API documentation
 - [Configuration Guide](docs/Configuration.md) - All configuration options
+- [Testing Guide](docs/Testing.md) - Integration testing with Testcontainers
 - [Examples](docs/Examples.md) - Real-world usage examples
-- [AWS Discovery](discovery-aws/README.md) - AWS integration guide
-- [Kubernetes Discovery](discovery-kubernetes/README.md) - K8s integration guide
+- [AWS Discovery](pushpin-discovery-aws/README.md) - AWS integration guide
+- [Kubernetes Discovery](pushpin-discovery-kubernetes/README.md) - K8s integration guide
 
 ## Contributing
 
