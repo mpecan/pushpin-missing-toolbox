@@ -209,20 +209,19 @@ tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("
 val installGitHook by tasks.registering {
     group = "git hooks"
     description = "Install pre-commit git hook for ktlint"
-    
+
     doLast {
         // Skip if running in CI environment
-        val isCI = System.getenv("CI") != null || 
-                   System.getenv("GITHUB_ACTIONS") != null ||
-                   System.getenv("JENKINS_HOME") != null ||
-                   System.getenv("GITLAB_CI") != null ||
-                   System.getenv("CIRCLECI") != null
-        
+        val isCI = System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null ||
+            System.getenv("JENKINS_HOME") != null ||
+            System.getenv("GITLAB_CI") != null ||
+            System.getenv("CIRCLECI") != null
+
         if (isCI) {
             logger.lifecycle("Skipping git hook installation in CI environment")
             return@doLast
         }
-        
+
         val hookFile = file(".git/hooks/pre-commit")
         val hookContent = """
             |#!/bin/sh
@@ -248,12 +247,12 @@ val installGitHook by tasks.registering {
             |echo "✅ All ktlint checks passed!"
             |exit 0
         """.trimMargin()
-        
+
         if (!hookFile.parentFile.exists()) {
             logger.warn("Git hooks directory not found. Skipping pre-commit hook installation.")
             return@doLast
         }
-        
+
         hookFile.writeText(hookContent)
         hookFile.setExecutable(true)
         logger.lifecycle("Pre-commit hook installed successfully at ${hookFile.path}")
