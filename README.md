@@ -362,6 +362,20 @@ When ZMQ is enabled, the application will:
 
 This is particularly useful in high-availability setups where clients might be connected to different Pushpin instances, and you need to ensure all clients receive all messages regardless of which server they're connected to.
 
+## Modules
+
+### pushpin-metrics-core
+
+The metrics core module provides a pluggable metrics collection system that automatically uses Micrometer when available on the classpath, or falls back to a no-op implementation. This allows libraries to collect metrics without forcing a dependency on Micrometer.
+
+Features:
+- Automatic implementation selection based on classpath
+- Low-cardinality metrics design (no high-dimensionality tags like channel names)
+- Transport-level and server-level metrics
+- Spring Boot autoconfiguration support
+
+For detailed documentation, see the pushpin-metrics-core module documentation.
+
 ## Development
 
 ### Project Structure
@@ -371,6 +385,7 @@ This is particularly useful in high-availability setups where clients might be c
 - `src/main/kotlin/io/github/mpecan/pmt/service` - Services for managing Pushpin servers
 - `src/main/kotlin/io/github/mpecan/pmt/controller` - REST controllers
 - `src/main/kotlin/io/github/mpecan/pmt/discovery` - Extensible server discovery system
+- `pushpin-metrics-core` - Metrics collection library with optional Micrometer support
 
 ### Building
 

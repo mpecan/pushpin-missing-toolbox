@@ -53,10 +53,18 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/api/public/**").permitAll()
-                    .requestMatchers("/api/pushpin/auth").permitAll()
-                    .requestMatchers("/actuator/health").permitAll()
-                    .requestMatchers("/actuator/info").permitAll()
+                    .requestMatchers("/api/public/**")
+                    .permitAll()
+                    .requestMatchers("/api/pushpin/auth")
+                    .permitAll()
+                    .requestMatchers("/actuator/health")
+                    .permitAll()
+                    .requestMatchers("/actuator/info")
+                    .permitAll()
+                    .requestMatchers("/actuator/metrics")
+                    .permitAll()
+                    .requestMatchers("/actuator/prometheus")
+                    .permitAll()
             }
 
         // Add rate limiting if enabled
@@ -120,12 +128,13 @@ class SecurityConfig(
      */
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration().apply {
-            allowedOrigins = listOf("*")
-            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            allowedHeaders = listOf("*")
-            maxAge = 3600
-        }
+        val configuration =
+            CorsConfiguration().apply {
+                allowedOrigins = listOf("*")
+                allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                allowedHeaders = listOf("*")
+                maxAge = 3600
+            }
         return UrlBasedCorsConfigurationSource().apply {
             registerCorsConfiguration("/**", configuration)
         }
@@ -148,11 +157,12 @@ class PushpinAuthFilter(
 
         if (authHeader != null && authHeader == authSecret) {
             // Create authentication token
-            val auth = org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                "pushpin",
-                null,
-                listOf(SimpleGrantedAuthority("ROLE_PUSHPIN")),
-            )
+            val auth =
+                org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                    "pushpin",
+                    null,
+                    listOf(SimpleGrantedAuthority("ROLE_PUSHPIN")),
+                )
             SecurityContextHolder.getContext().authentication = auth
 
             // Log successful authentication

@@ -10,6 +10,7 @@ include(
     ":discovery-aws",
     ":discovery-kubernetes",
     ":pushpin-client",
+    ":pushpin-metrics-core",
     ":pushpin-security-core",
     ":pushpin-security-remote",
     ":pushpin-security-audit",

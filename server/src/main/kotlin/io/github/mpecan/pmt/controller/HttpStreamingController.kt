@@ -1,6 +1,7 @@
 package io.github.mpecan.pmt.controller
 
 import io.github.mpecan.pmt.grip.GripApi
+import io.github.mpecan.pmt.metrics.MetricsService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,8 +17,9 @@ import reactor.core.publisher.Flux
  */
 @RestController
 @RequestMapping("/api/http-stream")
-class HttpStreamingController {
-
+class HttpStreamingController(
+    private val metricsService: MetricsService,
+) {
     /**
      * Subscribes to a channel using the GRIP protocol with HTTP streaming.
      * * This endpoint keeps the connection open and adds the necessary GRIP headers
@@ -27,12 +29,35 @@ class HttpStreamingController {
      * @return A Flux that never completes, with GRIP headers
      */
     @GetMapping("/{channel}")
-    fun subscribe(@PathVariable channel: String): ResponseEntity<Flux<String>> {
+    fun subscribe(
+        @PathVariable channel: String,
+    ): ResponseEntity<Flux<String>> {
+        val timer = metricsService.startTimer()
+
+        // Record SSE connection
+        metricsService.recordConnectionEvent("http-stream", "opened")
+        metricsService.incrementActiveConnections("http-stream")
+
         // Create a Flux that never completes to keep the connection open
-        val flux = Flux.just<String>("Successfully subscribed to channel: $channel\n")
+        val flux =
+            Flux
+                .just<String>("Successfully subscribed to channel: $channel\n")
+                .doOnCancel {
+                    // Record disconnection when client cancels
+                    metricsService.recordConnectionEvent("http-stream", "closed")
+                    metricsService.decrementActiveConnections("http-stream")
+                    metricsService.stopTimer(timer, "http-stream-subscribe")
+                }.doOnError { error ->
+                    // Record error
+                    metricsService.recordConnectionEvent("http-stream", "error")
+                    metricsService.decrementActiveConnections("http-stream")
+                    metricsService.recordMessageError("pushpin", "http-stream", error.javaClass.simpleName)
+                    metricsService.stopTimer(timer, "http-stream-subscribe")
+                }
 
         // Return the response with GRIP headers using the new API
-        return GripApi.streamingResponse(channel)
+        return GripApi
+            .streamingResponse(channel)
             .body(flux)
     }
 }
