@@ -18,6 +18,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Test methods: use backticks with descriptive names
 
 ## Dependency Management
+- All dependency versions must be defined in the root gradle.properties file
+- Submodules should inherit versions from the root module's dependency management configuration
+- Never hardcode version numbers directly in submodule build.gradle.kts files
 - Prefer constructor injection over field injection for better testability
 - Use primary constructors with default values for dependencies where appropriate
 - For external services (like AWS), inject clients or factories to allow mocking in tests

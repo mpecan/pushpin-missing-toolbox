@@ -51,6 +51,16 @@ subprojects {
     val commonsCompressVersion: String by project
     val servletApiVersion: String by project
     val kubernetesClientVersion: String by project
+    val jjwtVersion: String by project
+    val bucket4jVersion: String by project
+    val jsonPathVersion: String by project
+    val jeromqVersion: String by project
+    val caffeineVersion: String by project
+    val micrometerVersion: String by project
+    val kotlinxCoroutinesVersion: String by project
+    val reactorKotlinExtensionsVersion: String by project
+    val jacksonVersion: String by project
+    val reactorVersion: String by project
 
     // Apply dependency management
     dependencyManagement {
@@ -67,6 +77,11 @@ subprojects {
             dependency("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
             dependency("org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion")
 
+            // Kotlin Coroutines
+            dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
+            dependency("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxCoroutinesVersion")
+            dependency("io.projectreactor.kotlin:reactor-kotlin-extensions:$reactorKotlinExtensionsVersion")
+
             // Test dependencies
             dependency("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
             dependency("org.apache.commons:commons-compress:$commonsCompressVersion")
@@ -81,6 +96,21 @@ subprojects {
             dependency("io.kubernetes:client-java:$kubernetesClientVersion")
             dependency("io.kubernetes:client-java-api:$kubernetesClientVersion")
             dependency("io.kubernetes:client-java-spring-integration:$kubernetesClientVersion")
+
+            // Security dependencies
+            dependency("io.jsonwebtoken:jjwt-api:$jjwtVersion")
+            dependency("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
+            dependency("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
+            dependency("com.github.vladimir-bukhtoyarov:bucket4j-core:$bucket4jVersion")
+            dependency("com.jayway.jsonpath:json-path:$jsonPathVersion")
+
+            // Infrastructure dependencies
+            dependency("org.zeromq:jeromq:$jeromqVersion")
+            dependency("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
+
+            // Monitoring dependencies
+            dependency("io.micrometer:micrometer-core:$micrometerVersion")
+            dependency("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
         }
     }
 

@@ -37,18 +37,18 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-jose")
 
     // For symmetric key token generation in the AuthController (development/testing only)
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-api")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson")
 
     // Rate limiting
-    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.1")
+    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core")
 
     // JsonPath for JWT claim extraction
-    implementation("com.jayway.jsonpath:json-path:2.8.0")
+    implementation("com.jayway.jsonpath:json-path")
 
     // Caffeine for caching
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
     // Micrometer for metrics
     implementation("io.micrometer:micrometer-core")
@@ -62,7 +62,7 @@ dependencies {
     testImplementation("org.apache.commons:commons-compress")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("javax.servlet:javax.servlet-api")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
     testImplementation(project(":pushpin-testcontainers"))

@@ -9,7 +9,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("com.github.ben-manes.caffeine:caffeine:${rootProject.property("caffeineVersion")}")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("jakarta.servlet:jakarta.servlet-api")
 
@@ -18,7 +18,7 @@ dependencies {
 
     // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${rootProject.property("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 

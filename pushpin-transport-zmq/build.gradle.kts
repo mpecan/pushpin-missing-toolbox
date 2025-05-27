@@ -10,7 +10,7 @@ dependencies {
     api(project(":pushpin-discovery"))
     api(project(":pushpin-transport-core"))
 
-    implementation("org.zeromq:jeromq:${project.findProperty("jeromqVersion")}")
+    implementation("org.zeromq:jeromq")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter-logging")
@@ -20,6 +20,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${project.findProperty("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("io.projectreactor:reactor-test")
 }
