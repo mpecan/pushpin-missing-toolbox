@@ -42,7 +42,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
     // Rate limiting
-    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0")
+    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.1")
 
     // JsonPath for JWT claim extraction
     implementation("com.jayway.jsonpath:json-path:2.8.0")
