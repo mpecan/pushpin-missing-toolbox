@@ -6,10 +6,10 @@ rootProject.name = "pushpin-missing-toolbox"
 include(
     ":server",
     ":pushpin-api",
-    ":discovery",
-    ":discovery-aws",
-    ":discovery-kubernetes",
     ":pushpin-client",
+    ":pushpin-discovery",
+    ":pushpin-discovery-aws",
+    ":pushpin-discovery-kubernetes",
     ":pushpin-metrics-core",
     ":pushpin-security-core",
     ":pushpin-security-remote",
@@ -21,4 +21,5 @@ include(
     ":pushpin-transport-core",
     ":pushpin-transport-http",
     ":pushpin-transport-zmq",
+    ":pushpin-testcontainers",
 )

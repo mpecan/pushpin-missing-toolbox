@@ -1,391 +1,570 @@
 # Pushpin Missing Toolbox
 
-A Spring Boot application for managing multiple Pushpin servers and allowing systems to interact with them. This project provides a simple and flexible way to integrate Pushpin into your application architecture for realtime web capabilities.
+A Spring Boot application that simplifies managing multiple [Pushpin](https://pushpin.org/) servers for scalable realtime web applications. It provides load balancing, health monitoring, and a unified API for publishing messages across your Pushpin infrastructure.
 
-## Features
+## 🚀 TL;DR
 
-- Manage multiple Pushpin servers
-- Load balancing between Pushpin servers
-- Multi-server message broadcasting using ZeroMQ
-- Health checks for Pushpin servers
-- Comprehensive security features:
-  - Multiple authentication mechanisms (token-based, JWT)
-  - Role-based access control for channel operations
-  - Channel-level permissions (read/write/admin)
-  - Rate limiting to prevent abuse
-  - HMAC signature verification for server-to-server communication
-  - Encryption for sensitive channel data
-  - Detailed security audit logging
-- RESTful API for publishing messages
-- Server-Sent Events (SSE) support for realtime updates
-- Extensible server discovery system (configuration-based, AWS, Kubernetes, etc.)
+- **What**: A management layer for Pushpin servers that adds load balancing, health checks, and security
+- **Why**: Pushpin handles realtime connections, this toolbox manages multiple Pushpin instances
+- **How**: REST API to publish messages, automatic routing to healthy servers
+- **Quick Start**: `docker-compose up -d && ./gradlew bootRun` - You're live in 2 minutes!
 
-## Getting Started
+## Why Pushpin? Why This Toolbox?
 
-### Prerequisites
+### The Problem
 
-- Java 17 or higher
-- Docker and Docker Compose (for local development)
+Building realtime web applications (chat, live dashboards, notifications) traditionally requires:
+- Managing long-lived WebSocket/SSE connections
+- Handling connection state and reconnections
+- Scaling horizontally while maintaining message delivery
+- Complex backend code for connection management
 
-### Running Locally
+### What Pushpin Solves
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/mpecan/pushpin-missing-toolbox.git
-   cd pushpin-missing-toolbox
-   ```
+[Pushpin](https://pushpin.org/) is a reverse proxy that handles the complexity of realtime connections:
+- **Holds client connections** - Your backend stays stateless
+- **Protocol translation** - HTTP requests become WebSocket/SSE messages
+- **Horizontal scaling** - Clients stay connected even as backends scale
+- **GRIP protocol** - Simple HTTP-based publishing
 
-2. Start the Pushpin servers using Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
+### Why You Need This Toolbox
 
-3. Run the application:
-   ```bash
-   ./gradlew bootRun
-   ```
+While Pushpin is powerful, managing multiple Pushpin instances in production requires:
+- **Distributing messages** to all Pushpin servers
+- **Health monitoring** to route around failures
+- **Service discovery** for dynamic environments (AWS, Kubernetes)
+- **Security** - Authentication, rate limiting, encryption
+- **Unified API** - Single endpoint for all your Pushpin servers
+- **Example** - Serves as a reference implementation for building the support into your applications
 
-4. The application will be available at http://localhost:8080
+**This toolbox provides all of these features out of the box.**
 
-### Configuration
+### Real-World Use Cases
 
-The application can be configured using the `application.properties` file. Here are the key configuration options:
+1. **Live Dashboards** - Push metrics to thousands of users without managing connections
+2. **Chat Applications** - Scale horizontally while maintaining message delivery
+3. **Collaborative Editing** - Real-time document updates across users
+4. **IoT Data Streaming** - Push sensor data to monitoring dashboards
+5. **Live Notifications** - System alerts, order updates, social media notifications
+6. **Sports/Trading Platforms** - Live scores, price updates to millions of users
 
-```properties
-# Pushpin server configuration
-pushpin.servers[0].id=pushpin-1
-pushpin.servers[0].host=pushpin-1
-pushpin.servers[0].port=7999
-pushpin.servers[0].controlPort=5564
-pushpin.servers[0].publishPort=5560
-pushpin.servers[0].active=true
-pushpin.servers[0].weight=100
-pushpin.servers[0].healthCheckPath=/status
+## Architecture
 
-# Pushpin health check configuration
-pushpin.healthCheckEnabled=true
-pushpin.healthCheckInterval=60000
-pushpin.defaultTimeout=5000
-
-# Pushpin authentication configuration
-pushpin.authEnabled=false
-pushpin.authSecret=changeme
-
-# JWT Authentication
-pushpin.security.jwt.enabled=false
-pushpin.security.jwt.secret=changemechangemechangemechangemechangemechangeme
-pushpin.security.jwt.issuer=pushpin-missing-toolbox
-pushpin.security.jwt.audience=pushpin-client
-pushpin.security.jwt.expirationMs=3600000
-
-# Rate limiting
-pushpin.security.rateLimit.enabled=false
-pushpin.security.rateLimit.capacity=100
-pushpin.security.rateLimit.refillTimeInMillis=60000
-
-# Audit logging
-pushpin.security.auditLogging.enabled=true
-pushpin.security.auditLogging.level=INFO
-
-# HMAC request signing for server-to-server communication
-pushpin.security.hmac.enabled=false
-pushpin.security.hmac.algorithm=HmacSHA256
-pushpin.security.hmac.secretKey=changeme
-pushpin.security.hmac.headerName=X-Pushpin-Signature
-
-# Encryption for sensitive channel data
-pushpin.security.encryption.enabled=false
-pushpin.security.encryption.algorithm=AES/GCM/NoPadding
-pushpin.security.encryption.secretKey=
-
-# Multi-server ZMQ configuration
-pushpin.zmqEnabled=false
-pushpin.zmqHwm=1000
-pushpin.zmqLinger=0
-
-# Pushpin discovery configuration
-pushpin.discovery.enabled=true
-pushpin.discovery.refreshInterval=60s
-pushpin.discovery.configuration.enabled=true
-pushpin.discovery.aws.enabled=false
-pushpin.discovery.aws.region=us-east-1
-pushpin.discovery.aws.tagKey=service
-pushpin.discovery.aws.tagValue=pushpin
-pushpin.discovery.kubernetes.enabled=false
-pushpin.discovery.kubernetes.namespace=default
-pushpin.discovery.kubernetes.labelSelector=app=pushpin
+```mermaid
+graph LR
+    subgraph "Client Layer"
+        C1[Browser 1]
+        C2[Browser 2]
+        CN[Browser N]
+    end
+    
+    subgraph "Pushpin Proxy Layer"
+        P1[Pushpin Server 1<br/>:7999]
+        P2[Pushpin Server 2<br/>:7998]
+        PN[Pushpin Server N<br/>:xxxx]
+    end
+    
+    subgraph "Management Layer"
+        PT[Pushpin Toolbox<br/>:8080]
+        HM[Health Monitor]
+        LB[Load Balancer]
+        SD[Service Discovery<br/>AWS/K8s]
+    end
+    
+    subgraph "Application Layer"
+        A1[Your App 1]
+        A2[Your App 2]
+        AN[Your App N]
+    end
+    
+    C1 -.->|SSE/WebSocket| P1
+    C2 -.->|SSE/WebSocket| P2
+    CN -.->|SSE/WebSocket| PN
+    
+    A1 -->|POST /publish| PT
+    A2 -->|POST /publish| PT
+    AN -->|POST /publish| PT
+    
+    PT -->|HTTP/ZMQ| P1
+    PT -->|HTTP/ZMQ| P2
+    PT -->|HTTP/ZMQ| PN
+    
+    HM -.->|Health Checks| P1
+    HM -.->|Health Checks| P2
+    HM -.->|Health Checks| PN
+    
+    SD -.->|Discover| P1
+    SD -.->|Discover| P2
+    SD -.->|Discover| PN
+    
+    style PT fill:#f9f,stroke:#333,stroke-width:4px
+    style P1 fill:#bbf,stroke:#333,stroke-width:2px
+    style P2 fill:#bbf,stroke:#333,stroke-width:2px
+    style PN fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
-For more details on the discovery system, see the [Discovery System Documentation](src/main/kotlin/io/github/mpecan/pmt/discovery/README.md).
+### Message Flow
 
-## Usage
+```mermaid
+sequenceDiagram
+    participant App as Your Application
+    participant Toolbox as Pushpin Toolbox
+    participant Pushpin1 as Pushpin Server 1
+    participant Pushpin2 as Pushpin Server 2
+    participant Client1 as Client (Channel A)
+    participant Client2 as Client (Channel A)
+    
+    App->>Toolbox: POST /api/pushpin/publish<br/>{"channel": "A", "data": "Hello"}
+    Toolbox->>Toolbox: Check healthy servers
+    par Broadcast to all servers
+        Toolbox->>Pushpin1: Publish message (HTTP/ZMQ)
+    and
+        Toolbox->>Pushpin2: Publish message (HTTP/ZMQ)
+    end
+    Toolbox->>App: 200 OK {"success": true}
+    
+    par Push to connected clients
+        Pushpin1->>Client1: SSE: data: {"message": "Hello"}
+    and
+        Pushpin2->>Client2: SSE: data: {"message": "Hello"}
+    end
+```
 
-### Publishing Messages
+All of this can also be easily accomplished directly within your application code by using the libraries that the server is built on, but this toolbox provides a ready-to-use solution that handles the complexity of managing multiple Pushpin servers.
 
-To publish a message to a channel:
+**Key Benefits:**
+- **Stateless Applications** - Just POST messages, no connection management
+- **Automatic Failover** - Health monitoring routes around failed servers
+- **Horizontal Scaling** - Add more Pushpin servers as needed
+- **Unified API** - Single endpoint for all publishing needs
+- **Service Discovery** - Automatically find Pushpin servers in AWS/Kubernetes
+
+## Quick Start (2 Minutes)
+
+### Prerequisites
+- Docker & Docker Compose
+- Java 17+
+
+### 1. Clone and Start Everything
 
 ```bash
+# Clone the repository
+git clone https://github.com/mpecan/pushpin-missing-toolbox.git
+cd pushpin-missing-toolbox
+
+# Start Pushpin servers and the toolbox
+docker-compose up -d
+
+# Wait for services to be ready
+sleep 10
+```
+
+### 2. Test - Send Your First Message
+
+```bash
+# Publish a message
 curl -X POST http://localhost:8080/api/pushpin/publish \
   -H "Content-Type: application/json" \
   -d '{
     "channel": "test-channel",
-    "data": {
-      "message": "Hello, World!"
-    }
+    "data": {"message": "Hello, Realtime World!"}
   }'
 ```
 
-Or using the channel-specific endpoint:
+### 3. Test - Receive Messages in Real-Time
+
+Open a new terminal and subscribe to the channel:
 
 ```bash
-curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Hello, World!"
-  }'
+# Subscribe to receive messages (SSE)
+curl -N http://localhost:7999/api/events/test-channel
 ```
 
-### Subscribing to Events
+Now send another message from the first terminal - you'll see it appear instantly!
 
-To subscribe to a channel using Server-Sent Events:
+### That's It! 🎉
 
-```javascript
-const eventSource = new EventSource('http://localhost:8080/api/events/test-channel');
+You now have:
+- 2 Pushpin servers running (ports 7999, 7998)
+- Pushpin Toolbox managing them (port 8080)
+- Automatic health monitoring and load balancing
+- A working realtime messaging system
 
-eventSource.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log('Received message:', data);
-};
+### What Just Happened?
 
-eventSource.addEventListener('custom-event', (event) => {
-  const data = JSON.parse(event.data);
-  console.log('Received custom event:', data);
-});
+1. **docker-compose** started 2 Pushpin servers and configured them
+2. Your message was sent to the Toolbox
+3. Toolbox distributed it to all Pushpin servers
+4. Pushpin pushed it to all connected clients instantly
 
-eventSource.onerror = (error) => {
-  console.error('EventSource error:', error);
-  eventSource.close();
-};
+### Next Steps
+
+- Try the [Full Installation Guide](#installation) for production setup
+- See [Configuration](#configuration) for customization
+- Check [Examples](#examples) for real-world use cases
+
+## API Reference
+
+### Core Endpoints
+
+#### Publish Message
+
+```http
+POST /api/pushpin/publish
+Content-Type: application/json
+
+{
+  "channel": "string",
+  "data": "object",
+  "eventType": "string (optional)",
+  "id": "string (optional)",
+  "prevId": "string (optional)"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Message published successfully",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "message": "Failed to publish message",
+  "error": "No healthy servers available",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+**Status Codes:**
+- `200 OK` - Message published successfully
+- `400 Bad Request` - Invalid request body
+- `401 Unauthorized` - Authentication required
+- `429 Too Many Requests` - Rate limit exceeded
+- `500 Internal Server Error` - Server error
+
+#### Publish to Specific Channel
+
+```http
+POST /api/pushpin/publish/{channel}
+Content-Type: application/json
+
+{
+  "message": "Hello, World!",
+  "any": "other fields"
+}
+```
+
+Query Parameters:
+- `event` (optional) - Event type for SSE
+
+#### Subscribe to Channel (SSE)
+
+```http
+GET /api/events/{channel}
+Accept: text/event-stream
+```
+
+**Response:** Server-Sent Events stream
+```
+data: {"message": "Connected to channel"}
+
+event: custom-event
+data: {"type": "notification", "content": "New message"}
+
+data: {"message": "Hello, World!"}
 ```
 
 ### Server Management
 
-To get information about all configured Pushpin servers:
+#### List All Servers
 
-```bash
-curl http://localhost:8080/api/pushpin/servers
+```http
+GET /api/pushpin/servers
 ```
 
-To get information about healthy Pushpin servers:
-
-```bash
-curl http://localhost:8080/api/pushpin/servers/healthy
+**Response:**
+```json
+[
+  {
+    "id": "pushpin-1",
+    "host": "pushpin-1",
+    "port": 7999,
+    "controlPort": 5564,
+    "publishPort": 5560,
+    "active": true,
+    "weight": 100,
+    "healthCheckPath": "/status"
+  }
+]
 ```
 
-## Security Features
+#### List Healthy Servers
 
-### Authentication
-
-The system supports multiple authentication methods:
-
-#### Token-based Authentication
-
-1. Set `pushpin.authEnabled=true` in the application.properties file
-2. Set a secure value for `pushpin.authSecret`
-3. Include the `X-Pushpin-Auth` header with the secret value in your requests
-
-Example:
-
-```bash
-curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
-  -H "Content-Type: application/json" \
-  -H "X-Pushpin-Auth: your-secret-here" \
-  -d '{
-    "message": "Hello, World!"
-  }'
+```http
+GET /api/pushpin/servers/healthy
 ```
 
-#### JWT Authentication
+#### Get Server by ID
 
-For more robust authentication using JWT tokens:
+```http
+GET /api/pushpin/servers/{id}
+```
 
-1. Set `pushpin.authEnabled=true` in the application.properties file
-2. Set `pushpin.security.jwt.enabled=true`
-3. Configure JWT properties (provider, issuer, audience, etc.)
-4. Include the JWT token in the `Authorization` header
+### Monitoring Endpoints
 
-The system supports multiple JWT providers:
+#### Metrics Summary
 
-##### Symmetric Key (Development/Testing)
+```http
+GET /api/metrics/summary
+```
+
+**Response:**
+```json
+{
+  "messages": {
+    "sent": 1500,
+    "received": 1200,
+    "errors": 5,
+    "errorRate": 0.33
+  },
+  "servers": {
+    "pushpin-1": {
+      "healthy": true,
+      "host": "pushpin-1",
+      "port": 7999
+    }
+  },
+  "activeConnections": {
+    "websocket": 45,
+    "sse": 120
+  }
+}
+```
+
+### Authentication Headers
+
+When authentication is enabled:
+
+**Token-based:**
+```http
+X-Pushpin-Auth: your-secret-token
+```
+
+**JWT:**
+```http
+Authorization: Bearer your.jwt.token
+```
+
+**HMAC (Server-to-Server):**
+```http
+X-Pushpin-Signature: hmac-sha256-signature
+X-Pushpin-Timestamp: 1705316400000
+```
+
+## Installation
+
+### Docker Compose (Recommended)
+
+The fastest way to get started is with the included `docker-compose.yml`:
+
+```bash
+# Start everything (Pushpin servers + Toolbox)
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f
+
+# Stop everything
+docker-compose down
+```
+
+### Standalone JAR
+
+For production deployments:
+
+```bash
+# Build the JAR
+./gradlew bootJar
+
+# Run with external configuration
+java -jar server/build/libs/pushpin-missing-toolbox-*.jar \
+  --spring.config.location=./application-prod.properties
+```
+
+### Kubernetes
+
+See [deployment/kubernetes/](deployment/kubernetes/) for Helm charts and manifests.
+
+### AWS ECS/Fargate
+
+See [deployment/aws/](deployment/aws/) for CloudFormation templates.
+
+## Configuration
+
+### Minimal Configuration
+
+For a basic setup with 2 local Pushpin servers:
 
 ```properties
+# application.properties
+server.port=8080
+
+# Pushpin servers
+pushpin.servers[0].id=pushpin-1
+pushpin.servers[0].host=localhost
+pushpin.servers[0].port=7999
+
+pushpin.servers[1].id=pushpin-2
+pushpin.servers[1].host=localhost
+pushpin.servers[1].port=7998
+
+# Enable health checks
+pushpin.healthCheckEnabled=true
+```
+
+### Common Configurations
+
+#### Single Server
+```properties
+pushpin.servers[0].id=pushpin-main
+pushpin.servers[0].host=pushpin.example.com
+pushpin.servers[0].port=7999
+```
+
+#### With Authentication
+```properties
+# Enable token auth
+pushpin.authEnabled=true
+pushpin.authSecret=your-secret-key
+
+# OR enable JWT
+pushpin.security.jwt.enabled=true
 pushpin.security.jwt.provider=symmetric
-pushpin.security.jwt.secret=your-secret-key-at-least-32-chars-long
-pushpin.security.jwt.issuer=pushpin-missing-toolbox
-pushpin.security.jwt.audience=pushpin-client
+pushpin.security.jwt.secret=your-256-bit-secret-key
 ```
 
-For testing with the symmetric provider, you can get a token:
-
-```bash
-# Get JWT token
-curl -X POST http://localhost:8080/api/auth/token \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "your-username",
-    "password": "your-password"
-  }'
-```
-
-##### Keycloak Integration
-
+#### With AWS Discovery
 ```properties
-pushpin.security.jwt.provider=keycloak
-pushpin.security.jwt.jwksUri=https://your-keycloak-server/auth/realms/your-realm/protocol/openid-connect/certs
-pushpin.security.jwt.issuer=https://your-keycloak-server/auth/realms/your-realm
-pushpin.security.jwt.audience=your-client-id
+pushpin.discovery.enabled=true
+pushpin.discovery.aws.enabled=true
+pushpin.discovery.aws.region=us-east-1
+pushpin.discovery.aws.tags.service=pushpin
 ```
 
-##### Auth0 Integration
+### Full Configuration
 
-```properties
-pushpin.security.jwt.provider=auth0
-pushpin.security.jwt.jwksUri=https://your-auth0-tenant.auth0.com/.well-known/jwks.json
-pushpin.security.jwt.issuer=https://your-auth0-tenant.auth0.com/
-pushpin.security.jwt.audience=your-api-identifier
+For all available options, see [docs/Configuration.md](docs/Configuration.md) or check the fully documented [application.properties](server/src/main/resources/application.properties).
+
+## Examples
+
+### Live Dashboard
+
+Create a real-time dashboard that updates all connected clients:
+
+```javascript
+// Client-side: Subscribe to metrics
+const eventSource = new EventSource('/api/events/metrics');
+
+eventSource.onmessage = (event) => {
+  const metrics = JSON.parse(event.data);
+  updateDashboard(metrics);
+};
+
+// Server-side: Publish metrics every second
+setInterval(() => {
+  fetch('http://localhost:8080/api/pushpin/publish/metrics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      cpu: getCpuUsage(),
+      memory: getMemoryUsage(),
+      requests: getRequestCount()
+    })
+  });
+}, 1000);
 ```
 
-Using the JWT token:
+### Chat Application
 
-```bash
-# Use the JWT token to authenticate requests
-curl -X POST http://localhost:8080/api/pushpin/publish/test-channel \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-jwt-token-here" \
-  -d '{
-    "message": "Hello, World!"
-  }'
+Simple chat room with user presence:
+
+```javascript
+// Join chat
+fetch('/api/pushpin/publish/chat?event=user-joined', {
+  method: 'POST',
+  body: JSON.stringify({ user: 'Alice', timestamp: new Date() })
+});
+
+// Send message
+fetch('/api/pushpin/publish/chat?event=message', {
+  method: 'POST',
+  body: JSON.stringify({ 
+    user: 'Alice', 
+    message: 'Hello everyone!',
+    timestamp: new Date()
+  })
+});
+
+// Client receives typed events
+eventSource.addEventListener('user-joined', (e) => {
+  showNotification(`${JSON.parse(e.data).user} joined`);
+});
+
+eventSource.addEventListener('message', (e) => {
+  displayMessage(JSON.parse(e.data));
+});
 ```
 
-### Channel Permissions
+### IoT Sensor Streaming
 
-The system supports fine-grained permissions for channel operations:
+Stream sensor data to monitoring dashboards:
 
-- **READ**: Ability to subscribe to a channel
-- **WRITE**: Ability to publish messages to a channel
-- **ADMIN**: Full administrative access to a channel
+```python
+import requests
+import json
+from datetime import datetime
 
-Permissions can be granted to specific users or roles:
-
-```bash
-# Grant permissions to a user
-curl -X POST http://localhost:8080/api/auth/permissions/user \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer admin-jwt-token" \
-  -d '{
-    "username": "some-user",
-    "channelId": "some-channel",
-    "permissions": ["READ", "WRITE"]
-  }'
-
-# Grant permissions to a role
-curl -X POST http://localhost:8080/api/auth/permissions/role \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer admin-jwt-token" \
-  -d '{
-    "role": "ROLE_USER",
-    "channelId": "some-channel",
-    "permissions": ["READ"]
-  }'
+# Sensor publishes readings
+def publish_sensor_data(sensor_id, temperature, humidity):
+    requests.post(
+        'http://localhost:8080/api/pushpin/publish',
+        json={
+            'channel': f'sensors/{sensor_id}',
+            'data': {
+                'temperature': temperature,
+                'humidity': humidity,
+                'timestamp': datetime.now().isoformat()
+            },
+            'id': str(uuid.uuid4()),  # For message ordering
+            'prevId': last_message_id
+        }
+    )
 ```
 
-### Rate Limiting
+For more examples, see [docs/Examples.md](docs/Examples.md).
 
-To prevent abuse, you can enable rate limiting:
+## Project Structure
 
-1. Set `pushpin.security.rateLimit.enabled=true`
-2. Configure the capacity and refill time
-
-The system will automatically limit the number of requests per user or IP address.
-
-### Server-to-Server HMAC Signatures
-
-For secure server-to-server communication, you can enable HMAC signature verification:
-
-1. Set `pushpin.security.hmac.enabled=true`
-2. Configure a secure secret key
-3. Include the following headers in server-to-server requests:
-   - `X-Pushpin-Signature`: HMAC signature of the request body
-   - `X-Pushpin-Timestamp`: Current timestamp
-
-### Encryption for Sensitive Channel Data
-
-For channels that contain sensitive information, you can enable encryption:
-
-1. Set `pushpin.security.encryption.enabled=true`
-2. Configure an encryption secret key
-
-The system will automatically encrypt message content before publishing and decrypt it when retrieving.
-
-### Audit Logging
-
-The system includes comprehensive audit logging for security events:
-
-1. Set `pushpin.security.auditLogging.enabled=true`
-2. Choose a logging level (INFO, DEBUG, WARN, ERROR)
-
-Security events are logged with detailed information about the user, IP address, resource, and action.
-
-## Multi-Server ZMQ Configuration
-
-The application supports publishing messages to multiple Pushpin servers using ZeroMQ (ZMQ) for improved reliability and scalability. By default, this feature is disabled for backward compatibility, but it can be enabled with the following configuration:
-
-```properties
-# Enable ZMQ for multi-server communication
-pushpin.zmqEnabled=true
-
-# Choose the socket type based on your needs
-# PUB (default): broadcast messages to all servers (recommended for most cases)
-# PUSH: distribute messages using load balancing (one server gets each message)
-pushpin.zmqSocketType=PUB
-
-# Configure ZMQ performance parameters
-pushpin.zmqHwm=1000    # High water mark (max queued messages)
-pushpin.zmqLinger=0    # Linger time in ms (how long to wait for pending messages on close)
-```
-
-When ZMQ is enabled, the application will:
-
-1. Connect to all active Pushpin servers simultaneously
-2. Publish messages to all servers via ZMQ using the selected socket type
-3. Ensure message delivery across the entire server cluster
-
-This is particularly useful in high-availability setups where clients might be connected to different Pushpin instances, and you need to ensure all clients receive all messages regardless of which server they're connected to.
-
-## Modules
-
-### pushpin-metrics-core
-
-The metrics core module provides a pluggable metrics collection system that automatically uses Micrometer when available on the classpath, or falls back to a no-op implementation. This allows libraries to collect metrics without forcing a dependency on Micrometer.
-
-Features:
-- Automatic implementation selection based on classpath
-- Low-cardinality metrics design (no high-dimensionality tags like channel names)
-- Transport-level and server-level metrics
-- Spring Boot autoconfiguration support
-
-For detailed documentation, see the pushpin-metrics-core module documentation.
+- `server/` - Main Spring Boot application
+  - `src/main/kotlin/io/github/mpecan/pmt/model` - Data models
+  - `src/main/kotlin/io/github/mpecan/pmt/config` - Configuration classes
+  - `src/main/kotlin/io/github/mpecan/pmt/service` - Services for managing Pushpin servers
+  - `src/main/kotlin/io/github/mpecan/pmt/controller` - REST controllers
+  - `src/main/kotlin/io/github/mpecan/pmt/security` - Security components
+  - `src/main/kotlin/io/github/mpecan/pmt/health` - Health check components
+- `discovery/` - Core discovery interfaces and configuration-based implementation
+- `discovery-aws/` - AWS EC2 and Auto Scaling Group discovery module
+- `discovery-kubernetes/` - Kubernetes pod and service discovery module
+- `pushpin-api/` - GRIP protocol implementation library
+- `pushpin-client/` - Client library for publishing messages to Pushpin
 
 ## Development
-
-### Project Structure
-
-- `src/main/kotlin/io/github/mpecan/pmt/model` - Data models
-- `src/main/kotlin/io/github/mpecan/pmt/config` - Configuration classes
-- `src/main/kotlin/io/github/mpecan/pmt/service` - Services for managing Pushpin servers
-- `src/main/kotlin/io/github/mpecan/pmt/controller` - REST controllers
-- `src/main/kotlin/io/github/mpecan/pmt/discovery` - Extensible server discovery system
-- `pushpin-metrics-core` - Metrics collection library with optional Micrometer support
 
 ### Building
 
@@ -399,6 +578,29 @@ For detailed documentation, see the pushpin-metrics-core module documentation.
 ./gradlew test
 ```
 
+### Running Locally
+
+```bash
+# With Docker Compose (includes Pushpin servers)
+docker-compose up -d
+
+# Or standalone (requires external Pushpin servers)
+./gradlew bootRun
+```
+
+## Documentation
+
+- [API Reference](docs/API.md) - Complete API documentation
+- [Configuration Guide](docs/Configuration.md) - All configuration options
+- [Testing Guide](docs/Testing.md) - Integration testing with Testcontainers
+- [Examples](docs/Examples.md) - Real-world usage examples
+- [AWS Discovery](pushpin-discovery-aws/README.md) - AWS integration guide
+- [Kubernetes Discovery](pushpin-discovery-kubernetes/README.md) - K8s integration guide
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
+
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

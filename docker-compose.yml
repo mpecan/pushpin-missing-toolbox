@@ -11,8 +11,6 @@ services:
       - "5563:5563"  # ZMQ SUB socket
     volumes:
       - ./config/pushpin-1:/etc/pushpin
-    environment:
-      - GRIP_URL=http://app:8080/api/pushpin
     networks:
       - pushpin-network
 
@@ -26,8 +24,6 @@ services:
       - "6563:5563"  # ZMQ SUB socket
     volumes:
       - ./config/pushpin-2:/etc/pushpin
-    environment:
-      - GRIP_URL=http://app:8080/api/pushpin
     networks:
       - pushpin-network
 
@@ -44,7 +40,6 @@ services:
       - pushpin-network
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - PUSHPIN_SERVERS=pushpin-1:7999,pushpin-2:7999
 
 networks:
   pushpin-network:

@@ -1,107 +1,133 @@
 package io.github.mpecan.pmt.testcontainers
 
 import org.springframework.test.context.DynamicPropertyRegistry
-import org.testcontainers.containers.Network
 
 /**
- * Utility class for setting up testcontainers.
+ * Utility class for integrating Pushpin testcontainers with Spring Boot tests.
+ * * This utility provides convenient methods to:
+ * - Create pre-configured Pushpin containers
+ * - Configure Spring Boot properties to connect to Pushpin containers
+ * - Support both single and multi-server test scenarios
+ * * The utility automatically configures all necessary Spring properties including
+ * server endpoints, ports, health checks, and test-specific settings.
+ * * Example usage for single server:
+ * ```kotlin
+ * @Container
+ * val pushpinContainer = TestcontainersUtils.createPushpinContainer(8080)
+ * * @DynamicPropertySource
+ * fun configureProperties(registry: DynamicPropertyRegistry) {
+ *     TestcontainersUtils.configurePushpinProperties(registry, pushpinContainer)
+ *     registry.add("server.port") { 8080 }
+ * }
+ * ```
+ * * Example usage for multiple servers:
+ * ```kotlin
+ * @DynamicPropertySource
+ * fun configureProperties(registry: DynamicPropertyRegistry) {
+ *     TestcontainersUtils.configureMultiplePushpinProperties(
+ *         registry, *         listOf(container1, container2),
+ *         zmqEnabled = true
+ *     )
+ * }
+ * ```
  */
 object TestcontainersUtils {
+
     /**
-     * Creates a new Pushpin container.
+     * Creates a new Pushpin container configured for the given host application port.
+     * * This is a convenience method that creates a container with:
+     * - The specified host application port exposed
+     * - A simple catch-all route ("*") to the host application
+     * - Default configuration suitable for testing
+     * * @param hostPort The port your Spring Boot application runs on
+     * @return A configured PushpinContainer ready to start
      */
     fun createPushpinContainer(hostPort: Int): PushpinContainer {
-        return PushpinContainer().withHostPort(hostPort)
+        return PushpinContainerBuilder()
+            .withHostApplicationPort(hostPort)
+            .withSimpleHostRoute()
+            .build()
     }
 
     /**
-     * Creates multiple Pushpin containers with a shared network.
-     */
-    fun createMultiplePushpinContainers(hostPorts: List<Int>, network: Network? = null): List<PushpinContainer> {
-        return hostPorts.mapIndexed { index, hostPort ->
-            val container = PushpinContainer()
-                .withHostPort(hostPort)
-
-            // If network is provided, add the container to the network
-            if (network != null) {
-                container.withNetwork(network)
-                    .withNetworkAliases("pushpin-$index")
-            }
-
-            container
-        }
-    }
-
-    /**
-     * Configures Spring Boot application properties to use the Pushpin container.
+     * Configures Spring Boot application properties for a single Pushpin container.
+     * * This method sets up all necessary Spring properties to connect your application
+     * to the Pushpin container, including:
+     * - Server connection details (host, ports)
+     * - Health check configuration
+     * - Test mode settings
+     * - Default timeouts
+     * * The configured server will have ID "pushpin-test" at index 0.
+     * * @param registry The Spring dynamic property registry
+     * @param pushpinContainer The Pushpin container to configure properties for
      */
     fun configurePushpinProperties(registry: DynamicPropertyRegistry, pushpinContainer: PushpinContainer) {
-        // Configure a single Pushpin server - using localhost for consistent connectivity
-        registry.add("pushpin.servers[0].id") { "pushpin-test" }
-        registry.add("pushpin.servers[0].host") { "localhost" } // Always use localhost for tests
-        registry.add("pushpin.servers[0].port") { pushpinContainer.getMappedPort(PushpinContainer.HTTP_PORT) }
-        registry.add("pushpin.servers[0].publishPort") { pushpinContainer.getMappedPort(PushpinContainer.PUBLISH_PORT) }
-        registry.add("pushpin.servers[0].controlPort") { pushpinContainer.getMappedPort(PushpinContainer.CONTROL_PORT) }
-        registry.add("pushpin.servers[0].httpPort") { pushpinContainer.getMappedPort(PushpinContainer.XPUB_PORT) }
-        registry.add("pushpin.servers[0].active") { true }
-
-        // Enable health checks
-        registry.add("pushpin.health-check-enabled") { true }
-        registry.add("pushpin.health-check-interval") { 5000 }
-
-        // Set a shorter timeout for tests
-        registry.add("pushpin.default-timeout") { 10000 } // Increased timeout for reliability
-
-        // Enable test mode
-        registry.add("pushpin.test-mode") { true }
-
-        // Log the configuration
-        println("Configured Pushpin test server:")
-        println("  Host: localhost")
-        println("  HTTP Port: ${pushpinContainer.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        println("  Publish Port: ${pushpinContainer.getMappedPort(PushpinContainer.PUBLISH_PORT)}")
-        println("  Control Port: ${pushpinContainer.getMappedPort(PushpinContainer.XPUB_PORT)}")
+        configurePushpinServer(registry, pushpinContainer, 0)
+        configureCommonProperties(registry)
     }
 
     /**
-     * Configures Spring Boot application properties to use multiple Pushpin containers.
+     * Configures Spring Boot application properties for multiple Pushpin containers.
+     * * This method sets up a multi-server Pushpin configuration, useful for testing:
+     * - Load balancing scenarios
+     * - Failover behavior
+     * - Multi-region setups
+     * - ZMQ vs HTTP transport comparison
+     * * Each container is assigned:
+     * - A unique server ID (pushpin-test-0, pushpin-test-1, etc.)
+     * - Its own index in the servers array
+     * - All necessary connection properties
+     * * @param registry The Spring dynamic property registry
+     * @param pushpinContainers List of Pushpin containers to configure
+     * @param zmqEnabled Whether to enable ZMQ transport (default: true). *                   Set to false to use HTTP transport only.
      */
     fun configureMultiplePushpinProperties(
         registry: DynamicPropertyRegistry,
         pushpinContainers: List<PushpinContainer>,
         zmqEnabled: Boolean = true,
     ) {
-        // Configure multiple Pushpin servers
         pushpinContainers.forEachIndexed { index, container ->
-            // Use a unique ID based on the index
-            val serverId = "pushpin-test-$index"
-            registry.add("pushpin.servers[$index].id") { serverId }
-
-            // Use localhost for connecting to the container
-            registry.add("pushpin.servers[$index].host") { "localhost" }
-            registry.add("pushpin.servers[$index].port") { container.getHttpPort() }
-            registry.add("pushpin.servers[$index].publishPort") { container.getPublishPort() }
-            registry.add("pushpin.servers[$index].controlPort") { container.getControlPort() }
-            registry.add("pushpin.servers[$index].httpPort") { container.getHttpPublishPort() }
-            registry.add("pushpin.servers[$index].active") { true }
-
-            println(
-                "Configured Pushpin server: $serverId with ports: HTTP=${container.getHttpPort()}, " +
-                    "Publish=${container.getPublishPort()}, Control=${container.getControlPort()}",
-            )
+            configurePushpinServer(registry, container, index)
         }
 
+        configureCommonProperties(registry)
+        registry.add("pushpin.zmq-enabled") { zmqEnabled }
+    }
+
+    /**
+     * Configures a single Pushpin server at the specified index.
+     * This method encapsulates the common pattern of configuring server properties.
+     */
+    private fun configurePushpinServer(registry: DynamicPropertyRegistry, container: PushpinContainer, index: Int) {
+        val serverId = if (index == 0) "pushpin-test" else "pushpin-test-$index"
+
+        registry.add("pushpin.servers[$index].id") { serverId }
+        registry.add("pushpin.servers[$index].host") { "localhost" }
+        registry.add("pushpin.servers[$index].port") { container.getHttpPort() }
+        registry.add("pushpin.servers[$index].publishPort") { container.getPublishPort() }
+        registry.add("pushpin.servers[$index].controlPort") { container.getControlPort() }
+        registry.add("pushpin.servers[$index].httpPort") { container.getHttpPublishPort() }
+        registry.add("pushpin.servers[$index].active") { true }
+
+        println(
+            "Configured Pushpin server: $serverId with ports: HTTP=${container.getHttpPort()}, " +
+                "Publish=${container.getPublishPort()}, Control=${container.getControlPort()}, " +
+                "HttpPublish=${container.getHttpPublishPort()}",
+        )
+    }
+
+    /**
+     * Configures common properties for all test scenarios.
+     */
+    private fun configureCommonProperties(registry: DynamicPropertyRegistry) {
         // Enable health checks
         registry.add("pushpin.health-check-enabled") { true }
         registry.add("pushpin.health-check-interval") { 5000 }
 
-        // Set a shorter timeout for tests
-        registry.add("pushpin.default-timeout") { 2000 }
+        // Set timeouts for tests
+        registry.add("pushpin.default-timeout") { 10000 }
 
         // Enable test mode
         registry.add("pushpin.test-mode") { true }
-
-        // Enable ZMQ for multi-server setup
-        registry.add("pushpin.zmq-enabled") { zmqEnabled }
     }
 }

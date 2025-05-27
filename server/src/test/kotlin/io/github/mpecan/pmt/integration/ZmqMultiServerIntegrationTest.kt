@@ -4,7 +4,7 @@ import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.service.PushpinService
-import io.github.mpecan.pmt.testcontainers.PushpinContainer
+import io.github.mpecan.pmt.testcontainers.PushpinContainerBuilder
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -54,16 +54,20 @@ class ZmqMultiServerIntegrationTest {
         // Create individual Pushpin containers with shared network
         @Container
         @JvmStatic
-        private val pushpinContainer1 = PushpinContainer()
+        private val pushpinContainer1 = PushpinContainerBuilder()
+            .withHostApplicationPort(serverPort)
+            .withSimpleHostRoute()
+            .build()
             .withNetwork(network)
-            .withHostPort(serverPort)
             .withNetworkAliases("pushpin-0")
 
         @Container
         @JvmStatic
-        private val pushpinContainer2 = PushpinContainer()
+        private val pushpinContainer2 = PushpinContainerBuilder()
+            .withHostApplicationPort(serverPort)
+            .withSimpleHostRoute()
+            .build()
             .withNetwork(network)
-            .withHostPort(serverPort)
             .withNetworkAliases("pushpin-1")
 
         // List of containers for convenience
@@ -124,7 +128,7 @@ class ZmqMultiServerIntegrationTest {
         clients.forEach { client ->
             try {
                 client.closeAllConnections()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore exceptions during cleanup
             }
         }
@@ -142,17 +146,13 @@ class ZmqMultiServerIntegrationTest {
         val client2Messages = Collections.synchronizedList(mutableListOf<String>())
 
         // Create WebSocket clients - one for each Pushpin server
-        val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+        val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getHttpPort()}")
+        val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getHttpPort()}")
         println(
-            "Created WebSocket client 1 connecting to ws://localhost:${pushpinContainer1.getMappedPort(
-                PushpinContainer.HTTP_PORT,
-            )}",
+            "Created WebSocket client 1 connecting to ws://localhost:${pushpinContainer1.getHttpPort()}",
         )
         println(
-            "Created WebSocket client 2 connecting to ws://localhost:${pushpinContainer2.getMappedPort(
-                PushpinContainer.HTTP_PORT,
-            )}",
+            "Created WebSocket client 2 connecting to ws://localhost:${pushpinContainer2.getHttpPort()}",
         )
 
         // Add clients to the cleanup list
@@ -283,8 +283,8 @@ class ZmqMultiServerIntegrationTest {
         val client2Messages = Collections.synchronizedList(mutableListOf<String>())
 
         // Create WebSocket clients - one for each Pushpin server
-        val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+        val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getHttpPort()}")
+        val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getHttpPort()}")
         println("Created WebSocket clients for multiple message test")
 
         // Add clients to the cleanup list
@@ -415,8 +415,8 @@ class ZmqMultiServerIntegrationTest {
         val client2Messages = Collections.synchronizedList(mutableListOf<String>())
 
         // Create WebSocket clients connected to different servers but subscribed to different channels
-        val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}")
-        val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}")
+        val client1 = WebSocketClient("ws://localhost:${pushpinContainer1.getHttpPort()}")
+        val client2 = WebSocketClient("ws://localhost:${pushpinContainer2.getHttpPort()}")
         println("Created WebSocket clients for separate channel test")
 
         // Add clients to the cleanup list
@@ -534,10 +534,10 @@ class ZmqMultiServerIntegrationTest {
             println("Testing channel isolation...")
 
             val crossClient1 = WebSocketClient(
-                "ws://localhost:${pushpinContainer1.getMappedPort(PushpinContainer.HTTP_PORT)}",
+                "ws://localhost:${pushpinContainer1.getHttpPort()}",
             )
             val crossClient2 = WebSocketClient(
-                "ws://localhost:${pushpinContainer2.getMappedPort(PushpinContainer.HTTP_PORT)}",
+                "ws://localhost:${pushpinContainer2.getHttpPort()}",
             )
             this.clients.add(crossClient1)
             this.clients.add(crossClient2)

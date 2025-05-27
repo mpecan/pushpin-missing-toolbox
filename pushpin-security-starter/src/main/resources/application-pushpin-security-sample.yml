@@ -1,0 +1,133 @@
+# Sample configuration for Pushpin Security Starter
+# Copy and modify these properties to your application.yml
+
+# =============================================================================
+# PUSHPIN SECURITY CONFIGURATION
+# =============================================================================
+
+pushpin:
+  # Global security settings
+  auth-enabled: true
+  
+  security:
+    enabled: true
+    # =============================================================================
+    # REMOTE AUTHORIZATION
+    # =============================================================================
+    
+    # Enable remote authorization service
+    remote:
+      enabled: false
+      base-url: https://auth.example.com
+      timeout: 30000
+      retry-attempts: 3
+      retry-delay-ms: 1000
+      
+      # Authorization cache settings
+      cache:
+        enabled: true
+        max-size: 1000
+        expire-after-write-minutes: 5
+        expire-after-access-minutes: 10
+    
+    # =============================================================================
+    # AUDIT LOGGING
+    # =============================================================================
+    
+    # Enable audit logging
+    audit:
+      enabled: true
+      include-sensitive-data: false
+      max-event-length: 1000
+    
+    # =============================================================================
+    # DATA ENCRYPTION
+    # =============================================================================
+    
+    # Enable encryption for sensitive data
+    encryption:
+      enabled: false
+      algorithm: AES/GCM/NoPadding
+      key-size: 256
+      # WARNING: Never commit secrets to version control!
+      # Use environment variables: ${ENCRYPTION_SECRET_KEY}
+      secret-key: 
+    
+    # =============================================================================
+    # HMAC SIGNING
+    # =============================================================================
+    
+    # Enable HMAC signing for server-to-server communication
+    hmac:
+      enabled: false
+      algorithm: HmacSHA256
+      header-name: X-Pushpin-Signature
+      max-age-ms: 300000
+      # WARNING: Never commit secrets to version control!
+      # Use environment variables: ${HMAC_SECRET_KEY}
+      secret-key: 
+      
+      # Paths excluded from HMAC verification
+      excluded-paths:
+        - /api/public/
+        - /actuator/
+        - /api/pushpin/auth
+    
+    # =============================================================================
+    # JWT PROCESSING
+    # =============================================================================
+    
+    # Enable JWT authentication
+    jwt:
+      enabled: true
+      
+      # JWT Provider configuration
+      # Options: symmetric, keycloak, auth0, okta, oauth2
+      provider: symmetric
+      
+      # For symmetric provider (development/testing)
+      # WARNING: Never commit secrets to version control!
+      # Use environment variables: ${JWT_SECRET_KEY}
+      # Minimum 32 characters required
+      secret: your-jwt-secret-at-least-32-characters-long
+      
+      # For OAuth2 providers (production)
+      # jwks-uri: https://your-provider.com/.well-known/jwks.json
+      
+      # JWT validation settings
+      issuer: 
+      audience: 
+      
+      # Authority extraction from JWT
+      authorities-claim: scope
+      authorities-prefix: SCOPE_
+      
+      # Channel subscription extraction from JWT
+      claim-extraction:
+        enabled: false
+        extract-claims:
+          - $.channels
+
+# =============================================================================
+# SPRING SECURITY INTEGRATION
+# =============================================================================
+
+# Disable Spring Security's default behavior if needed
+# spring:
+#   security:
+#     user:
+#       name: admin
+#       password: admin
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+
+# Enable debug logging for security modules (development only)
+# logging:
+#   level:
+#     io.github.mpecan.pmt.security: DEBUG
+#   
+#   # Audit log pattern (optional)
+#   pattern:
+#     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
