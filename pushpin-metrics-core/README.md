@@ -19,7 +19,7 @@ Add the following to your `build.gradle.kts`:
 ```kotlin
 dependencies {
     implementation("io.github.mpecan.pmt:pushpin-metrics-core")
-    
+
     // Optional: Add Micrometer for actual metrics collection
     implementation("io.micrometer:micrometer-core")
 }
@@ -178,8 +178,132 @@ class CustomMetricsService : MetricsService {
     override fun recordMessageSent(server: String, transport: String, status: String) {
         // Your custom implementation
     }
-    
+
     // Implement other methods...
+}
+```
+
+## Advanced Usage Examples
+
+### Tracking Message Publishing Performance
+
+```kotlin
+@Service
+class PublishingService(private val metricsService: MetricsService) {
+
+    fun publishMessage(server: String, channel: String, message: Any) {
+        // Use the recordOperation method to automatically time the operation
+        metricsService.recordOperation("message.publish", server) {
+            // Your publishing logic here
+            // The operation will be timed and recorded automatically
+        }
+    }
+
+    fun publishBatchWithManualTiming(server: String, messages: List<Any>) {
+        // For more complex scenarios, use manual timing
+        val timer = metricsService.startTimer()
+
+        try {
+            // Your batch publishing logic
+            messages.forEach { /* publish message */ }
+
+            // Record throughput
+            val totalBytes = messages.sumOf { it.toString().length }
+            metricsService.recordThroughput("batch", totalBytes.toLong())
+
+            // Record success
+            metricsService.recordMessageSent(server, "batch", "success")
+        } catch (e: Exception) {
+            // Record failure
+            metricsService.recordMessageError(server, "batch", e.javaClass.simpleName)
+            throw e
+        } finally {
+            // Stop the timer
+            metricsService.stopTimer(timer, "message.batch.publish", server)
+        }
+    }
+}
+```
+
+### Monitoring Connection Health
+
+```kotlin
+@Service
+class ConnectionMonitor(private val metricsService: MetricsService) {
+
+    fun monitorConnections(transport: String, connectionCount: Int) {
+        // Update the active connections gauge
+        metricsService.updateActiveConnections(transport, connectionCount.toLong())
+    }
+
+    fun checkServerHealth(server: String) {
+        try {
+            // Your health check logic
+            val startTime = System.currentTimeMillis()
+            val isHealthy = checkServerConnection(server) // Implement this method
+            val duration = System.currentTimeMillis() - startTime
+
+            // Record the health check result
+            metricsService.updateServerHealth(server, isHealthy)
+
+            // Record the response time
+            metricsService.recordServerResponseTime(
+                server, 
+                "health", 
+                duration, 
+                TimeUnit.MILLISECONDS
+            )
+        } catch (e: Exception) {
+            metricsService.recordPublishError(server, "health_check_failed")
+        }
+    }
+
+    private fun checkServerConnection(server: String): Boolean {
+        // Implementation of server health check
+        return try {
+            // Example: Check if server is reachable
+            // URL("http://$server/health").openConnection().connect()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+}
+```
+
+### Integration with Spring Boot Actuator
+
+When using Spring Boot Actuator, you can expose your metrics through the `/actuator/metrics` endpoint:
+
+```kotlin
+@Configuration
+class MetricsConfig {
+
+    @Bean
+    fun metricsEndpoint(meterRegistry: MeterRegistry): Supplier<Map<String, Any>> {
+        return Supplier {
+            mapOf(
+                "messages" to mapOf(
+                    "sent" to getMetricCount(meterRegistry, "pushpin.messages.sent"),
+                    "errors" to getMetricCount(meterRegistry, "pushpin.messages.errors")
+                ),
+                "connections" to mapOf(
+                    "active" to getGaugeValue(meterRegistry, "pushpin.active.connections")
+                ),
+                "servers" to mapOf(
+                    "healthy" to getGaugeValue(meterRegistry, "pushpin.server.healthy")
+                )
+            )
+        }
+    }
+
+    private fun getMetricCount(meterRegistry: MeterRegistry, name: String): Double {
+        return meterRegistry.find(name).counter()?.count() ?: 0.0
+    }
+
+    private fun getGaugeValue(meterRegistry: MeterRegistry, name: String): Double {
+        return meterRegistry.find(name).gauge()?.value() ?: 0.0
+    }
 }
 ```
 
