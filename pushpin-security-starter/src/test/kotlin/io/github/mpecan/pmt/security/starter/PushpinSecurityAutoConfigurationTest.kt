@@ -3,7 +3,8 @@ package io.github.mpecan.pmt.security.starter
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner
-import kotlin.test.*
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class PushpinSecurityAutoConfigurationTest {
 

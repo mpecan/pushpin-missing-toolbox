@@ -212,7 +212,8 @@ class HttpRemoteSubscriptionClient(
                 username = userId,
                 ipAddress = request.remoteAddr,
                 channelId = null,
-                error = "Channel list by pattern failed - ${e.javaClass.simpleName}: ${e.message ?: "Unknown error"} (pattern: $pattern)",
+                error = "Channel list by pattern failed - ${e.javaClass.simpleName}: " +
+                    "${e.message ?: "Unknown error"} (pattern: $pattern)",
             )
             return emptyList()
         }

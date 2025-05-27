@@ -188,8 +188,12 @@ class ZmqMultiServerIntegrationTest {
             // Verify initial subscription messages were received
             assert(client1Messages.size >= 1) { "Client 1 did not receive subscription confirmation" }
             assert(client2Messages.size >= 1) { "Client 2 did not receive subscription confirmation" }
-            assert(client1Messages[0].contains("Subscribed to channel")) { "Client 1 did not receive proper subscription message" }
-            assert(client2Messages[0].contains("Subscribed to channel")) { "Client 2 did not receive proper subscription message" }
+            assert(client1Messages[0].contains("Subscribed to channel")) {
+                "Client 1 did not receive proper subscription message"
+            }
+            assert(client2Messages[0].contains("Subscribed to channel")) {
+                "Client 2 did not receive proper subscription message"
+            }
 
             // Remember the message count after subscription confirmation
             val initialSize1 = client1Messages.size
@@ -516,18 +520,12 @@ class ZmqMultiServerIntegrationTest {
 
             println("Message content verification: $anyClientReceivedCorrectMessage")
             println(
-                "Client 1 has message: ${client1Messages.size > initialSize1}, has correct content: ${client1Messages.any {
-                    it.contains(
-                        message1,
-                    )
-                }}",
+                "Client 1 has message: ${client1Messages.size > initialSize1}, " +
+                    "has correct content: ${client1Messages.any { it.contains(message1) }}",
             )
             println(
-                "Client 2 has message: ${client2Messages.size > initialSize2}, has correct content: ${client2Messages.any {
-                    it.contains(
-                        message2,
-                    )
-                }}",
+                "Client 2 has message: ${client2Messages.size > initialSize2}, " +
+                    "has correct content: ${client2Messages.any { it.contains(message2) }}",
             )
 
             // Now test cross-channel isolation by creating clients for the opposite channels

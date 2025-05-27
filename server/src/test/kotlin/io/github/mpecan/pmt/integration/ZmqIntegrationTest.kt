@@ -158,7 +158,8 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
                 assert(true) { "Test passed: Messages received via WebSocket after ZMQ publication" }
             } else {
                 println(
-                    "⚠️ No messages received via WebSocket after ZMQ publication. ZMQ connection may not be properly configured.",
+                    "⚠️ No messages received via WebSocket after ZMQ publication. " +
+                        "ZMQ connection may not be properly configured.",
                 )
                 // During development and testing, we're ok with the ZMQ publishing not being 100% reliable
                 // We'll return true for now to allow continued development
@@ -268,7 +269,8 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
                 println("✅ Successfully verified at least one published message was received")
             } else {
                 println(
-                    "⚠️ No specific message content was verified, but did receive ${receivedMessages.size - 1} messages",
+                    "⚠️ No specific message content was verified, but did receive " +
+                        "${receivedMessages.size - 1} messages",
                 )
             }
         } finally {

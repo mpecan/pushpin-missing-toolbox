@@ -3,7 +3,9 @@ package io.github.mpecan.pmt.security.hmac
 import io.github.mpecan.pmt.security.core.HmacSignatureException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class DefaultHmacServiceTest {
 

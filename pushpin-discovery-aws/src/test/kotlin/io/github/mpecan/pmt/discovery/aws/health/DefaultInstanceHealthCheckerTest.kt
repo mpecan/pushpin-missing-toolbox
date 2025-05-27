@@ -10,7 +10,14 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import software.amazon.awssdk.services.ec2.Ec2Client
-import software.amazon.awssdk.services.ec2.model.*
+import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest
+import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusResponse
+import software.amazon.awssdk.services.ec2.model.Instance
+import software.amazon.awssdk.services.ec2.model.InstanceState
+import software.amazon.awssdk.services.ec2.model.InstanceStateName
+import software.amazon.awssdk.services.ec2.model.InstanceStatus
+import software.amazon.awssdk.services.ec2.model.InstanceStatusSummary
+import software.amazon.awssdk.services.ec2.model.SummaryStatus
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

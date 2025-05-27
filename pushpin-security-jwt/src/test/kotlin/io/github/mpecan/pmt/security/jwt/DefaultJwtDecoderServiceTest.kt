@@ -2,7 +2,9 @@ package io.github.mpecan.pmt.security.jwt
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class DefaultJwtDecoderServiceTest {
 
