@@ -58,10 +58,10 @@ class YourService(
     fun publishMessage(channel: String, data: Any) {
         // Create a message
         val message = Message.simple(channel, data)
-        
+
         // Serialize the message to Pushpin format
         val pushpinMessage = messageSerializer.serialize(message)
-        
+
         // Send the message to your Pushpin server
         // ...
     }
@@ -232,22 +232,11 @@ val customSerializer = MessageSerializerBuilder.builder()
 The library provides a flexible way to customize message formatting using `FormatterOptions`:
 
 ```kotlin
-// Create formatter options with custom pre-processor and post-processor
+// Create formatter options with custom settings
 val options = FormatterOptions()
-    .withPreProcessor { message ->
-        // Pre-process the message before formatting
-        message.addMeta(mapOf("timestamp" to System.currentTimeMillis()))
-    }
-    .withPostProcessor { format, message ->
-        // Post-process the format after formatting
-        // This is type-specific, so you need to cast
-        if (format is WebSocketFormat) {
-            format.copy(action = "custom-action")
-        } else {
-            format
-        }
-    }
+    // Add custom options
     .withOption("ws.type", "binary")
+    .withOption("ws.action", "send")
 
 // Create a formatter with these options
 val formatterFactory = DefaultFormatterFactory(serializationService)
@@ -281,7 +270,7 @@ class CustomWebSocketMessageFormatter(
     serializationService: MessageSerializationService,
     options: FormatterOptions = FormatterOptions()
 ) : AbstractMessageFormatter<WebSocketFormat>(serializationService, options), WebSocketMessageFormatter {
-    
+
     override fun doFormat(message: Message): WebSocketFormat {
         // Custom formatting logic
         return WebSocketFormat(
@@ -302,7 +291,7 @@ class CustomWebSocketMessageFormatter(
 ```kotlin
 @Configuration
 class CustomFormattersConfig {
-    
+
     @Bean
     @Primary
     fun customWebSocketFormatter(serializationService: MessageSerializationService): WebSocketMessageFormatter {
@@ -310,6 +299,140 @@ class CustomFormattersConfig {
     }
 }
 ```
+
+## Complete End-to-End Example
+
+Here's a complete Spring Boot application example that demonstrates how to use the Pushpin client library:
+
+```kotlin
+import io.github.mpecan.pmt.client.model.Message
+import io.github.mpecan.pmt.client.model.Transport
+import io.github.mpecan.pmt.client.serialization.MessageSerializer
+import org.springframework.boot.CommandLineRunner
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
+@SpringBootApplication
+class PushpinClientDemoApplication {
+    @Bean
+    fun demoRunner(pushpinService: PushpinService): CommandLineRunner = CommandLineRunner {
+        // Start a background thread to publish messages every 5 seconds
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        executor.scheduleAtFixedRate({
+            try {
+                pushpinService.publishMessage(
+                    channel = "demo-channel",
+                    message = "Hello from Pushpin client! Time: ${System.currentTimeMillis()}"
+                )
+                println("Message published successfully")
+            } catch (e: Exception) {
+                println("Error publishing message: ${e.message}")
+            }
+        }, 0, 5, TimeUnit.SECONDS)
+    }
+}
+
+@Service
+class PushpinService(private val messageSerializer: MessageSerializer) {
+    private val restTemplate = RestTemplate()
+    private val pushpinControlUrl = "http://localhost:5561/publish" // Pushpin Control API URL
+
+    fun publishMessage(channel: String, message: String) {
+        // Create a message for all transport types
+        val pushpinMessage = Message.simple(channel, message)
+
+        // Serialize the message
+        val serializedMessage = messageSerializer.serialize(pushpinMessage)
+
+        // Set up HTTP headers
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
+
+        // Create HTTP entity with headers and body
+        val request = HttpEntity(serializedMessage, headers)
+
+        // Send the request to Pushpin
+        val response = restTemplate.postForEntity(pushpinControlUrl, request, String::class.java)
+
+        if (!response.statusCode.is2xxSuccessful) {
+            throw RuntimeException("Failed to publish message: ${response.statusCode}")
+        }
+    }
+}
+
+// Run the application
+fun main(args: Array<String>) {
+    runApplication<PushpinClientDemoApplication>(*args)
+}
+```
+
+### Client-Side Subscription Example
+
+Here's how clients can subscribe to the channel using Server-Sent Events (SSE):
+
+```javascript
+// HTML
+<div id="messages"></div>
+
+// JavaScript
+const eventSource = new EventSource('http://localhost:7999/api/events/demo-channel');
+
+eventSource.onmessage = (event) => {
+    const message = event.data;
+    const messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML += `<p>${message}</p>`;
+};
+
+eventSource.onerror = (error) => {
+    console.error('EventSource error:', error);
+    eventSource.close();
+};
+```
+
+### Error Handling Best Practices
+
+When using the Pushpin client library, consider these error handling best practices:
+
+1. **Wrap serialization in try-catch blocks**:
+   ```kotlin
+   try {
+       val serializedMessage = messageSerializer.serialize(message)
+       // Send the message
+   } catch (e: MessageSerializationException) {
+       logger.error("Failed to serialize message: ${e.message}")
+       // Handle the error
+   }
+   ```
+
+2. **Handle transport-specific errors**:
+   ```kotlin
+   try {
+       val response = restTemplate.postForEntity(pushpinControlUrl, request, String::class.java)
+       // Process the response
+   } catch (e: RestClientException) {
+       logger.error("Transport error: ${e.message}")
+       // Implement retry logic or fallback
+   }
+   ```
+
+3. **Use circuit breakers for resilience**:
+   ```kotlin
+   // With resilience4j
+   @CircuitBreaker(name = "pushpin")
+   fun publishWithCircuitBreaker(message: Message) {
+       // Publishing logic
+   }
+   ```
 
 ## License
 

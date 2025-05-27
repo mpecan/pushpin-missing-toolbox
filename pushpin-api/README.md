@@ -21,6 +21,84 @@ dependencies {
 }
 ```
 
+### Getting Started
+
+To start using the GRIP protocol implementation, follow these steps:
+
+1. **Set up your Spring Boot application**:
+
+```kotlin
+@SpringBootApplication
+class YourApplication
+
+fun main(args: Array<String>) {
+    runApplication<YourApplication>(*args)
+}
+```
+
+2. **Create a controller for handling realtime endpoints**:
+
+```kotlin
+@RestController
+@RequestMapping("/api")
+class RealtimeController {
+
+    // Long-polling endpoint
+    @GetMapping("/poll/{channel}")
+    fun poll(@PathVariable channel: String): ResponseEntity<Map<String, Any>> {
+        // Create a response with data
+        val data = mapOf("status" to "waiting for updates")
+
+        // Add GRIP headers for long-polling
+        return GripApi.longPollingResponse(channel, timeout = 30)
+            .body(data)
+    }
+
+    // Server-Sent Events endpoint
+    @GetMapping("/events/{channel}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun events(@PathVariable channel: String): ResponseEntity<String> {
+        // Initial SSE message
+        val initialEvent = "data: Connected to channel $channel\n\n"
+
+        // Add GRIP headers for SSE
+        return GripApi.sseResponse(channel)
+            .body(initialEvent)
+    }
+}
+```
+
+3. **Publish messages to channels**:
+
+```kotlin
+@Service
+class PublishingService {
+    private val restTemplate = RestTemplate()
+    private val pushpinPublishUrl = "http://localhost:5561/publish" // Adjust to your Pushpin setup
+
+    fun publishToChannel(channel: String, data: Any) {
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
+
+        val body = mapOf(
+            "items" to listOf(
+                mapOf(
+                    "channel" to channel,
+                    "formats" to mapOf(
+                        "http-stream" to mapOf(
+                            "content" to "data: ${objectMapper.writeValueAsString(data)}\n\n"
+                        )
+                    )
+                )
+            )
+        )
+
+        val request = HttpEntity(body, headers)
+        restTemplate.postForEntity(pushpinPublishUrl, request, String::class.java)
+    }
+}
+```
+
 ### Basic Usage
 
 #### HTTP Long-Polling
@@ -31,11 +109,11 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class LongPollingController {
-    
+
     @GetMapping("/poll/{channel}")
     fun poll(@PathVariable channel: String): ResponseEntity<Map<String, Any>> {
         val response = mapOf("status" to "waiting")
-        
+
         // Create response with GRIP headers for long-polling
         return GripApi.longPollingResponse(channel, timeout = 30)
             .body(response)
@@ -49,7 +127,7 @@ class LongPollingController {
 @GetMapping("/stream/{channel}")
 fun stream(@PathVariable channel: String): ResponseEntity<Flux<String>> {
     val stream = Flux.just("Connected to $channel\n")
-    
+
     // Create response with GRIP headers for streaming
     return GripApi.streamingResponse(channel)
         .body(stream)
@@ -62,7 +140,7 @@ fun stream(@PathVariable channel: String): ResponseEntity<Flux<String>> {
 @GetMapping("/events/{channel}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
 fun events(@PathVariable channel: String): ResponseEntity<Flux<String>> {
     val events = Flux.just("data: Connected\n\n")
-    
+
     // Create response with GRIP headers for SSE
     return GripApi.sseResponse(channel)
         .body(events)
@@ -80,7 +158,7 @@ fun handleWebSocket(
 ): ResponseEntity<String> {
     // Parse incoming WebSocket events
     val events = GripApi.parseWebSocketEvents(body)
-    
+
     // Build response
     val response = GripApi.websocket()
         .open()
@@ -88,7 +166,7 @@ fun handleWebSocket(
         .keepAlive(timeout = 30)
         .message(mapOf("status" to "connected"))
         .build()
-    
+
     // Return with WebSocket headers
     return GripApi.websocketResponse(key)
         .body(response)
@@ -216,16 +294,16 @@ Here's a complete controller demonstrating various GRIP features:
 @RestController
 @RequestMapping("/api/grip")
 class GripDemoController {
-    
+
     // HTTP Long-Polling endpoint
     @GetMapping("/poll/{channel}")
     fun longPoll(@PathVariable channel: String): ResponseEntity<Mono<Message>> {
         val message = Mono.just(Message("No new messages"))
-        
+
         return GripApi.longPollingResponse(channel, timeout = 20)
             .body(message)
     }
-    
+
     // SSE endpoint with custom headers
     @GetMapping("/events/{channel}")
     fun serverSentEvents(
@@ -234,7 +312,7 @@ class GripDemoController {
     ): ResponseEntity<Flux<String>> {
         val events = Flux.interval(Duration.ofSeconds(1))
             .map { "data: Event $it\n\n" }
-        
+
         return GripApi.headers()
             .holdStream()
             .channel(channel)
@@ -243,7 +321,7 @@ class GripDemoController {
             .contentType(MediaType.TEXT_EVENT_STREAM)
             .body(events)
     }
-    
+
     // WebSocket endpoint with full message handling
     @PostMapping("/ws/{channel}")
     fun websocket(
@@ -254,7 +332,7 @@ class GripDemoController {
     ): ResponseEntity<String> {
         val events = GripApi.parseWebSocketEvents(body)
         val messageBuilder = WebSocketMessageBuilder()
-        
+
         // Handle different event types
         events.forEach { event ->
             when (event.type) {
@@ -277,15 +355,15 @@ class GripDemoController {
                 else -> {} // Handle other types as needed
             }
         }
-        
+
         // Extract and apply meta headers
         val metaHeaders = GripApi.extractMetaHeaders(headers)
-        
+
         return GripApi.websocketResponse(key)
             .let { GripApi.applyMetaHeaders(it, metaHeaders) }
             .body(messageBuilder.build())
     }
-    
+
     data class Message(val content: String)
 }
 ```
@@ -297,6 +375,59 @@ class GripDemoController {
 3. **Keep-Alive**: Configure appropriate timeouts to prevent connection drops
 4. **Error Handling**: Always handle malformed WebSocket events gracefully
 5. **Authentication**: Use GRIP signatures for secure proxy-to-backend communication
+
+## Common Patterns
+
+### Implementing a Chat Application
+
+A common use case for Pushpin is building a chat application. Here's how you might structure it:
+
+1. **Channel Structure**:
+   - Global channel: `chat.global`
+   - Room channels: `chat.room.{roomId}`
+   - Private channels: `chat.private.{userId1}.{userId2}`
+
+2. **Backend Implementation**:
+   - Create SSE endpoint for subscribing to channels
+   - Create REST endpoint for sending messages
+   - Use GRIP headers to manage subscriptions
+
+3. **Client Implementation**:
+   - Connect to SSE endpoint for receiving messages
+   - Send POST requests to message endpoint for sending messages
+
+### Implementing Notifications
+
+Another common pattern is implementing a notification system:
+
+1. **Channel Structure**:
+   - User-specific channels: `notifications.user.{userId}`
+   - Topic-based channels: `notifications.topic.{topicName}`
+
+2. **Notification Types**:
+   - Use the event type to differentiate between notification types
+   - Include metadata for rendering different notification styles
+
+3. **Delivery Guarantees**:
+   - Use message IDs and `prevId` for ensuring ordered delivery
+   - Implement client-side acknowledgment for important notifications
+
+### Scaling Considerations
+
+When scaling your Pushpin implementation:
+
+1. **Multiple Pushpin Instances**:
+   - Use consistent hashing for channel distribution
+   - Implement a shared publishing mechanism (e.g., Redis, Kafka)
+
+2. **High-Volume Channels**:
+   - Consider channel sharding for high-volume channels
+   - Implement rate limiting at the application level
+
+3. **Monitoring**:
+   - Track channel subscription counts
+   - Monitor message throughput and latency
+   - Set up alerts for connection drops or publishing failures
 
 ## Testing
 
