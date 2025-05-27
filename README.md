@@ -1,6 +1,8 @@
 # Pushpin Missing Toolbox
 
-A Spring Boot application that simplifies managing multiple [Pushpin](https://pushpin.org/) servers for scalable realtime web applications. It provides load balancing, health monitoring, and a unified API for publishing messages across your Pushpin infrastructure.
+A project to make Pushpin easier to use in the Java ecosystem.
+1. A Spring Boot application that simplifies managing multiple [Pushpin](https://pushpin.org/) servers for scalable realtime web applications. It provides load balancing, health monitoring, and a unified API for publishing messages across your Pushpin infrastructure.
+2. A collection of Spring Boot modules that allow you to assemble a Pushpin server management layer. **[Learn more about the libraries →](README-LIBRARIES.md)**
 
 ## 🚀 TL;DR
 
@@ -57,46 +59,46 @@ graph LR
         C2[Browser 2]
         CN[Browser N]
     end
-    
+
     subgraph "Pushpin Proxy Layer"
         P1[Pushpin Server 1<br/>:7999]
         P2[Pushpin Server 2<br/>:7998]
         PN[Pushpin Server N<br/>:xxxx]
     end
-    
+
     subgraph "Management Layer"
         PT[Pushpin Toolbox<br/>:8080]
         HM[Health Monitor]
         LB[Load Balancer]
         SD[Service Discovery<br/>AWS/K8s]
     end
-    
+
     subgraph "Application Layer"
         A1[Your App 1]
         A2[Your App 2]
         AN[Your App N]
     end
-    
+
     C1 -.->|SSE/WebSocket| P1
     C2 -.->|SSE/WebSocket| P2
     CN -.->|SSE/WebSocket| PN
-    
+
     A1 -->|POST /publish| PT
     A2 -->|POST /publish| PT
     AN -->|POST /publish| PT
-    
+
     PT -->|HTTP/ZMQ| P1
     PT -->|HTTP/ZMQ| P2
     PT -->|HTTP/ZMQ| PN
-    
+
     HM -.->|Health Checks| P1
     HM -.->|Health Checks| P2
     HM -.->|Health Checks| PN
-    
+
     SD -.->|Discover| P1
     SD -.->|Discover| P2
     SD -.->|Discover| PN
-    
+
     style PT fill:#f9f,stroke:#333,stroke-width:4px
     style P1 fill:#bbf,stroke:#333,stroke-width:2px
     style P2 fill:#bbf,stroke:#333,stroke-width:2px
@@ -113,7 +115,7 @@ sequenceDiagram
     participant Pushpin2 as Pushpin Server 2
     participant Client1 as Client (Channel A)
     participant Client2 as Client (Channel A)
-    
+
     App->>Toolbox: POST /api/pushpin/publish<br/>{"channel": "A", "data": "Hello"}
     Toolbox->>Toolbox: Check healthy servers
     par Broadcast to all servers
@@ -122,7 +124,7 @@ sequenceDiagram
         Toolbox->>Pushpin2: Publish message (HTTP/ZMQ)
     end
     Toolbox->>App: 200 OK {"success": true}
-    
+
     par Push to connected clients
         Pushpin1->>Client1: SSE: data: {"message": "Hello"}
     and
@@ -397,14 +399,6 @@ java -jar server/build/libs/pushpin-missing-toolbox-*.jar \
   --spring.config.location=./application-prod.properties
 ```
 
-### Kubernetes
-
-See [deployment/kubernetes/](deployment/kubernetes/) for Helm charts and manifests.
-
-### AWS ECS/Fargate
-
-See [deployment/aws/](deployment/aws/) for CloudFormation templates.
-
 ## Configuration
 
 ### Minimal Configuration
@@ -459,7 +453,7 @@ pushpin.discovery.aws.tags.service=pushpin
 
 ### Full Configuration
 
-For all available options, see [docs/Configuration.md](docs/Configuration.md) or check the fully documented [application.properties](server/src/main/resources/application.properties).
+For all available options, see [docs/Configuration.md](docs/Configuration.md) or check the fully documented [application.properties](server/src/main/resources/application.yml).
 
 ## Examples
 
@@ -564,6 +558,8 @@ For more examples, see [docs/Examples.md](docs/Examples.md).
 - `pushpin-api/` - GRIP protocol implementation library
 - `pushpin-client/` - Client library for publishing messages to Pushpin
 
+For more detailed information about the library modules, see the [Library Documentation](README-LIBRARIES.md).
+
 ## Development
 
 ### Building
@@ -594,6 +590,7 @@ docker-compose up -d
 - [Configuration Guide](docs/Configuration.md) - All configuration options
 - [Testing Guide](docs/Testing.md) - Integration testing with Testcontainers
 - [Examples](docs/Examples.md) - Real-world usage examples
+- [Library Documentation](README-LIBRARIES.md) - Overview of all library modules
 - [AWS Discovery](pushpin-discovery-aws/README.md) - AWS integration guide
 - [Kubernetes Discovery](pushpin-discovery-kubernetes/README.md) - K8s integration guide
 
