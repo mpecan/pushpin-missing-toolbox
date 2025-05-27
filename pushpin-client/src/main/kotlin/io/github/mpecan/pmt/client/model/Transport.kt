@@ -2,8 +2,7 @@ package io.github.mpecan.pmt.client.model
 
 /**
  * Represents the different transport mechanisms supported by Pushpin.
- * 
- * Each transport type corresponds to a different way of delivering messages to clients:
+ * * Each transport type corresponds to a different way of delivering messages to clients:
  * - WebSocket: For real-time bidirectional communication over a persistent connection
  * - HttpStream: For streaming data over HTTP with custom content type
  * - HttpResponse: For delivering a single HTTP response

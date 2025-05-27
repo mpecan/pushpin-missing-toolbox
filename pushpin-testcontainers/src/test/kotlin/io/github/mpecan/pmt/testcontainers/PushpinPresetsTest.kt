@@ -70,4 +70,3 @@ class PushpinPresetsTest {
         assertTrue(config.statsConnectionSend)
     }
 }
-

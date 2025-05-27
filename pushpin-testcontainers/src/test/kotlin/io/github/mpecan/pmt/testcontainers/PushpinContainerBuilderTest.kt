@@ -64,4 +64,3 @@ class PushpinContainerBuilderTest {
         // Host port should be set to 9090
     }
 }
-

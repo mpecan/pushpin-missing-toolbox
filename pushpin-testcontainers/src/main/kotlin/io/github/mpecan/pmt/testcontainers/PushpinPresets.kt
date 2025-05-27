@@ -2,13 +2,11 @@ package io.github.mpecan.pmt.testcontainers
 
 /**
  * Preset configurations for common Pushpin testing scenarios.
- * 
- * This object provides pre-configured [PushpinConfiguration] instances optimized for
+ * * This object provides pre-configured [PushpinConfiguration] instances optimized for
  * specific use cases. These presets help you quickly set up Pushpin containers with
  * appropriate settings for different testing scenarios without having to manually
  * configure all parameters.
- * 
- * Available presets:
+ * * Available presets:
  * - [minimal]: Basic HTTP testing with debug enabled
  * - [webSocket]: Optimized for WebSocket connections with increased message rates
  * - [serverSentEvents]: Configured for SSE streaming with longer timeouts
@@ -16,20 +14,18 @@ package io.github.mpecan.pmt.testcontainers
  * - [authenticated]: Security features enabled for auth testing
  * - [productionLike]: Settings that mimic production environments
  * - [development]: Maximum verbosity for debugging
- * 
- * Usage example:
+ * * Usage example:
  * ```kotlin
  * val container = PushpinContainerBuilder()
  *     .withPreset(PushpinPresets.webSocket())
  *     .withHostApplicationPort(8080)
  *     .build()
  * ```
- * 
- * @see PushpinConfiguration
+ * * @see PushpinConfiguration
  * @see PushpinContainerBuilder
  */
 object PushpinPresets {
-    
+
     /**
      * Minimal configuration for basic HTTP testing.
      * - HTTP only (no HTTPS)
@@ -40,9 +36,9 @@ object PushpinPresets {
     fun minimal(): PushpinConfiguration = PushpinConfiguration(
         debug = true,
         logLevel = 5,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
-    
+
     /**
      * Configuration for testing WebSocket functionality.
      * - Increased message rates
@@ -56,9 +52,9 @@ object PushpinPresets {
         messageHwm = 50000,
         subscriptionLinger = 120,
         connectionSubscriptionMax = 50,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
-    
+
     /**
      * Configuration for testing Server-Sent Events (SSE).
      * - Optimized for streaming
@@ -71,9 +67,9 @@ object PushpinPresets {
         messageWait = 10000,
         subscriptionLinger = 300,
         statsConnectionTtl = 300,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
-    
+
     /**
      * Configuration for high-throughput testing.
      * - Maximum message rates
@@ -88,9 +84,9 @@ object PushpinPresets {
         clientMaxConn = 100000,
         clientBufferSize = 16384,
         connectionSubscriptionMax = 100,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
-    
+
     /**
      * Configuration with authentication enabled.
      * - Signature verification
@@ -104,9 +100,9 @@ object PushpinPresets {
         sigKey = "test-secret-key",
         sigIss = "test-issuer",
         acceptXForwardedProtocol = true,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
-    
+
     /**
      * Configuration for production-like testing.
      * - HTTPS enabled (requires cert configuration)
@@ -124,9 +120,9 @@ object PushpinPresets {
         xForwardedFor = "truncate:0,append",
         logFrom = true,
         logUserAgent = true,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
-    
+
     /**
      * Configuration for development/debugging.
      * - Maximum verbosity
@@ -139,6 +135,6 @@ object PushpinPresets {
         logFrom = true,
         logUserAgent = true,
         statsConnectionSend = true,
-        updatesCheck = "off"
+        updatesCheck = "off",
     )
 }

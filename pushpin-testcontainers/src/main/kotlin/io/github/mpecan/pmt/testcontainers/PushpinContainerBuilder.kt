@@ -8,16 +8,14 @@ import io.github.mpecan.pmt.testcontainers.PushpinContainer.Companion.DEFAULT_SU
 
 /**
  * Builder for creating PushpinContainer instances with a fluent API.
- * 
- * This builder provides a convenient way to configure and create Pushpin containers
+ * * This builder provides a convenient way to configure and create Pushpin containers
  * for integration testing. It allows you to:
  * - Configure network ports (HTTP, ZMQ publish, control, etc.)
  * - Set up routing rules for request forwarding
  * - Apply configuration presets for common scenarios
  * - Enable debug mode and adjust logging levels
  * - Customize the Docker image used
- * 
- * The builder starts with sensible defaults and allows incremental customization.
+ * * The builder starts with sensible defaults and allows incremental customization.
  * Call [build] to create the configured container instance.
  *
  * Example usage:
@@ -30,26 +28,25 @@ import io.github.mpecan.pmt.testcontainers.PushpinContainer.Companion.DEFAULT_SU
  *     .withRoute("api/`*`", "localhost:8080,over_http")
  *     .build()
  * ```
- * 
- * For common configurations, consider using presets:
+ * * For common configurations, consider using presets:
  * ```kotlin
  * val container = PushpinContainerBuilder()
  *     .withPreset(PushpinPresets.webSocket())
  *     .withHostApplicationPort(8080)
  *     .build()
  * ```
- * 
- * @see PushpinContainer
+ * * @see PushpinContainer
  * @see PushpinPresets
  */
+@Suppress("unused")
 class PushpinContainerBuilder {
     private var dockerImage: String = PushpinContainer.DEFAULT_IMAGE
     private var configuration: PushpinConfiguration = PushpinConfiguration(
-            commandPort = DEFAULT_CONTROL_PORT,
-            httpPort = DEFAULT_HTTP_PORT,
-            pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
-            pushInPort = DEFAULT_PUBLISH_PORT,
-            pushInSubPort = DEFAULT_SUB_PORT,
+        commandPort = DEFAULT_CONTROL_PORT,
+        httpPort = DEFAULT_HTTP_PORT,
+        pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
+        pushInPort = DEFAULT_PUBLISH_PORT,
+        pushInSubPort = DEFAULT_SUB_PORT,
     )
     private var hostApplicationPort: Int = 8080
     private val routes = mutableMapOf<String, String>()
@@ -211,7 +208,7 @@ class PushpinContainerBuilder {
      */
     fun build(): PushpinContainer {
         val container = PushpinContainer(dockerImage, configuration)
-                .withHostApplicationPort(hostApplicationPort)
+            .withHostApplicationPort(hostApplicationPort)
 
         // Add routes if any were specified
         if (routes.isNotEmpty()) {

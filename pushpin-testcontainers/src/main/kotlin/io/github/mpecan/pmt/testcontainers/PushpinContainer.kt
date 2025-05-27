@@ -22,29 +22,24 @@ import java.time.Duration
  * - ZMQ and HTTP message publishing
  * - Custom routing configuration
  * - Debug logging and monitoring
- * 
- * The container automatically:
+ * * The container automatically:
  * - Generates pushpin.conf from the provided [PushpinConfiguration]
  * - Creates route files based on configured routes
  * - Exposes all necessary ports (HTTP, ZMQ publish, control, etc.)
  * - Enables host access for routing to test applications
  * - Provides verbose logging for debugging
- * 
- * Example usage:
+ * * Example usage:
  * ```kotlin
  * val container = PushpinContainer()
  *     .withHostApplicationPort(8080)
- *     .withRoute("api/*", "host.testcontainers.internal:8080,over_http")
+ *     .withRoute("api/`*`", "host.testcontainers.internal:8080,over_http")
  *     .withConfiguration { copy(debug = true, logLevel = 5) }
- * 
- * container.start()
- * 
- * // Access the container
+ * * container.start()
+ * * // Access the container
  * val httpUrl = container.getHttpUrl()
  * val publishPort = container.getPublishPort()
  * ```
- * 
- * For easier configuration, use [PushpinContainerBuilder]:
+ * * For easier configuration, use [PushpinContainerBuilder]:
  * ```kotlin
  * val container = PushpinContainerBuilder()
  *     .withPreset(PushpinPresets.webSocket())
@@ -58,9 +53,10 @@ import java.time.Duration
  * @see PushpinContainerBuilder
  * @see PushpinPresets
  */
+@Suppress("unused")
 class PushpinContainer(
-        dockerImageName: String = DEFAULT_IMAGE,
-        private var configuration: PushpinConfiguration = PushpinConfiguration(),
+    dockerImageName: String = DEFAULT_IMAGE,
+    private var configuration: PushpinConfiguration = PushpinConfiguration(),
 ) : GenericContainer<PushpinContainer>(DockerImageName.parse(dockerImageName)) {
 
     companion object {
@@ -78,11 +74,11 @@ class PushpinContainer(
 
     init {
         configuration = configuration.copy(
-                commandPort = DEFAULT_CONTROL_PORT,
-                httpPort = DEFAULT_HTTP_PORT,
-                pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
-                pushInPort = DEFAULT_PUBLISH_PORT,
-                pushInSubPort = DEFAULT_SUB_PORT,
+            commandPort = DEFAULT_CONTROL_PORT,
+            httpPort = DEFAULT_HTTP_PORT,
+            pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
+            pushInPort = DEFAULT_PUBLISH_PORT,
+            pushInSubPort = DEFAULT_SUB_PORT,
         )
     }
 
@@ -93,11 +89,11 @@ class PushpinContainer(
     init {
         // Expose default ports
         withExposedPorts(
-                configuration.httpPort,
-                configuration.pushInHttpPort,
-                extractPort(configuration.pushInSpec),
-                extractPort(configuration.pushInSubSpec),
-                extractPort(configuration.commandSpec),
+            configuration.httpPort,
+            configuration.pushInHttpPort,
+            extractPort(configuration.pushInSpec),
+            extractPort(configuration.pushInSubSpec),
+            extractPort(configuration.commandSpec),
         )
 
         // Enable host access for routing
@@ -126,11 +122,11 @@ class PushpinContainer(
         // Re-expose ports based on new configuration
         clearExposedPorts()
         withExposedPorts(
-                configuration.httpPort,
-                configuration.pushInHttpPort,
-                configuration.pushInPort,
-                configuration.pushInSubPort,
-                configuration.commandPort,
+            configuration.httpPort,
+            configuration.pushInHttpPort,
+            configuration.pushInPort,
+            configuration.pushInSubPort,
+            configuration.commandPort,
         )
         return this
     }
@@ -185,8 +181,8 @@ class PushpinContainer(
         withCopyToContainer(Transferable.of(routesContent), "/etc/pushpin/routes")
         logger.info("Pushpin routes:\n$routesContent")
         withCopyToContainer(
-                Transferable.of(
-                        """#!/bin/sh
+            Transferable.of(
+                """#!/bin/sh
             echo '====== PUSHPIN CONFIG ======' >&2
             cat /etc/pushpin/pushpin.conf 
             echo '============================' >&2
@@ -194,17 +190,18 @@ class PushpinContainer(
             cat /etc/pushpin/routes 
             echo '============================' >&2
             pushpin start --verbose
-        """.trimIndent(), 777
-                ),
-                "/etc/pushpin/pushpin-start.sh",
+                """.trimIndent(),
+                777,
+            ),
+            "/etc/pushpin/pushpin-start.sh",
         )
 
         // Start Pushpin with verbose logging
         withCommand("/etc/pushpin/pushpin-start.sh")
         // Wait for Pushpin to be ready
         waitingFor(
-                Wait.forListeningPort()
-                        .withStartupTimeout(Duration.ofSeconds(60)),
+            Wait.forListeningPort()
+                .withStartupTimeout(Duration.ofSeconds(60)),
         )
     }
 
@@ -270,7 +267,7 @@ class PushpinContainer(
         // Handle specs like "tcp://*:5560" or "tcp://0.0.0.0:5560"
         val portMatch = Regex(":([0-9]+)").find(spec)
         return portMatch?.groupValues?.get(1)?.toInt()
-                ?: throw IllegalArgumentException("Cannot extract port from spec: $spec")
+            ?: throw IllegalArgumentException("Cannot extract port from spec: $spec")
     }
 
     /**
@@ -280,4 +277,3 @@ class PushpinContainer(
         exposedPorts.clear()
     }
 }
-

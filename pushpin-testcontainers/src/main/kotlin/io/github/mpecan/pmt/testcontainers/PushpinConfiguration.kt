@@ -2,87 +2,83 @@ package io.github.mpecan.pmt.testcontainers
 
 /**
  * Configuration for Pushpin container with sensible defaults.
- * 
- * This data class represents all available Pushpin configuration parameters that can be
+ * * This data class represents all available Pushpin configuration parameters that can be
  * customized when running Pushpin in a test container. Each parameter maps directly to
  * Pushpin's configuration file options.
- * 
- * The configuration is divided into several sections:
+ * * The configuration is divided into several sections:
  * - Global settings: General Pushpin behavior
  * - Runner settings: HTTP/HTTPS server configuration
  * - Proxy settings: Request routing and handling
  * - Handler settings: Message publishing and ZMQ transport
- * 
- * Most parameters have sensible defaults that work well for testing scenarios.
+ * * Most parameters have sensible defaults that work well for testing scenarios.
  * Use [PushpinContainerBuilder] or [PushpinPresets] for convenient configuration.
- * 
- * @see PushpinContainerBuilder
+ * * @see PushpinContainerBuilder
  * @see PushpinPresets
  */
 data class PushpinConfiguration(
     // Global settings
-        val runDir: String = "run",
-        val ipcPrefix: String = "pushpin-",
-        val portOffset: Int = 0,
-        val statsConnectionTtl: Int = 120,
-        val statsConnectionSend: Boolean = true,
+    val runDir: String = "run",
+    val ipcPrefix: String = "pushpin-",
+    val portOffset: Int = 0,
+    val statsConnectionTtl: Int = 120,
+    val statsConnectionSend: Boolean = true,
 
     // Runner settings
-        val services: String = "condure,pushpin-proxy,pushpin-handler",
-        val httpPort: Int = 7999,
-        val httpsPort: Int? = null,
-        val localPorts: String? = null,
-        val logDir: String = "log",
-        val logLevel: Int = 5,
-        val clientBufferSize: Int = 8192,
-        val clientMaxConn: Int = 50000,
-        val allowCompression: Boolean = false,
+    val services: String = "condure,pushpin-proxy,pushpin-handler",
+    val httpPort: Int = 7999,
+    val httpsPort: Int? = null,
+    val localPorts: String? = null,
+    val logDir: String = "log",
+    val logLevel: Int = 5,
+    val clientBufferSize: Int = 8192,
+    val clientMaxConn: Int = 50000,
+    val allowCompression: Boolean = false,
 
     // Proxy settings
-        val routesFile: String = "routes",
-        val debug: Boolean = false,
-        val autoCrossOrigin: Boolean = false,
-        val acceptXForwardedProtocol: Boolean = false,
-        val setXForwardedProtocol: String = "proto-only",
-        val xForwardedFor: String = "",
-        val xForwardedForTrusted: String = "",
-        val origHeadersNeedMark: String = "",
-        val acceptPushpinRoute: Boolean = false,
-        val cdnLoop: String = "",
-        val logFrom: Boolean = false,
-        val logUserAgent: Boolean = false,
-        val sigIss: String = "pushpin",
-        val sigKey: String = "changeme",
-        val upstreamKey: String = "",
-        val sockjsUrl: String = "http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js",
-        val updatesCheck: String = "off",
-        val organizationName: String = "",
+    val routesFile: String = "routes",
+    val debug: Boolean = false,
+    val autoCrossOrigin: Boolean = false,
+    val acceptXForwardedProtocol: Boolean = false,
+    val setXForwardedProtocol: String = "proto-only",
+    val xForwardedFor: String = "",
+    val xForwardedForTrusted: String = "",
+    val origHeadersNeedMark: String = "",
+    val acceptPushpinRoute: Boolean = false,
+    val cdnLoop: String = "",
+    val logFrom: Boolean = false,
+    val logUserAgent: Boolean = false,
+    val sigIss: String = "pushpin",
+    val sigKey: String = "changeme",
+    val upstreamKey: String = "",
+    val sockjsUrl: String = "http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js",
+    val updatesCheck: String = "off",
+    val organizationName: String = "",
 
     // Handler settings
-        val ipcFileMode: String? = null,
-        val pushInPort: Int = 5560,
-        val pushInSpec: String = "tcp://*:$pushInPort",
-        val pushInSubPort: Int = 5562,
-        val pushInSubSpec: String = "tcp://*:$pushInSubPort",
-        val pushInSubConnect: Boolean = false,
-        val pushInHttpAddr: String = "0.0.0.0",
-        val pushInHttpPort: Int = 5561,
-        val pushInHttpMaxHeadersSize: Int = 10000,
-        val pushInHttpMaxBodySize: Int = 1000000,
-        val statsSpec: String = "ipc://{rundir}/{ipc_prefix}stats",
-        val commandPort: Int = 5563,
-        val commandSpec: String = "tcp://*:$commandPort",
-        val messageRate: Int = 2500,
-        val messageHwm: Int = 25000,
-        val messageBlockSize: String? = null,
-        val messageWait: Int = 5000,
-        val idCacheTtl: Int = 60,
-        val updateOnFirstSubscription: Boolean = true,
-        val connectionSubscriptionMax: Int = 20,
-        val subscriptionLinger: Int = 60,
-        val statsSubscriptionTtl: Int = 60,
-        val statsReportInterval: Int = 10,
-        val statsFormat: String = "tnetstring",
+    val ipcFileMode: String? = null,
+    val pushInPort: Int = 5560,
+    val pushInSpec: String = "tcp://*:$pushInPort",
+    val pushInSubPort: Int = 5562,
+    val pushInSubSpec: String = "tcp://*:$pushInSubPort",
+    val pushInSubConnect: Boolean = false,
+    val pushInHttpAddr: String = "0.0.0.0",
+    val pushInHttpPort: Int = 5561,
+    val pushInHttpMaxHeadersSize: Int = 10000,
+    val pushInHttpMaxBodySize: Int = 1000000,
+    val statsSpec: String = "ipc://{rundir}/{ipc_prefix}stats",
+    val commandPort: Int = 5563,
+    val commandSpec: String = "tcp://*:$commandPort",
+    val messageRate: Int = 2500,
+    val messageHwm: Int = 25000,
+    val messageBlockSize: String? = null,
+    val messageWait: Int = 5000,
+    val idCacheTtl: Int = 60,
+    val updateOnFirstSubscription: Boolean = true,
+    val connectionSubscriptionMax: Int = 20,
+    val subscriptionLinger: Int = 60,
+    val statsSubscriptionTtl: Int = 60,
+    val statsReportInterval: Int = 10,
+    val statsFormat: String = "tnetstring",
 ) {
     /**
      * Generate the pushpin.conf content based on the configuration.
@@ -279,4 +275,3 @@ data class PushpinConfiguration(
         }
     }
 }
-

@@ -4,7 +4,6 @@ import io.github.mpecan.pmt.client.WebSocketClient
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.service.PushpinService
-import io.github.mpecan.pmt.testcontainers.PushpinContainer
 import io.github.mpecan.pmt.testcontainers.PushpinContainerBuilder
 import io.github.mpecan.pmt.testcontainers.TestcontainersUtils
 import org.junit.jupiter.api.AfterEach
@@ -129,7 +128,7 @@ class ZmqMultiServerIntegrationTest {
         clients.forEach { client ->
             try {
                 client.closeAllConnections()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore exceptions during cleanup
             }
         }

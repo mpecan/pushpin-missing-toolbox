@@ -64,4 +64,3 @@ class PushpinConfigurationTest {
         assertTrue(configString.contains("log_user_agent=true"))
     }
 }
-
