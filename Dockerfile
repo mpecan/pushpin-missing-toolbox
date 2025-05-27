@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 RUN gradle build --no-daemon -x test
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17.0.15_6-jre-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
