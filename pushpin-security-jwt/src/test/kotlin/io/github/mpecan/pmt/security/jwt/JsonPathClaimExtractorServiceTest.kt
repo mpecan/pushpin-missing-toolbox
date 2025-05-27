@@ -2,7 +2,10 @@ package io.github.mpecan.pmt.security.jwt
 
 import org.junit.jupiter.api.Test
 import org.springframework.security.oauth2.jwt.Jwt
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class JsonPathClaimExtractorServiceTest {
 

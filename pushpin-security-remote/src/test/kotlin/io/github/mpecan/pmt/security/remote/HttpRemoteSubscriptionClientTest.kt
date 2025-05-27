@@ -10,11 +10,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpStatus
@@ -91,9 +94,9 @@ class HttpRemoteSubscriptionClientTest {
 
     private fun setupDefaultMocks() {
         // Default cache behavior - no cached results
-        whenever(mockCache.getSubscriptionCheck(anyString(), anyString())).thenReturn(null)
-        whenever(mockCache.getSubscribableChannels(anyString())).thenReturn(null)
-        whenever(mockCache.getSubscribableChannelsByPattern(anyString(), anyString())).thenReturn(null)
+        whenever(mockCache.getSubscriptionCheck(any<String>(), any<String>())).thenReturn(null)
+        whenever(mockCache.getSubscribableChannels(any<String>())).thenReturn(null)
+        whenever(mockCache.getSubscribableChannelsByPattern(any<String>(), any<String>())).thenReturn(null)
 
         // Default request behavior
         whenever(mockRequest.remoteAddr).thenReturn(TEST_IP)

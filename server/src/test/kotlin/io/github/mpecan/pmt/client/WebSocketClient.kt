@@ -48,9 +48,15 @@ class WebSocketClient(private val baseUrl: String) {
         }
             .subscribeOn(Schedulers.boundedElastic())
             .subscribe(
-                { /* onNext - success */ println("Connection successfully established") },
-                { error -> /* onError */ println("Failed to establish connection: ${error.message}") },
-                { /* onComplete */ println("Connection setup completed") },
+                { // onNext - success
+                    println("Connection successfully established")
+                },
+                { error -> // onError
+                    println("Failed to establish connection: ${error.message}")
+                },
+                { // onComplete
+                    println("Connection setup completed")
+                },
             )
 
         // Store the subscription to prevent it from being garbage collected

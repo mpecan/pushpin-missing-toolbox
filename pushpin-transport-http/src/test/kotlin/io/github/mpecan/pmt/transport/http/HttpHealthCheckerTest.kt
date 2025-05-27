@@ -3,7 +3,9 @@ package io.github.mpecan.pmt.transport.http
 import io.github.mpecan.pmt.model.PushpinServer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec

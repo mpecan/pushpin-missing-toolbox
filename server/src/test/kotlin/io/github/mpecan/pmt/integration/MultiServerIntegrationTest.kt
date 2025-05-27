@@ -167,8 +167,12 @@ class MultiServerIntegrationTest {
             // Verify initial subscription messages were received
             assert(client1Messages.size >= 1) { "Client 1 did not receive subscription confirmation" }
             assert(client2Messages.size >= 1) { "Client 2 did not receive subscription confirmation" }
-            assert(client1Messages[0].contains("Subscribed to channel")) { "Client 1 did not receive proper subscription message" }
-            assert(client2Messages[0].contains("Subscribed to channel")) { "Client 2 did not receive proper subscription message" }
+            assert(client1Messages[0].contains("Subscribed to channel")) {
+                "Client 1 did not receive proper subscription message"
+            }
+            assert(client2Messages[0].contains("Subscribed to channel")) {
+                "Client 2 did not receive proper subscription message"
+            }
 
             // Remember the message count after subscription confirmation
             val initialSize1 = client1Messages.size
@@ -323,13 +327,17 @@ class MultiServerIntegrationTest {
                 if (i % 4 == 0) {
                     println("Waiting for message delivery... Attempt $i")
                     println(
-                        "Client 1 messages: ${client1Messages.size - initialSize1}/${messages.size}, " +
-                            "Client 2 messages: ${client2Messages.size - initialSize2}/${messages.size}",
+                        "Client 1 messages: " +
+                            "${client1Messages.size - initialSize1}/${messages.size}, " +
+                            "Client 2 messages: " +
+                            "${client2Messages.size - initialSize2}/${messages.size}",
                     )
                 }
 
                 // Break early if both clients received all messages
-                if (client1Messages.size >= initialSize1 + messages.size && client2Messages.size >= initialSize2 + messages.size) {
+                if (client1Messages.size >= initialSize1 + messages.size &&
+                    client2Messages.size >= initialSize2 + messages.size
+                ) {
                     println("Both clients received all messages!")
                     break
                 }
@@ -340,8 +348,14 @@ class MultiServerIntegrationTest {
             println("Client 2 received ${client2Messages.size - initialSize2}/${messages.size} messages")
 
             // Verify that all messages were received by both clients
-            assert(client1Messages.size >= initialSize1 + messages.size) { "Client 1 did not receive all messages. Expected ${messages.size}, got ${client1Messages.size - initialSize1}" }
-            assert(client2Messages.size >= initialSize2 + messages.size) { "Client 2 did not receive all messages. Expected ${messages.size}, got ${client2Messages.size - initialSize2}" }
+            assert(client1Messages.size >= initialSize1 + messages.size) {
+                "Client 1 did not receive all messages. Expected ${messages.size}, " +
+                    "got ${client1Messages.size - initialSize1}"
+            }
+            assert(client2Messages.size >= initialSize2 + messages.size) {
+                "Client 2 did not receive all messages. Expected ${messages.size}, " +
+                    "got ${client2Messages.size - initialSize2}"
+            }
 
             println("Multiple message delivery test completed successfully!")
         } finally {
@@ -428,7 +442,10 @@ class MultiServerIntegrationTest {
                 // Print progress every few seconds
                 if (i % 4 == 0) {
                     println("Still waiting for message delivery... Attempt $i")
-                    println("Client 1 messages: ${client1Messages.size}, Client 2 messages: ${client2Messages.size}")
+                    println(
+                        "Client 1 messages: ${client1Messages.size}, " +
+                            "Client 2 messages: ${client2Messages.size}",
+                    )
                 }
             }
 
@@ -441,8 +458,12 @@ class MultiServerIntegrationTest {
             assert(client2Messages.size > initialSize2) { "Client 2 did not receive the JSON message" }
 
             // Verify message content contains JSON message text
-            assert(client1Messages.any { it.contains("Hello from JSON") }) { "Client 1 did not receive proper message content" }
-            assert(client2Messages.any { it.contains("Hello from JSON") }) { "Client 2 did not receive proper message content" }
+            assert(client1Messages.any { it.contains("Hello from JSON") }) {
+                "Client 1 did not receive proper message content"
+            }
+            assert(client2Messages.any { it.contains("Hello from JSON") }) {
+                "Client 2 did not receive proper message content"
+            }
 
             println("Format test delivery completed successfully!")
         } finally {
@@ -606,8 +627,12 @@ class MultiServerIntegrationTest {
             Thread.sleep(3000)
 
             // Cross clients should not receive any messages after the subscription
-            assert(crossMessages1.size == crossInitialSize1) { "Cross client 1 received messages meant for channel 1 on channel 2" }
-            assert(crossMessages2.size == crossInitialSize2) { "Cross client 2 received messages meant for channel 2 on channel 1" }
+            assert(crossMessages1.size == crossInitialSize1) {
+                "Cross client 1 received messages meant for channel 1 on channel 2"
+            }
+            assert(crossMessages2.size == crossInitialSize2) {
+                "Cross client 2 received messages meant for channel 2 on channel 1"
+            }
 
             // Clean up cross subscriptions
             crossSubscription1.dispose()

@@ -7,13 +7,23 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient
 import software.amazon.awssdk.services.autoscaling.model.AutoScalingGroup
 import software.amazon.awssdk.services.autoscaling.model.DescribeAutoScalingGroupsRequest
 import software.amazon.awssdk.services.autoscaling.model.DescribeAutoScalingGroupsResponse
 import software.amazon.awssdk.services.ec2.Ec2Client
-import software.amazon.awssdk.services.ec2.model.*
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse
+import software.amazon.awssdk.services.ec2.model.Instance
+import software.amazon.awssdk.services.ec2.model.InstanceState
+import software.amazon.awssdk.services.ec2.model.InstanceStateName
+import software.amazon.awssdk.services.ec2.model.Reservation
+import software.amazon.awssdk.services.ec2.model.Tag
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import software.amazon.awssdk.services.autoscaling.model.Instance as AsgInstance

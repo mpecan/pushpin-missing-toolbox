@@ -2,7 +2,10 @@ package io.github.mpecan.pmt.client.formatter
 
 import io.github.mpecan.pmt.client.exception.MessageFormattingException
 import io.github.mpecan.pmt.client.model.Message
-import io.github.mpecan.pmt.model.*
+import io.github.mpecan.pmt.model.HttpResponseFormat
+import io.github.mpecan.pmt.model.HttpStreamFormat
+import io.github.mpecan.pmt.model.PushpinFormat
+import io.github.mpecan.pmt.model.WebSocketFormat
 
 /**
  * Interface for formatting messages to Pushpin format.

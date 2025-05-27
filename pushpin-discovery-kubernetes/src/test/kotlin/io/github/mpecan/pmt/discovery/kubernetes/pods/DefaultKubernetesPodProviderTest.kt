@@ -4,9 +4,19 @@ import io.github.mpecan.pmt.discovery.kubernetes.KubernetesDiscoveryProperties
 import io.github.mpecan.pmt.discovery.kubernetes.clients.KubernetesClientProvider
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.CoreV1Api
-import io.kubernetes.client.openapi.models.*
+import io.kubernetes.client.openapi.models.V1ObjectMeta
+import io.kubernetes.client.openapi.models.V1Pod
+import io.kubernetes.client.openapi.models.V1PodList
+import io.kubernetes.client.openapi.models.V1PodStatus
+import io.kubernetes.client.openapi.models.V1Service
+import io.kubernetes.client.openapi.models.V1ServiceSpec
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

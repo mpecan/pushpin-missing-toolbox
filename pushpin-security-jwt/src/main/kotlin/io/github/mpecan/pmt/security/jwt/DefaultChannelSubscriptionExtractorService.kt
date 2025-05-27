@@ -79,7 +79,9 @@ class DefaultChannelSubscriptionExtractorService(
     }
 
     override fun getChannelsClaimPath(): String {
-        return properties.claimExtraction.extractClaims.find { it.contains("channel") || it.contains("subscription") } ?: "$.channels"
+        return properties.claimExtraction.extractClaims
+            .find { it.contains("channel") || it.contains("subscription") }
+            ?: "$.channels"
     }
 
     override fun isClaimExtractionEnabled(): Boolean = properties.claimExtraction.enabled

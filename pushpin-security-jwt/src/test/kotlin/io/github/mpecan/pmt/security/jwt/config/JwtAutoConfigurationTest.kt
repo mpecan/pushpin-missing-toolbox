@@ -1,11 +1,19 @@
 package io.github.mpecan.pmt.security.jwt.config
 
-import io.github.mpecan.pmt.security.core.*
-import io.github.mpecan.pmt.security.jwt.*
+import io.github.mpecan.pmt.security.core.ChannelSubscriptionExtractorService
+import io.github.mpecan.pmt.security.core.ClaimExtractorService
+import io.github.mpecan.pmt.security.core.JwtDecoderService
+import io.github.mpecan.pmt.security.core.NoOpClaimExtractorService
+import io.github.mpecan.pmt.security.core.NoOpJwtDecoderService
+import io.github.mpecan.pmt.security.jwt.DefaultChannelSubscriptionExtractorService
+import io.github.mpecan.pmt.security.jwt.DefaultJwtDecoderService
+import io.github.mpecan.pmt.security.jwt.JsonPathClaimExtractorService
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
-import kotlin.test.*
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class JwtAutoConfigurationTest {
 

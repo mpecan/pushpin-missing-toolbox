@@ -47,7 +47,8 @@ class ZmqTransport(
      */
     init {
         logger.info(
-            "Initializing ZMQ transport with PUSH socket type and connection pool: ${zmqProperties.connectionPoolEnabled}",
+            "Initializing ZMQ transport with PUSH socket type and connection pool: " +
+                "${zmqProperties.connectionPoolEnabled}",
         )
     }
 
