@@ -2,6 +2,7 @@ package io.github.mpecan.pmt.service
 
 import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
+import io.github.mpecan.pmt.metrics.MetricsService
 import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.core.EncryptionService
 import io.github.mpecan.pmt.transport.PushpinTransport
@@ -13,11 +14,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PushpinServiceTest {
-
     private val discoveryManager: PushpinDiscoveryManager = mock()
     private val transport: PushpinTransport = mock()
     private val encryptionService: EncryptionService = mock()
     private val auditService: AuditService = mock()
+    private val metricsService: MetricsService = mock()
 
     private lateinit var pushpinProperties: PushpinProperties
     private lateinit var pushpinService: PushpinService
@@ -25,42 +26,49 @@ class PushpinServiceTest {
     @BeforeEach
     fun setUp() {
         // Create test properties
-        val serverProps1 = PushpinProperties.ServerProperties(
-            id = "test-server-1",
-            host = "localhost",
-            port = 7999,
-            active = true,
-        )
+        val serverProps1 =
+            PushpinProperties.ServerProperties(
+                id = "test-server-1",
+                host = "localhost",
+                port = 7999,
+                active = true,
+            )
 
-        val serverProps2 = PushpinProperties.ServerProperties(
-            id = "test-server-2",
-            host = "localhost",
-            port = 7998,
-            active = true,
-        )
+        val serverProps2 =
+            PushpinProperties.ServerProperties(
+                id = "test-server-2",
+                host = "localhost",
+                port = 7998,
+                active = true,
+            )
 
-        pushpinProperties = PushpinProperties(
-            servers = listOf(serverProps1, serverProps2),
-            healthCheckEnabled = false,
-        )
+        pushpinProperties =
+            PushpinProperties(
+                servers = listOf(serverProps1, serverProps2),
+                healthCheckEnabled = false,
+            )
 
         // Create security properties
-        val securityProps = PushpinProperties.SecurityProperties(
-            encryption = PushpinProperties.EncryptionProperties(enabled = false),
-        )
+        val securityProps =
+            PushpinProperties.SecurityProperties(
+                encryption = PushpinProperties.EncryptionProperties(enabled = false),
+            )
 
         // Update properties to include security settings
-        pushpinProperties = pushpinProperties.copy(
-            security = securityProps,
-        )
+        pushpinProperties =
+            pushpinProperties.copy(
+                security = securityProps,
+            )
 
         // Create service with mocked dependencies
-        pushpinService = PushpinService(
-            discoveryManager,
-            encryptionService,
-            auditService,
-            pushpinTransports = listOf(transport),
-        )
+        pushpinService =
+            PushpinService(
+                discoveryManager,
+                encryptionService,
+                auditService,
+                metricsService,
+                pushpinTransports = listOf(transport),
+            )
     }
 
     @Test

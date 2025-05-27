@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":discovery"))
     implementation(project(":discovery-aws"))
     implementation(project(":discovery-kubernetes"))
+    implementation(project(":pushpin-metrics-core"))
     implementation(project(":pushpin-security-core"))
     implementation(project(":pushpin-security-remote"))
     implementation(project(":pushpin-security-audit"))
@@ -25,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -47,6 +49,10 @@ dependencies {
 
     // Caffeine for caching
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+
+    // Micrometer for metrics
+    implementation("io.micrometer:micrometer-core")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

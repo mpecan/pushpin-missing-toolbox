@@ -3,6 +3,7 @@ package io.github.mpecan.pmt.controller
 import io.github.mpecan.pmt.grip.GripApi
 import io.github.mpecan.pmt.grip.websocket.WebSocketEventType
 import io.github.mpecan.pmt.grip.websocket.WebSocketMessageBuilder
+import io.github.mpecan.pmt.metrics.MetricsService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,8 +17,9 @@ import org.springframework.web.bind.annotation.*
  */
 @RestController
 @RequestMapping("/api/ws")
-class WebSocketController {
-
+class WebSocketController(
+    private val metricsService: MetricsService,
+) {
     /**
      * Handles WebSocket-over-HTTP requests from Pushpin.
      * This endpoint processes WebSocket events encoded in the request body and
@@ -50,6 +52,10 @@ class WebSocketController {
 
         // Check if this is an initial connection (OPEN event)
         if (events.any { it.type == WebSocketEventType.OPEN }) {
+            // Record connection event
+            metricsService.recordConnectionEvent("websocket", "opened")
+            metricsService.incrementActiveConnections("websocket")
+
             // Build the response using the new API
             messageBuilder
                 .open()
@@ -66,11 +72,15 @@ class WebSocketController {
             for (event in events) {
                 when (event.type) {
                     WebSocketEventType.TEXT -> {
+                        // Record message received
+                        metricsService.recordMessageReceived("pushpin", "websocket")
                         // Echo the text message back
                         messageBuilder.text(event.content)
                     }
 
                     WebSocketEventType.BINARY -> {
+                        // Record message received
+                        metricsService.recordMessageReceived("pushpin", "websocket")
                         // Echo the binary message back for demonstration
                         messageBuilder.binary(event.content)
                     }
@@ -85,11 +95,17 @@ class WebSocketController {
                     }
 
                     WebSocketEventType.CLOSE -> {
+                        // Record disconnection
+                        metricsService.recordConnectionEvent("websocket", "closed")
+                        metricsService.decrementActiveConnections("websocket")
                         // Acknowledge the close
                         messageBuilder.close(event.content)
                     }
 
                     WebSocketEventType.DISCONNECT -> {
+                        // Record disconnection
+                        metricsService.recordConnectionEvent("websocket", "disconnected")
+                        metricsService.decrementActiveConnections("websocket")
                         // Connection is already closed or doesn't exist
                         messageBuilder.disconnect()
                     }

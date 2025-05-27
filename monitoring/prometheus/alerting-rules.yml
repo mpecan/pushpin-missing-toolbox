@@ -1,0 +1,146 @@
+groups:
+  - name: pushpin_alerts
+    interval: 30s
+    rules:
+      # High error rate alert
+      - alert: PushpinHighErrorRate
+        expr: |
+          (
+            sum(rate(pushpin_messages_errors_total[5m])) by (application, channel)
+            /
+            sum(rate(pushpin_messages_sent_total[5m])) by (application, channel)
+          ) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          service: pushpin
+        annotations:
+          summary: "High error rate detected"
+          description: "Channel {{ $labels.channel }} in {{ $labels.application }} has error rate of {{ $value | humanize }}%"
+
+      # Server unavailable alert
+      - alert: PushpinServerDown
+        expr: pushpin_server_health == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: pushpin
+        annotations:
+          summary: "Pushpin server is down"
+          description: "Server {{ $labels.server }} is not responding to health checks"
+
+      # High latency alert
+      - alert: PushpinHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(pushpin_operation_duration_seconds_bucket[5m])) by (application, operation, le)
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "High operation latency detected"
+          description: "Operation {{ $labels.operation }} in {{ $labels.application }} has 95th percentile latency of {{ $value | humanize }}s"
+
+      # Connection pool exhaustion alert
+      - alert: PushpinHighConnectionCount
+        expr: |
+          sum(pushpin_channel_active_connections) by (application, channel)
+          > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "High number of active connections"
+          description: "Channel {{ $labels.channel }} in {{ $labels.application }} has {{ $value }} active connections"
+
+      # No message activity alert
+      - alert: PushpinNoMessageActivity
+        expr: |
+          sum(rate(pushpin_messages_sent_total[10m])) by (application) == 0
+          and
+          sum(pushpin_messages_sent_total) by (application) > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "No message activity detected"
+          description: "No messages have been sent in {{ $labels.application }} for the last 10 minutes"
+
+      # Publish errors alert
+      - alert: PushpinPublishErrors
+        expr: |
+          sum(rate(pushpin_publish_errors_total[5m])) by (application, channel, error_type)
+          > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "Publish errors detected"
+          description: "Channel {{ $labels.channel }} is experiencing {{ $labels.error_type }} errors at {{ $value | humanize }} errors/sec"
+
+      # WebSocket connection failures
+      - alert: PushpinWebSocketConnectionFailures
+        expr: |
+          (
+            sum(rate(pushpin_websocket_connections_total{event="error"}[5m])) by (application, channel)
+            /
+            sum(rate(pushpin_websocket_connections_total{event="opened"}[5m])) by (application, channel)
+          ) * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "High WebSocket connection failure rate"
+          description: "Channel {{ $labels.channel }} has {{ $value | humanize }}% WebSocket connection failure rate"
+
+      # Server response time degradation
+      - alert: PushpinServerSlowResponse
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(pushpin_server_response_time_seconds_bucket[5m])) by (server, le)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "Server response time degraded"
+          description: "Server {{ $labels.server }} has 95th percentile response time of {{ $value | humanize }}s"
+
+      # Multiple servers down
+      - alert: PushpinMultipleServersDown
+        expr: |
+          count(pushpin_server_health == 0) by (application)
+          >= 
+          count(pushpin_server_health) by (application) * 0.5
+        for: 2m
+        labels:
+          severity: critical
+          service: pushpin
+        annotations:
+          summary: "Multiple Pushpin servers are down"
+          description: "{{ $value }} servers are down in {{ $labels.application }}, which is 50% or more of the total"
+
+      # Channel throughput drop
+      - alert: PushpinChannelThroughputDrop
+        expr: |
+          (
+            sum(rate(pushpin_channel_throughput_bytes_total[5m])) by (application, channel)
+            < 
+            sum(rate(pushpin_channel_throughput_bytes_total[30m] offset 1h)) by (application, channel) * 0.5
+          )
+          and
+          sum(rate(pushpin_channel_throughput_bytes_total[30m] offset 1h)) by (application, channel) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          service: pushpin
+        annotations:
+          summary: "Channel throughput has dropped significantly"
+          description: "Channel {{ $labels.channel }} throughput dropped by more than 50% compared to 1 hour ago"

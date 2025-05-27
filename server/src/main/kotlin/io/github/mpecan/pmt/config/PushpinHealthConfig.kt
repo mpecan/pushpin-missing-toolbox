@@ -2,6 +2,7 @@ package io.github.mpecan.pmt.config
 
 import io.github.mpecan.pmt.health.DefaultPushpinHealthChecker
 import io.github.mpecan.pmt.health.PushpinHealthChecker
+import io.github.mpecan.pmt.metrics.MetricsService
 import io.github.mpecan.pmt.service.PushpinService
 import io.github.mpecan.pmt.transport.health.TransportHealthChecker
 import org.springframework.beans.factory.annotation.Value
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 class PushpinHealthConfig {
-
     /**
      * Creates a PushpinHealthChecker bean if none is provided.
      * * This bean now supports multiple transport health checkers and will
@@ -26,13 +26,13 @@ class PushpinHealthConfig {
         transportHealthCheckers: List<TransportHealthChecker>,
         pushpinProperties: PushpinProperties,
         pushpinService: PushpinService,
+        metricsService: MetricsService,
         @Value("\${pushpin.transport:http}") transportType: String,
-    ): PushpinHealthChecker {
-        return DefaultPushpinHealthChecker(
-            transportHealthCheckers,
-            pushpinProperties.healthCheckEnabled,
-            pushpinService,
-            transportType,
-        )
-    }
+    ): PushpinHealthChecker = DefaultPushpinHealthChecker(
+        transportHealthCheckers,
+        pushpinProperties.healthCheckEnabled,
+        pushpinService,
+        metricsService,
+        transportType,
+    )
 }
