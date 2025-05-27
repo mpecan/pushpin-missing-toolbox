@@ -1,9 +1,8 @@
-package io.github.mpecan.pmt.security
+package io.github.mpecan.pmt.security.ratelimit
 
 import io.github.bucket4j.Bandwidth
 import io.github.bucket4j.Bucket
 import io.github.bucket4j.Refill
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -16,12 +15,13 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Filter for rate limiting requests.
  *
- * @param properties The Pushpin properties containing rate limiting configuration
+ * @param properties The rate limiting configuration properties
+ * @param auditService The audit service for logging rate limit events
  * @param buckets A map to store rate limit buckets, keyed by IP address or username.
  *                This is injectable to allow for better testability.
  */
 class RateLimitFilter(
-    private val properties: PushpinProperties,
+    private val properties: RateLimitProperties,
     private val auditService: AuditService,
     private val buckets: ConcurrentHashMap<String, Bucket> = ConcurrentHashMap(),
 ) : OncePerRequestFilter() {
@@ -32,7 +32,7 @@ class RateLimitFilter(
         filterChain: FilterChain,
     ) {
         // Skip rate limiting if disabled
-        if (!properties.security.rateLimit.enabled) {
+        if (!properties.enabled) {
             filterChain.doFilter(request, response)
             return
         }
@@ -107,8 +107,8 @@ class RateLimitFilter(
      * Create a new token bucket with the configured capacity and refill rate.
      */
     private fun createBucket(): Bucket {
-        val limit = properties.security.rateLimit.capacity
-        val refillTime = properties.security.rateLimit.refillTimeInMillis
+        val limit = properties.capacity
+        val refillTime = properties.refillTimeInMillis
 
         val refill = Refill.intervally(limit, Duration.ofMillis(refillTime))
         val bandwidth = Bandwidth.classic(limit, refill)

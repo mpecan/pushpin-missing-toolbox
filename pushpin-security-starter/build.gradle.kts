@@ -12,6 +12,7 @@ dependencies {
     api(project(":pushpin-security-encryption"))
     api(project(":pushpin-security-hmac"))
     api(project(":pushpin-security-jwt"))
+    api(project(":pushpin-security-ratelimit"))
 
     // Spring Boot starter dependencies
     implementation("org.springframework.boot:spring-boot-starter")

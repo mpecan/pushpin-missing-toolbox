@@ -17,6 +17,7 @@ include(
     ":pushpin-security-encryption",
     ":pushpin-security-hmac",
     ":pushpin-security-jwt",
+    ":pushpin-security-ratelimit",
     ":pushpin-security-starter",
     ":pushpin-transport-core",
     ":pushpin-transport-http",
