@@ -335,8 +335,9 @@ class MultiServerIntegrationTest {
                 }
 
                 // Break early if both clients received all messages
-                if (client1Messages.size >= initialSize1 + messages.size && 
-                    client2Messages.size >= initialSize2 + messages.size) {
+                if (client1Messages.size >= initialSize1 + messages.size &&
+                    client2Messages.size >= initialSize2 + messages.size
+                ) {
                     println("Both clients received all messages!")
                     break
                 }

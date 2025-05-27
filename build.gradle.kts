@@ -105,7 +105,7 @@ subprojects {
         android.set(false)
         outputToConsole.set(true)
         outputColorName.set("RED")
-        ignoreFailures.set(true) // Set to true for CI to continue on lint errors
+        ignoreFailures.set(false) // Set to false to fail on ktlint errors
         enableExperimentalRules.set(true)
 
         filter {
@@ -230,7 +230,7 @@ val installGitHook by tasks.registering {
             |echo "Running ktlintCheck..."
             |
             |# Run ktlintCheck
-            |./gradlew ktlintCheck --quiet
+            |./gradlew ktlintCheck --console=plain
             |
             |# Capture the exit code
             |RESULT=${'$'}?
