@@ -204,3 +204,65 @@ tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("
     outputDir = "build/reports/dependencyUpdates"
     reportfileName = "report"
 }
+
+// Install pre-commit hook for ktlint (only for developers, not CI)
+val installGitHook by tasks.registering {
+    group = "git hooks"
+    description = "Install pre-commit git hook for ktlint"
+    
+    doLast {
+        // Skip if running in CI environment
+        val isCI = System.getenv("CI") != null || 
+                   System.getenv("GITHUB_ACTIONS") != null ||
+                   System.getenv("JENKINS_HOME") != null ||
+                   System.getenv("GITLAB_CI") != null ||
+                   System.getenv("CIRCLECI") != null
+        
+        if (isCI) {
+            logger.lifecycle("Skipping git hook installation in CI environment")
+            return@doLast
+        }
+        
+        val hookFile = file(".git/hooks/pre-commit")
+        val hookContent = """
+            |#!/bin/sh
+            |
+            |# Run ktlintCheck before commit
+            |echo "Running ktlintCheck..."
+            |
+            |# Run ktlintCheck
+            |./gradlew ktlintCheck --quiet
+            |
+            |# Capture the exit code
+            |RESULT=${'$'}?
+            |
+            |# If ktlintCheck failed, abort the commit
+            |if [ ${'$'}RESULT -ne 0 ]; then
+            |    echo ""
+            |    echo "❌ Commit aborted due to ktlint violations."
+            |    echo "Please fix the issues and try again."
+            |    echo "You can run './gradlew ktlintFormat' to auto-fix some violations."
+            |    exit 1
+            |fi
+            |
+            |echo "✅ All ktlint checks passed!"
+            |exit 0
+        """.trimMargin()
+        
+        if (!hookFile.parentFile.exists()) {
+            logger.warn("Git hooks directory not found. Skipping pre-commit hook installation.")
+            return@doLast
+        }
+        
+        hookFile.writeText(hookContent)
+        hookFile.setExecutable(true)
+        logger.lifecycle("Pre-commit hook installed successfully at ${hookFile.path}")
+    }
+}
+
+// Automatically install git hooks after project evaluation
+afterEvaluate {
+    tasks.named("build") {
+        dependsOn(installGitHook)
+    }
+}
