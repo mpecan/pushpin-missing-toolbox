@@ -17,11 +17,7 @@ class MicrometerMetricsService(
     // Connection gauges by transport type
     private val activeConnections = ConcurrentHashMap<String, AtomicLong>()
 
-    override fun recordMessageSent(
-        server: String,
-        transport: String,
-        status: String,
-    ) {
+    override fun recordMessageSent(server: String, transport: String, status: String) {
         Counter
             .builder(MetricNames.MESSAGES_SENT)
             .description("Total number of messages sent")
@@ -32,10 +28,7 @@ class MicrometerMetricsService(
             .increment()
     }
 
-    override fun recordMessageReceived(
-        server: String,
-        transport: String,
-    ) {
+    override fun recordMessageReceived(server: String, transport: String) {
         Counter
             .builder(MetricNames.MESSAGES_RECEIVED)
             .description("Total number of messages received")
@@ -45,11 +38,7 @@ class MicrometerMetricsService(
             .increment()
     }
 
-    override fun recordMessageError(
-        server: String,
-        transport: String,
-        errorType: String,
-    ) {
+    override fun recordMessageError(server: String, transport: String, errorType: String) {
         Counter
             .builder(MetricNames.MESSAGES_ERRORS)
             .description("Total number of message errors")
@@ -60,12 +49,7 @@ class MicrometerMetricsService(
             .increment()
     }
 
-    override fun recordOperationDuration(
-        operation: String,
-        server: String?,
-        duration: Long,
-        unit: TimeUnit,
-    ) {
+    override fun recordOperationDuration(operation: String, server: String?, duration: Long, unit: TimeUnit) {
         val timerBuilder =
             Timer
                 .builder(MetricNames.OPERATION_DURATION)
@@ -81,11 +65,7 @@ class MicrometerMetricsService(
             .record(duration, unit)
     }
 
-    override fun <T> recordOperation(
-        operation: String,
-        server: String?,
-        block: () -> T,
-    ): T {
+    override fun <T> recordOperation(operation: String, server: String?, block: () -> T): T {
         val timerBuilder =
             Timer
                 .builder(MetricNames.OPERATION_DURATION)
@@ -101,10 +81,7 @@ class MicrometerMetricsService(
             .recordCallable(block)!!
     }
 
-    override fun updateServerHealth(
-        server: String,
-        healthy: Boolean,
-    ) {
+    override fun updateServerHealth(server: String, healthy: Boolean) {
         Gauge
             .builder(MetricNames.SERVER_HEALTH) { if (healthy) 1.0 else 0.0 }
             .description("Server health status (1=healthy, 0=unhealthy)")
@@ -112,12 +89,7 @@ class MicrometerMetricsService(
             .register(meterRegistry)
     }
 
-    override fun recordServerResponseTime(
-        server: String,
-        endpoint: String,
-        responseTime: Long,
-        unit: TimeUnit,
-    ) {
+    override fun recordServerResponseTime(server: String, endpoint: String, responseTime: Long, unit: TimeUnit) {
         Timer
             .builder(MetricNames.SERVER_RESPONSE_TIME)
             .description("Server response times")
@@ -128,10 +100,7 @@ class MicrometerMetricsService(
             .record(responseTime, unit)
     }
 
-    override fun updateActiveConnections(
-        transport: String,
-        count: Long,
-    ) {
+    override fun updateActiveConnections(transport: String, count: Long) {
         activeConnections.compute(transport) { _, current ->
             val atomic = current ?: AtomicLong(0)
             atomic.set(count)
@@ -165,10 +134,7 @@ class MicrometerMetricsService(
         }
     }
 
-    override fun recordThroughput(
-        transport: String,
-        bytes: Long,
-    ) {
+    override fun recordThroughput(transport: String, bytes: Long) {
         Counter
             .builder(MetricNames.THROUGHPUT_BYTES)
             .description("Total throughput in bytes")
@@ -178,10 +144,7 @@ class MicrometerMetricsService(
             .increment(bytes.toDouble())
     }
 
-    override fun recordPublishError(
-        server: String,
-        errorType: String,
-    ) {
+    override fun recordPublishError(server: String, errorType: String) {
         Counter
             .builder(MetricNames.PUBLISH_ERRORS)
             .description("Total number of publish errors")
@@ -191,10 +154,7 @@ class MicrometerMetricsService(
             .increment()
     }
 
-    override fun recordConnectionEvent(
-        transport: String,
-        event: String,
-    ) {
+    override fun recordConnectionEvent(transport: String, event: String) {
         Counter
             .builder(MetricNames.CONNECTION_EVENTS)
             .description("Connection lifecycle events")
@@ -206,11 +166,7 @@ class MicrometerMetricsService(
 
     override fun startTimer(): MetricsService.TimerSample = MicrometerTimerSample(Timer.start(meterRegistry))
 
-    override fun stopTimer(
-        sample: MetricsService.TimerSample,
-        operation: String,
-        server: String?,
-    ) {
+    override fun stopTimer(sample: MetricsService.TimerSample, operation: String, server: String?) {
         if (sample is MicrometerTimerSample) {
             val timerBuilder =
                 Timer
@@ -229,10 +185,7 @@ class MicrometerMetricsService(
     private class MicrometerTimerSample(
         val micrometerSample: Timer.Sample,
     ) : MetricsService.TimerSample {
-        override fun stop(
-            operation: String,
-            server: String?,
-        ) {
+        override fun stop(operation: String, server: String?) {
             // Delegate to the parent stopTimer method
             throw UnsupportedOperationException("Use MetricsService.stopTimer instead")
         }
