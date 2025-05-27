@@ -1,7 +1,6 @@
-package io.github.mpecan.pmt.security
+package io.github.mpecan.pmt.security.ratelimit
 
 import io.github.bucket4j.Bucket
-import io.github.mpecan.pmt.config.PushpinProperties
 import io.github.mpecan.pmt.security.core.AuditService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -32,7 +31,7 @@ class RateLimitFilterTest {
     private lateinit var mockFilterChain: FilterChain
     private lateinit var mockPrintWriter: PrintWriter
     private lateinit var mockAuditService: AuditService
-    private lateinit var properties: PushpinProperties
+    private lateinit var properties: RateLimitProperties
     private lateinit var buckets: ConcurrentHashMap<String, Bucket>
 
     @BeforeEach
@@ -55,19 +54,11 @@ class RateLimitFilterTest {
         whenever(mockRequest.remoteAddr).thenReturn("127.0.0.1")
 
         // Create properties with rate limiting enabled
-        val rateLimitProperties = mock<PushpinProperties.RateLimitProperties> {
-            on { enabled } doReturn true
-            on { capacity } doReturn 5L
-            on { refillTimeInMillis } doReturn 60000L
-        }
-
-        val securityProperties = mock<PushpinProperties.SecurityProperties> {
-            on { rateLimit } doReturn rateLimitProperties
-        }
-
-        properties = mock {
-            on { security } doReturn securityProperties
-        }
+        properties = RateLimitProperties(
+            enabled = true,
+            capacity = 5L,
+            refillTimeInMillis = 60000L,
+        )
 
         // Create rate limit filter with mocked buckets
         rateLimitFilter = RateLimitFilter(properties, mockAuditService, buckets)
@@ -76,7 +67,8 @@ class RateLimitFilterTest {
     @Test
     fun `filter should skip rate limiting when disabled`() {
         // Arrange - Modify properties to disable rate limiting
-        whenever(properties.security.rateLimit.enabled).thenReturn(false)
+        val disabledProperties = properties.copy(enabled = false)
+        rateLimitFilter = RateLimitFilter(disabledProperties, mockAuditService, buckets)
 
         // Act
         rateLimitFilter.doFilter(mockRequest, mockResponse, mockFilterChain)

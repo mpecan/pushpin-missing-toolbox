@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":pushpin-security-encryption"))
     implementation(project(":pushpin-security-hmac"))
     implementation(project(":pushpin-security-jwt"))
+    implementation(project(":pushpin-security-ratelimit"))
     implementation(project(":pushpin-transport-http"))
     implementation(project(":pushpin-transport-zmq"))
 
@@ -40,9 +41,6 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api")
     runtimeOnly("io.jsonwebtoken:jjwt-impl")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson")
-
-    // Rate limiting
-    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core")
 
     // JsonPath for JWT claim extraction
     implementation("com.jayway.jsonpath:json-path")

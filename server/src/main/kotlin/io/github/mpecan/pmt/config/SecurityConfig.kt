@@ -1,9 +1,9 @@
 package io.github.mpecan.pmt.config
 
-import io.github.mpecan.pmt.security.RateLimitFilter
 import io.github.mpecan.pmt.security.core.AuditService
 import io.github.mpecan.pmt.security.core.JwtDecoderService
 import io.github.mpecan.pmt.security.hmac.HmacSignatureFilter
+import io.github.mpecan.pmt.security.ratelimit.RateLimitFilter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -42,6 +42,9 @@ class SecurityConfig(
     @Autowired(required = false)
     private var hmacSignatureFilter: HmacSignatureFilter? = null
 
+    @Autowired(required = false)
+    private var rateLimitFilter: RateLimitFilter? = null
+
     /**
      * Configures the security filter chain.
      */
@@ -67,10 +70,10 @@ class SecurityConfig(
                     .permitAll()
             }
 
-        // Add rate limiting if enabled
-        if (pushpinProperties.security.rateLimit.enabled) {
+        // Add rate limiting if enabled and available
+        if (pushpinProperties.security.rateLimit.enabled && rateLimitFilter != null) {
             http.addFilterBefore(
-                RateLimitFilter(pushpinProperties, auditService),
+                rateLimitFilter!!,
                 UsernamePasswordAuthenticationFilter::class.java,
             )
         }
