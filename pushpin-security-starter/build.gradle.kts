@@ -22,8 +22,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // Optional dependencies that security modules might need
-    implementation("com.jayway.jsonpath:json-path:2.8.0")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("com.jayway.jsonpath:json-path")
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

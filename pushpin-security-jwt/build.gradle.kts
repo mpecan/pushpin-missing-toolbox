@@ -14,11 +14,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // JsonPath for JWT claim extraction
-    implementation("com.jayway.jsonpath:json-path:2.8.0")
+    implementation("com.jayway.jsonpath:json-path")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation(kotlin("test"))
 }
 
