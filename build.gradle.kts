@@ -6,7 +6,7 @@ val springDependencyManagementVersion: String by project
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.4" apply false
+    id("org.springframework.boot") version "3.4.5" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
     id("jacoco-report-aggregation")
@@ -61,6 +61,11 @@ subprojects {
     val reactorKotlinExtensionsVersion: String by project
     val jacksonVersion: String by project
     val reactorVersion: String by project
+    val logbackVersion: String by project
+    val httpClientVersion: String by project
+    val artemisVersion: String by project
+    val tomcatVersion: String by project
+    val okioVersion: String by project
 
     // Apply dependency management
     dependencyManagement {
@@ -111,6 +116,17 @@ subprojects {
             // Monitoring dependencies
             dependency("io.micrometer:micrometer-core:$micrometerVersion")
             dependency("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
+
+            // Override vulnerable versions
+            dependency("ch.qos.logback:logback-classic:$logbackVersion")
+            dependency("ch.qos.logback:logback-core:$logbackVersion")
+            dependency("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
+            dependency("org.apache.activemq:artemis-project:$artemisVersion")
+            dependency("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
+            dependency("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
+            dependency("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
+            dependency("com.squareup.okio:okio:$okioVersion")
+            dependency("com.squareup.okio:okio-jvm:$okioVersion")
         }
     }
 
