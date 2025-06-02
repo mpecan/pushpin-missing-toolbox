@@ -15,7 +15,10 @@ interface RemoteAuthorizationClient {
      * @param channelId The channel ID to check subscription access for
      * @return True if user can subscribe to the channel, false otherwise
      */
-    fun canSubscribe(request: HttpServletRequest, channelId: String): Boolean
+    fun canSubscribe(
+        request: HttpServletRequest,
+        channelId: String,
+    ): Boolean
 
     /**
      * Get all channels that the user can subscribe to.
@@ -32,5 +35,8 @@ interface RemoteAuthorizationClient {
      * @param pattern The channel pattern (e.g., "news.*", "user.123.*")
      * @return List of channel IDs matching the pattern that the user can subscribe to
      */
-    fun getSubscribableChannelsByPattern(request: HttpServletRequest, pattern: String): List<String> = emptyList()
+    fun getSubscribableChannelsByPattern(
+        request: HttpServletRequest,
+        pattern: String,
+    ): List<String> = emptyList()
 }

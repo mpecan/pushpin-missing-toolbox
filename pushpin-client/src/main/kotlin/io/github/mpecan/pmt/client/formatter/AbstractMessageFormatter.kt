@@ -40,13 +40,12 @@ abstract class AbstractMessageFormatter<T : PushpinFormat>(
      * @param message The message to pre-process
      * @return The pre-processed message
      */
-    protected open fun preProcessMessage(message: Message): Message {
-        return if (options.applyCustomPreProcessors) {
+    protected open fun preProcessMessage(message: Message): Message =
+        if (options.applyCustomPreProcessors) {
             options.preProcessors.fold(message) { acc, processor -> processor(acc) }
         } else {
             message
         }
-    }
 
     /**
      * Actual formatting implementation.
@@ -65,14 +64,16 @@ abstract class AbstractMessageFormatter<T : PushpinFormat>(
      * @param originalMessage The original message
      * @return The post-processed result
      */
-    protected open fun postProcessResult(result: T, originalMessage: Message): T {
-        return if (options.applyCustomPostProcessors) {
+    protected open fun postProcessResult(
+        result: T,
+        originalMessage: Message,
+    ): T =
+        if (options.applyCustomPostProcessors) {
             @Suppress("UNCHECKED_CAST")
             options.postProcessors.fold(result) { acc, processor -> processor(acc, originalMessage) as T }
         } else {
             result
         }
-    }
 }
 
 /**
@@ -83,25 +84,21 @@ data class FormatterOptions(
      * Whether to apply custom pre-processors. Default is false.
      */
     val applyCustomPreProcessors: Boolean = false,
-
     /**
      * Whether to apply custom post-processors. Default is false.
      */
     val applyCustomPostProcessors: Boolean = false,
-
     /**
      * Custom pre-processors to apply to messages before formatting.
      * Each processor takes a Message and returns a Message.
      */
     val preProcessors: List<(Message) -> Message> = emptyList(),
-
     /**
      * Custom post-processors to apply to results after formatting.
      * Each processor takes a PushpinFormat and the original Message,
      * and returns a PushpinFormat.
      */
     val postProcessors: List<(PushpinFormat, Message) -> PushpinFormat> = emptyList(),
-
     /**
      * Additional options specific to the formatter.
      */
@@ -110,29 +107,29 @@ data class FormatterOptions(
     /**
      * Creates a new options instance with an additional pre-processor.
      */
-    fun withPreProcessor(processor: (Message) -> Message): FormatterOptions {
-        return copy(
+    fun withPreProcessor(processor: (Message) -> Message): FormatterOptions =
+        copy(
             applyCustomPreProcessors = true,
             preProcessors = preProcessors + processor,
         )
-    }
 
     /**
      * Creates a new options instance with an additional post-processor.
      */
-    fun withPostProcessor(processor: (PushpinFormat, Message) -> PushpinFormat): FormatterOptions {
-        return copy(
+    fun withPostProcessor(processor: (PushpinFormat, Message) -> PushpinFormat): FormatterOptions =
+        copy(
             applyCustomPostProcessors = true,
             postProcessors = postProcessors + processor,
         )
-    }
 
     /**
      * Creates a new options instance with an additional option.
      */
-    fun withOption(key: String, value: Any): FormatterOptions {
-        return copy(
+    fun withOption(
+        key: String,
+        value: Any,
+    ): FormatterOptions =
+        copy(
             additionalOptions = additionalOptions + (key to value),
         )
-    }
 }

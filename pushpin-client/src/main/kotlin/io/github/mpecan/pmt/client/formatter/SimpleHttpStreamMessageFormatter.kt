@@ -9,10 +9,11 @@ class SimpleHttpStreamMessageFormatter(
 ) : HttpStreamMessageFormatter {
     override fun format(message: Message): HttpStreamFormat {
         // Handle string data differently to avoid extra quotes
-        val data = when (message.data) {
-            is String -> message.data
-            else -> serializationService.serialize(message.data)
-        }
+        val data =
+            when (message.data) {
+                is String -> message.data
+                else -> serializationService.serialize(message.data)
+            }
 
         return HttpStreamFormat(
             content = data + "\n",

@@ -24,7 +24,6 @@ import java.io.PrintWriter
 import java.util.concurrent.ConcurrentHashMap
 
 class RateLimitFilterTest {
-
     private lateinit var rateLimitFilter: RateLimitFilter
     private lateinit var mockRequest: HttpServletRequest
     private lateinit var mockResponse: HttpServletResponse
@@ -54,11 +53,12 @@ class RateLimitFilterTest {
         whenever(mockRequest.remoteAddr).thenReturn("127.0.0.1")
 
         // Create properties with rate limiting enabled
-        properties = RateLimitProperties(
-            enabled = true,
-            capacity = 5L,
-            refillTimeInMillis = 60000L,
-        )
+        properties =
+            RateLimitProperties(
+                enabled = true,
+                capacity = 5L,
+                refillTimeInMillis = 60000L,
+            )
 
         // Create rate limit filter with mocked buckets
         rateLimitFilter = RateLimitFilter(properties, mockAuditService, buckets)
@@ -82,9 +82,10 @@ class RateLimitFilterTest {
     fun `filter should use IP address for rate limiting when not authenticated`() {
         // Arrange
         val expectedKey = "ip:127.0.0.1"
-        val mockBucket = mock<Bucket> {
-            on { tryConsume(1) } doReturn true
-        }
+        val mockBucket =
+            mock<Bucket> {
+                on { tryConsume(1) } doReturn true
+            }
 
         // Set up buckets to return our mock bucket
         doReturn(mockBucket).whenever(buckets).computeIfAbsent(eq(expectedKey), any())
@@ -104,17 +105,19 @@ class RateLimitFilterTest {
         val username = "testuser"
         val expectedKey = "user:$username"
 
-        val authentication = UsernamePasswordAuthenticationToken(
-            username,
-            null,
-            listOf(SimpleGrantedAuthority("ROLE_USER")),
-        )
+        val authentication =
+            UsernamePasswordAuthenticationToken(
+                username,
+                null,
+                listOf(SimpleGrantedAuthority("ROLE_USER")),
+            )
         val securityContext = SecurityContextImpl(authentication)
         SecurityContextHolder.setContext(securityContext)
 
-        val mockBucket = mock<Bucket> {
-            on { tryConsume(1) } doReturn true
-        }
+        val mockBucket =
+            mock<Bucket> {
+                on { tryConsume(1) } doReturn true
+            }
 
         // Set up buckets to return our mock bucket
         doReturn(mockBucket).whenever(buckets).computeIfAbsent(eq(expectedKey), any())
@@ -131,9 +134,10 @@ class RateLimitFilterTest {
     @Test
     fun `filter should allow requests when bucket has tokens`() {
         // Arrange
-        val mockBucket = mock<Bucket> {
-            on { tryConsume(1) } doReturn true
-        }
+        val mockBucket =
+            mock<Bucket> {
+                on { tryConsume(1) } doReturn true
+            }
 
         // Set up buckets to return our mock bucket
         doReturn(mockBucket).whenever(buckets).computeIfAbsent(any(), any())
@@ -150,9 +154,10 @@ class RateLimitFilterTest {
     @Test
     fun `filter should block requests when bucket is empty`() {
         // Arrange
-        val mockBucket = mock<Bucket> {
-            on { tryConsume(1) } doReturn false
-        }
+        val mockBucket =
+            mock<Bucket> {
+                on { tryConsume(1) } doReturn false
+            }
 
         // Set up buckets to return our mock bucket
         doReturn(mockBucket).whenever(buckets).computeIfAbsent(any(), any())
@@ -178,9 +183,10 @@ class RateLimitFilterTest {
 
         whenever(mockRequest.getHeader("X-Forwarded-For")).thenReturn("$realIP, 10.0.0.1")
 
-        val mockBucket = mock<Bucket> {
-            on { tryConsume(1) } doReturn true
-        }
+        val mockBucket =
+            mock<Bucket> {
+                on { tryConsume(1) } doReturn true
+            }
 
         // Set up buckets to return our mock bucket
         doReturn(mockBucket).whenever(buckets).computeIfAbsent(eq(expectedKey), any())
@@ -202,9 +208,10 @@ class RateLimitFilterTest {
         whenever(mockRequest.getHeader("X-Forwarded-For")).thenReturn(null)
         whenever(mockRequest.getHeader("X-Real-IP")).thenReturn(realIP)
 
-        val mockBucket = mock<Bucket> {
-            on { tryConsume(1) } doReturn true
-        }
+        val mockBucket =
+            mock<Bucket> {
+                on { tryConsume(1) } doReturn true
+            }
 
         // Set up buckets to return our mock bucket
         doReturn(mockBucket).whenever(buckets).computeIfAbsent(eq(expectedKey), any())

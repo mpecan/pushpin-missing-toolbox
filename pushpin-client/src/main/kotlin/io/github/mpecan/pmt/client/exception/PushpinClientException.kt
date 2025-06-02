@@ -33,14 +33,15 @@ class PublishingException(
     statusCode: Int? = null,
     cause: Throwable? = null,
 ) : PushpinClientException(
-    message = when {
-        serverInfo != null && statusCode != null -> "$message (Server: $serverInfo, Status: $statusCode)"
-        serverInfo != null -> "$message (Server: $serverInfo)"
-        statusCode != null -> "$message (Status: $statusCode)"
-        else -> message
-    },
-    cause = cause,
-)
+        message =
+            when {
+                serverInfo != null && statusCode != null -> "$message (Server: $serverInfo, Status: $statusCode)"
+                serverInfo != null -> "$message (Server: $serverInfo)"
+                statusCode != null -> "$message (Status: $statusCode)"
+                else -> message
+            },
+        cause = cause,
+    )
 
 /**
  * Exception thrown when no Pushpin servers are available.
@@ -59,14 +60,15 @@ class PushpinTimeoutException(
     timeoutMs: Long? = null,
     cause: Throwable? = null,
 ) : PushpinClientException(
-    message = when {
-        serverInfo != null && timeoutMs != null -> "$message (Server: $serverInfo, Timeout: ${timeoutMs}ms)"
-        serverInfo != null -> "$message (Server: $serverInfo)"
-        timeoutMs != null -> "$message (Timeout: ${timeoutMs}ms)"
-        else -> message
-    },
-    cause = cause,
-)
+        message =
+            when {
+                serverInfo != null && timeoutMs != null -> "$message (Server: $serverInfo, Timeout: ${timeoutMs}ms)"
+                serverInfo != null -> "$message (Server: $serverInfo)"
+                timeoutMs != null -> "$message (Timeout: ${timeoutMs}ms)"
+                else -> message
+            },
+        cause = cause,
+    )
 
 /**
  * Exception thrown when there's an authentication error with Pushpin.
@@ -76,6 +78,6 @@ class PushpinAuthenticationException(
     serverInfo: String? = null,
     cause: Throwable? = null,
 ) : PushpinClientException(
-    message = if (serverInfo != null) "$message (Server: $serverInfo)" else message,
-    cause = cause,
-)
+        message = if (serverInfo != null) "$message (Server: $serverInfo)" else message,
+        cause = cause,
+    )

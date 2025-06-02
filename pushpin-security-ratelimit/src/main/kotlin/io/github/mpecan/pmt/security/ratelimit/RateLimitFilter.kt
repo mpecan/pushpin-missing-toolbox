@@ -25,7 +25,6 @@ class RateLimitFilter(
     private val auditService: AuditService,
     private val buckets: ConcurrentHashMap<String, Bucket> = ConcurrentHashMap(),
 ) : OncePerRequestFilter() {
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -64,7 +63,9 @@ class RateLimitFilter(
     private fun getRequestKey(request: HttpServletRequest): RequestKey {
         // Get the authenticated username if available
         val authentication =
-            org.springframework.security.core.context.SecurityContextHolder.getContext().authentication
+            org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .authentication
         val username =
             if (authentication != null && authentication.isAuthenticated && authentication.name != "anonymousUser") {
                 authentication.name
@@ -76,10 +77,11 @@ class RateLimitFilter(
         return RequestKey(getClientIP(request), username)
     }
 
-    inner class RequestKey(val ip: String, val username: String?) {
-        override fun toString(): String {
-            return if (username != null) "user:$username" else "ip:$ip"
-        }
+    inner class RequestKey(
+        val ip: String,
+        val username: String?,
+    ) {
+        override fun toString(): String = if (username != null) "user:$username" else "ip:$ip"
     }
 
     /**
@@ -113,7 +115,8 @@ class RateLimitFilter(
         val refill = Refill.intervally(limit, Duration.ofMillis(refillTime))
         val bandwidth = Bandwidth.classic(limit, refill)
 
-        return Bucket.builder()
+        return Bucket
+            .builder()
             .addLimit(bandwidth)
             .build()
     }

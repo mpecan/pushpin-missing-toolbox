@@ -13,7 +13,6 @@ class ConfigurationBasedDiscovery(
     private val properties: ConfigurationDiscoveryProperties,
     private val pushpinProperties: PushpinProperties,
 ) : PushpinDiscovery {
-
     private val logger = LoggerFactory.getLogger(ConfigurationBasedDiscovery::class.java)
 
     override val id: String = "configuration"
@@ -21,13 +20,12 @@ class ConfigurationBasedDiscovery(
     override fun discoverServers(): Flux<PushpinServer> {
         logger.debug("Discovering Pushpin servers from configuration")
 
-        return Flux.fromIterable(pushpinProperties.servers)
+        return Flux
+            .fromIterable(pushpinProperties.servers)
             .filter { it.active }
             .map { it.toPushpinServer() }
             .doOnNext { logger.debug("Discovered Pushpin server from configuration: ${it.id} at ${it.getBaseUrl()}") }
     }
 
-    override fun isEnabled(): Boolean {
-        return properties.enabled
-    }
+    override fun isEnabled(): Boolean = properties.enabled
 }

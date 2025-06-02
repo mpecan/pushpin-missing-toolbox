@@ -43,41 +43,37 @@ import org.springframework.http.ResponseEntity
  */
 @Suppress("unused")
 object GripApi {
-
     /**
      * Creates a new GRIP header builder.
      */
-    fun headers(): GripHeaderBuilder {
-        return GripHeaderBuilder()
-    }
+    fun headers(): GripHeaderBuilder = GripHeaderBuilder()
 
     /**
      * Creates a new WebSocket message builder.
      */
-    fun websocket(): WebSocketMessageBuilder {
-        return WebSocketMessageBuilder()
-    }
+    fun websocket(): WebSocketMessageBuilder = WebSocketMessageBuilder()
 
     /**
      * Parses WebSocket events from a request body.
      */
-    fun parseWebSocketEvents(body: String): List<WebSocketEvent> {
-        return WebSocketEventParser.parse(body)
-    }
+    fun parseWebSocketEvents(body: String): List<WebSocketEvent> = WebSocketEventParser.parse(body)
 
     /**
      * Creates a GRIP signature for authentication.
      */
-    fun createSignature(issuer: String, key: String, expiresIn: Long? = null): String {
-        return GripAuthHelper.createGripSignature(issuer, key, expiresIn)
-    }
+    fun createSignature(
+        issuer: String,
+        key: String,
+        expiresIn: Long? = null,
+    ): String = GripAuthHelper.createGripSignature(issuer, key, expiresIn)
 
     /**
      * Validates a GRIP signature.
      */
-    fun validateSignature(token: String, key: String): Boolean {
-        return GripAuthHelper.validateGripSignature(token, key)
-    }
+    fun validateSignature(
+        token: String,
+        key: String,
+    ): Boolean = GripAuthHelper.validateGripSignature(token, key)
 
     /**
      * Creates a ResponseEntity builder for HTTP long-polling with GRIP headers.
@@ -85,33 +81,33 @@ object GripApi {
     fun <T> longPollingResponse(
         channel: String,
         timeout: Int = GripConstants.DEFAULT_TIMEOUT,
-    ): ResponseEntity.BodyBuilder {
-        return ResponseEntity.ok()
+    ): ResponseEntity.BodyBuilder =
+        ResponseEntity
+            .ok()
             .contentType(MediaType.APPLICATION_JSON)
             .header(GripConstants.HEADER_GRIP_HOLD, GripConstants.HOLD_MODE_RESPONSE)
             .header(GripConstants.HEADER_GRIP_CHANNEL, channel)
             .header(GripConstants.HEADER_GRIP_TIMEOUT, timeout.toString())
-    }
 
     /**
      * Creates a ResponseEntity builder for HTTP streaming with GRIP headers.
      */
-    fun streamingResponse(channel: String): ResponseEntity.BodyBuilder {
-        return ResponseEntity.ok()
+    fun streamingResponse(channel: String): ResponseEntity.BodyBuilder =
+        ResponseEntity
+            .ok()
             .contentType(MediaType.TEXT_PLAIN)
             .header(GripConstants.HEADER_GRIP_HOLD, GripConstants.HOLD_MODE_STREAM)
             .header(GripConstants.HEADER_GRIP_CHANNEL, channel)
-    }
 
     /**
      * Creates a ResponseEntity builder for Server-Sent Events with GRIP headers.
      */
-    fun sseResponse(channel: String): ResponseEntity.BodyBuilder {
-        return ResponseEntity.ok()
+    fun sseResponse(channel: String): ResponseEntity.BodyBuilder =
+        ResponseEntity
+            .ok()
             .contentType(MediaType.TEXT_EVENT_STREAM)
             .header(GripConstants.HEADER_GRIP_HOLD, GripConstants.HOLD_MODE_STREAM)
             .header(GripConstants.HEADER_GRIP_CHANNEL, channel)
-    }
 
     /**
      * Creates a ResponseEntity builder for WebSocket-over-HTTP with GRIP headers.
@@ -119,26 +115,25 @@ object GripApi {
     fun websocketResponse(
         secWebSocketAccept: String,
         keepAliveInterval: Int = GripConstants.DEFAULT_KEEP_ALIVE_INTERVAL,
-    ): ResponseEntity.BodyBuilder {
-        return ResponseEntity.ok()
+    ): ResponseEntity.BodyBuilder =
+        ResponseEntity
+            .ok()
             .contentType(MediaType.parseMediaType(GripConstants.CONTENT_TYPE_WEBSOCKET_EVENTS))
             .header(GripConstants.HEADER_SEC_WEBSOCKET_EXTENSIONS, GripConstants.WEBSOCKET_EXTENSION_GRIP)
             .header(GripConstants.HEADER_SEC_WEBSOCKET_ACCEPT, secWebSocketAccept)
             .header(GripConstants.HEADER_KEEP_ALIVE_INTERVAL, keepAliveInterval.toString())
-    }
 
     /**
      * Extracts meta headers from request headers.
      * * @param headers The request headers
      * @return Map of meta headers without the "Meta-" prefix
      */
-    fun extractMetaHeaders(headers: HttpHeaders): Map<String, String> {
-        return headers.entries
+    fun extractMetaHeaders(headers: HttpHeaders): Map<String, String> =
+        headers.entries
             .filter { (key, _) -> key.startsWith(GripConstants.HEADER_META_PREFIX, ignoreCase = true) }
             .associate { (key, values) ->
                 key.removePrefix(GripConstants.HEADER_META_PREFIX) to (values.firstOrNull() ?: "")
             }
-    }
 
     /**
      * Applies meta headers to a response.

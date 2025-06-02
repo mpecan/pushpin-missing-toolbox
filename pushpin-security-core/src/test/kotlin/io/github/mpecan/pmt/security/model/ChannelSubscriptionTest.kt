@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class ChannelSubscriptionTest {
-
     @Test
     fun `should create channel subscription with defaults`() {
         val subscription = ChannelSubscription(channelId = "news")
@@ -16,14 +15,16 @@ class ChannelSubscriptionTest {
 
     @Test
     fun `should create channel subscription with metadata`() {
-        val subscription = ChannelSubscription(
-            channelId = "user.123",
-            allowed = true,
-            metadata = mapOf(
-                "expiresAt" to "2024-12-31",
-                "filter" to "important",
-            ),
-        )
+        val subscription =
+            ChannelSubscription(
+                channelId = "user.123",
+                allowed = true,
+                metadata =
+                    mapOf(
+                        "expiresAt" to "2024-12-31",
+                        "filter" to "important",
+                    ),
+            )
 
         assertThat(subscription.getMetadata<String>("expiresAt")).isEqualTo("2024-12-31")
         assertThat(subscription.getMetadata<String>("filter")).isEqualTo("important")
@@ -32,14 +33,16 @@ class ChannelSubscriptionTest {
 
     @Test
     fun `should handle type-safe metadata retrieval`() {
-        val subscription = ChannelSubscription(
-            channelId = "analytics",
-            metadata = mapOf(
-                "limit" to 100,
-                "active" to true,
-                "tags" to listOf("sales", "revenue"),
-            ),
-        )
+        val subscription =
+            ChannelSubscription(
+                channelId = "analytics",
+                metadata =
+                    mapOf(
+                        "limit" to 100,
+                        "active" to true,
+                        "tags" to listOf("sales", "revenue"),
+                    ),
+            )
 
         assertThat(subscription.getMetadata<Int>("limit")).isEqualTo(100)
         assertThat(subscription.getMetadata<Boolean>("active")).isTrue()
@@ -49,18 +52,19 @@ class ChannelSubscriptionTest {
 }
 
 class ChannelSubscriptionsTest {
-
     @Test
     fun `should check if subscription is allowed`() {
-        val subscriptions = ChannelSubscriptions(
-            principal = "user123",
-            subscriptions = listOf(
-                ChannelSubscription("news", allowed = true),
-                ChannelSubscription("admin", allowed = false),
-                ChannelSubscription("user.123", allowed = true),
-            ),
-            defaultAllow = false,
-        )
+        val subscriptions =
+            ChannelSubscriptions(
+                principal = "user123",
+                subscriptions =
+                    listOf(
+                        ChannelSubscription("news", allowed = true),
+                        ChannelSubscription("admin", allowed = false),
+                        ChannelSubscription("user.123", allowed = true),
+                    ),
+                defaultAllow = false,
+            )
 
         assertThat(subscriptions.canSubscribe("news")).isTrue()
         assertThat(subscriptions.canSubscribe("admin")).isFalse()
@@ -70,13 +74,15 @@ class ChannelSubscriptionsTest {
 
     @Test
     fun `should respect default allow policy`() {
-        val subscriptions = ChannelSubscriptions(
-            principal = "user123",
-            subscriptions = listOf(
-                ChannelSubscription("blocked", allowed = false),
-            ),
-            defaultAllow = true,
-        )
+        val subscriptions =
+            ChannelSubscriptions(
+                principal = "user123",
+                subscriptions =
+                    listOf(
+                        ChannelSubscription("blocked", allowed = false),
+                    ),
+                defaultAllow = true,
+            )
 
         assertThat(subscriptions.canSubscribe("blocked")).isFalse()
         assertThat(subscriptions.canSubscribe("any-other-channel")).isTrue()
@@ -84,15 +90,17 @@ class ChannelSubscriptionsTest {
 
     @Test
     fun `should get all allowed channels`() {
-        val subscriptions = ChannelSubscriptions(
-            principal = "user123",
-            subscriptions = listOf(
-                ChannelSubscription("news", allowed = true),
-                ChannelSubscription("admin", allowed = false),
-                ChannelSubscription("user.123", allowed = true),
-                ChannelSubscription("private", allowed = false),
-            ),
-        )
+        val subscriptions =
+            ChannelSubscriptions(
+                principal = "user123",
+                subscriptions =
+                    listOf(
+                        ChannelSubscription("news", allowed = true),
+                        ChannelSubscription("admin", allowed = false),
+                        ChannelSubscription("user.123", allowed = true),
+                        ChannelSubscription("private", allowed = false),
+                    ),
+            )
 
         assertThat(subscriptions.getAllowedChannels())
             .containsExactlyInAnyOrder("news", "user.123")
@@ -100,11 +108,12 @@ class ChannelSubscriptionsTest {
 
     @Test
     fun `should handle empty subscriptions`() {
-        val subscriptions = ChannelSubscriptions(
-            principal = "user123",
-            subscriptions = emptyList(),
-            defaultAllow = false,
-        )
+        val subscriptions =
+            ChannelSubscriptions(
+                principal = "user123",
+                subscriptions = emptyList(),
+                defaultAllow = false,
+            )
 
         assertThat(subscriptions.getAllowedChannels()).isEmpty()
         assertThat(subscriptions.canSubscribe("any-channel")).isFalse()

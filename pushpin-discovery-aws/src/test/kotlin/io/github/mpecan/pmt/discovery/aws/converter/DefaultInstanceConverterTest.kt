@@ -8,31 +8,33 @@ import software.amazon.awssdk.services.ec2.model.Tag
 import kotlin.test.assertEquals
 
 class DefaultInstanceConverterTest {
-
     private lateinit var converter: DefaultInstanceConverter
     private lateinit var properties: AwsDiscoveryProperties
 
     @BeforeEach
     fun setUp() {
         converter = DefaultInstanceConverter()
-        properties = AwsDiscoveryProperties(
-            enabled = true,
-            port = 7999,
-            controlPort = 5564,
-            publishPort = 5560,
-            healthCheckPath = "/test/health",
-            privateIp = true,
-        )
+        properties =
+            AwsDiscoveryProperties(
+                enabled = true,
+                port = 7999,
+                controlPort = 5564,
+                publishPort = 5560,
+                healthCheckPath = "/test/health",
+                privateIp = true,
+            )
     }
 
     @Test
     fun `should use private IP when privateIp is true`() {
         // Create an instance with both private and public IPs
-        val instance = Instance.builder()
-            .instanceId("i-12345")
-            .privateIpAddress("10.0.0.1")
-            .publicIpAddress("54.0.0.1")
-            .build()
+        val instance =
+            Instance
+                .builder()
+                .instanceId("i-12345")
+                .privateIpAddress("10.0.0.1")
+                .publicIpAddress("54.0.0.1")
+                .build()
 
         // Convert to PushpinServer
         val server = converter.toPushpinServer(instance, properties)
@@ -52,11 +54,13 @@ class DefaultInstanceConverterTest {
         val publicIpProperties = properties.copy(privateIp = false)
 
         // Create an instance with both private and public IPs
-        val instance = Instance.builder()
-            .instanceId("i-12345")
-            .privateIpAddress("10.0.0.1")
-            .publicIpAddress("54.0.0.1")
-            .build()
+        val instance =
+            Instance
+                .builder()
+                .instanceId("i-12345")
+                .privateIpAddress("10.0.0.1")
+                .publicIpAddress("54.0.0.1")
+                .build()
 
         // Convert to PushpinServer
         val server = converter.toPushpinServer(instance, publicIpProperties)
@@ -71,11 +75,13 @@ class DefaultInstanceConverterTest {
         val publicIpProperties = properties.copy(privateIp = false)
 
         // Create an instance with only private IP
-        val instance = Instance.builder()
-            .instanceId("i-12345")
-            .privateIpAddress("10.0.0.1")
-            .publicIpAddress(null)
-            .build()
+        val instance =
+            Instance
+                .builder()
+                .instanceId("i-12345")
+                .privateIpAddress("10.0.0.1")
+                .publicIpAddress(null)
+                .build()
 
         // Convert to PushpinServer
         val server = converter.toPushpinServer(instance, publicIpProperties)
@@ -87,11 +93,18 @@ class DefaultInstanceConverterTest {
     @Test
     fun `should use Name tag for server ID if available`() {
         // Create an instance with a Name tag
-        val instance = Instance.builder()
-            .instanceId("i-12345")
-            .privateIpAddress("10.0.0.1")
-            .tags(Tag.builder().key("Name").value("pushpin-server-1").build())
-            .build()
+        val instance =
+            Instance
+                .builder()
+                .instanceId("i-12345")
+                .privateIpAddress("10.0.0.1")
+                .tags(
+                    Tag
+                        .builder()
+                        .key("Name")
+                        .value("pushpin-server-1")
+                        .build(),
+                ).build()
 
         // Convert to PushpinServer
         val server = converter.toPushpinServer(instance, properties)
@@ -103,11 +116,18 @@ class DefaultInstanceConverterTest {
     @Test
     fun `should use instance ID for server ID if Name tag is not available`() {
         // Create an instance without a Name tag
-        val instance = Instance.builder()
-            .instanceId("i-12345")
-            .privateIpAddress("10.0.0.1")
-            .tags(Tag.builder().key("OtherTag").value("other-value").build())
-            .build()
+        val instance =
+            Instance
+                .builder()
+                .instanceId("i-12345")
+                .privateIpAddress("10.0.0.1")
+                .tags(
+                    Tag
+                        .builder()
+                        .key("OtherTag")
+                        .value("other-value")
+                        .build(),
+                ).build()
 
         // Convert to PushpinServer
         val server = converter.toPushpinServer(instance, properties)
@@ -119,18 +139,21 @@ class DefaultInstanceConverterTest {
     @Test
     fun `should use configured port values`() {
         // Create properties with custom port values
-        val customPortProperties = properties.copy(
-            port = 8000,
-            controlPort = 6000,
-            publishPort = 7000,
-            healthCheckPath = "/custom/health",
-        )
+        val customPortProperties =
+            properties.copy(
+                port = 8000,
+                controlPort = 6000,
+                publishPort = 7000,
+                healthCheckPath = "/custom/health",
+            )
 
         // Create an instance
-        val instance = Instance.builder()
-            .instanceId("i-12345")
-            .privateIpAddress("10.0.0.1")
-            .build()
+        val instance =
+            Instance
+                .builder()
+                .instanceId("i-12345")
+                .privateIpAddress("10.0.0.1")
+                .build()
 
         // Convert to PushpinServer
         val server = converter.toPushpinServer(instance, customPortProperties)

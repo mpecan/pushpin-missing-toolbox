@@ -129,10 +129,9 @@ class MessageSerializerBuilder {
         /**
          * Creates a default MessageSerializer using the provided FormatterFactory.
          */
-        fun defaultSerializer(formatterFactory: FormatterFactory): MessageSerializer {
-            return builder()
+        fun defaultSerializer(formatterFactory: FormatterFactory): MessageSerializer =
+            builder()
                 .withFormatterFactory(formatterFactory)
                 .build()
-        }
     }
 }

@@ -41,35 +41,30 @@ class DefaultFormatterFactory(
     /**
      * Creates a WebSocket message formatter with custom options.
      */
-    override fun createWebSocketFormatter(options: FormatterOptions): WebSocketMessageFormatter {
-        return DefaultWebSocketMessageFormatter(serializationService, options)
-    }
+    override fun createWebSocketFormatter(options: FormatterOptions): WebSocketMessageFormatter =
+        DefaultWebSocketMessageFormatter(serializationService, options)
 
     /**
      * Creates an HTTP stream message formatter with custom options.
      */
-    override fun createHttpStreamFormatter(options: FormatterOptions): HttpStreamMessageFormatter {
-        return SimpleHttpStreamMessageFormatter(serializationService)
-    }
+    override fun createHttpStreamFormatter(options: FormatterOptions): HttpStreamMessageFormatter =
+        SimpleHttpStreamMessageFormatter(serializationService)
 
     /**
      * Creates an SSE stream message formatter with custom options.
      */
-    override fun createSseStreamFormatter(options: FormatterOptions): SSEStreamMessageFormatter {
-        return HttpSSEStreamMessageFormatter(serializationService)
-    }
+    override fun createSseStreamFormatter(options: FormatterOptions): SSEStreamMessageFormatter =
+        HttpSSEStreamMessageFormatter(serializationService)
 
     /**
      * Creates an HTTP response message formatter with custom options.
      */
-    override fun createHttpResponseFormatter(options: FormatterOptions): HttpResponseMessageFormatter {
-        return DefaultHttpResponseMessageFormatter(serializationService)
-    }
+    override fun createHttpResponseFormatter(options: FormatterOptions): HttpResponseMessageFormatter =
+        DefaultHttpResponseMessageFormatter(serializationService)
 
     /**
      * Creates a long polling message formatter with custom options.
      */
-    override fun createLongPollingFormatter(options: FormatterOptions): LongPollingMessageFormatter {
-        return DefaultLongPollingMessageFormatter(serializationService)
-    }
+    override fun createLongPollingFormatter(options: FormatterOptions): LongPollingMessageFormatter =
+        DefaultLongPollingMessageFormatter(serializationService)
 }

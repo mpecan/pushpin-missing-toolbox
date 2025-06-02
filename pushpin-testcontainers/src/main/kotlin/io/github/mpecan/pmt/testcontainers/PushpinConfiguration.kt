@@ -22,7 +22,6 @@ data class PushpinConfiguration(
     val portOffset: Int = 0,
     val statsConnectionTtl: Int = 120,
     val statsConnectionSend: Boolean = true,
-
     // Runner settings
     val services: String = "condure,pushpin-proxy,pushpin-handler",
     val httpPort: Int = 7999,
@@ -33,7 +32,6 @@ data class PushpinConfiguration(
     val clientBufferSize: Int = 8192,
     val clientMaxConn: Int = 50000,
     val allowCompression: Boolean = false,
-
     // Proxy settings
     val routesFile: String = "routes",
     val debug: Boolean = false,
@@ -53,7 +51,6 @@ data class PushpinConfiguration(
     val sockjsUrl: String = "http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js",
     val updatesCheck: String = "off",
     val organizationName: String = "",
-
     // Handler settings
     val ipcFileMode: String? = null,
     val pushInPort: Int = 5560,
@@ -83,8 +80,8 @@ data class PushpinConfiguration(
     /**
      * Generate the pushpin.conf content based on the configuration.
      */
-    fun toConfigString(): String {
-        return buildString {
+    fun toConfigString(): String =
+        buildString {
             appendLine("[global]")
             appendLine("include={libdir}/internal.conf")
             appendLine()
@@ -273,5 +270,4 @@ data class PushpinConfiguration(
             appendLine("# stats output format")
             appendLine("stats_format=$statsFormat")
         }
-    }
 }

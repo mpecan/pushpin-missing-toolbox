@@ -12,17 +12,19 @@ class HttpSSEStreamMessageFormatter(
 ) : SSEStreamMessageFormatter {
     override fun format(message: Message): HttpStreamFormat {
         // Handle string data differently to avoid extra quotes
-        val data = when (message.data) {
-            is String -> message.data
-            else -> serializationService.serialize(message.data)
-        }
+        val data =
+            when (message.data) {
+                is String -> message.data
+                else -> serializationService.serialize(message.data)
+            }
 
-        val content = listOf(
-            message.eventType?.let {
-                "event: ${message.eventType}\n"
-            } ?: "",
-            "data: $data\n\n",
-        ).joinToString("")
+        val content =
+            listOf(
+                message.eventType?.let {
+                    "event: ${message.eventType}\n"
+                } ?: "",
+                "data: $data\n\n",
+            ).joinToString("")
 
         return HttpStreamFormat(
             content = content,

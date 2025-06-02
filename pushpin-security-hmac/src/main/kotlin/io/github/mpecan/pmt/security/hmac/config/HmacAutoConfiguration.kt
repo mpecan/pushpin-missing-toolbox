@@ -18,22 +18,17 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @EnableConfigurationProperties(HmacProperties::class)
 class HmacAutoConfiguration {
-
     @Bean
     @ConditionalOnProperty(
         prefix = "pushpin.security.hmac",
         name = ["enabled"],
         havingValue = "true",
     )
-    fun hmacService(properties: HmacProperties): HmacService {
-        return DefaultHmacService(properties)
-    }
+    fun hmacService(properties: HmacProperties): HmacService = DefaultHmacService(properties)
 
     @Bean
     @ConditionalOnMissingBean(HmacService::class)
-    fun noOpHmacService(): HmacService {
-        return NoOpHmacService()
-    }
+    fun noOpHmacService(): HmacService = NoOpHmacService()
 
     @Bean
     @ConditionalOnProperty(
@@ -45,7 +40,5 @@ class HmacAutoConfiguration {
         hmacService: HmacService,
         properties: HmacProperties,
         auditService: AuditService,
-    ): HmacSignatureFilter {
-        return HmacSignatureFilter(hmacService, properties, auditService)
-    }
+    ): HmacSignatureFilter = HmacSignatureFilter(hmacService, properties, auditService)
 }

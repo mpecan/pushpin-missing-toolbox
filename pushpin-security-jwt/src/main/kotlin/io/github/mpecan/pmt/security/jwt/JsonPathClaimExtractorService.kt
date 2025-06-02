@@ -13,7 +13,10 @@ import org.springframework.security.oauth2.jwt.Jwt
 class JsonPathClaimExtractorService : ClaimExtractorService {
     private val logger = LoggerFactory.getLogger(JsonPathClaimExtractorService::class.java)
 
-    override fun extractStringClaim(jwt: Jwt, claimPath: String): String? {
+    override fun extractStringClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): String? {
         val context = createJsonContext(jwt)
         return try {
             context.read<Any>(validatePath(claimPath))?.toString()
@@ -26,7 +29,10 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
         }
     }
 
-    override fun extractListClaim(jwt: Jwt, claimPath: String): List<String> {
+    override fun extractListClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): List<String> {
         val context = createJsonContext(jwt)
         return try {
             val result = context.read<Any>(validatePath(claimPath))
@@ -45,7 +51,10 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
         }
     }
 
-    override fun extractMapClaim(jwt: Jwt, claimPath: String): Map<String, Any> {
+    override fun extractMapClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): Map<String, Any> {
         val context = createJsonContext(jwt)
         return try {
             val result = context.read<Any>(validatePath(claimPath))
@@ -66,7 +75,10 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
         }
     }
 
-    override fun hasClaim(jwt: Jwt, claimPath: String): Boolean {
+    override fun hasClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): Boolean {
         val context = createJsonContext(jwt)
         return try {
             context.read<Any>(validatePath(claimPath)) != null

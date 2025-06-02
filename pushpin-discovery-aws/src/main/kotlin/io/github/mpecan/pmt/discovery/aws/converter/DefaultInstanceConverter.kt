@@ -8,13 +8,17 @@ import software.amazon.awssdk.services.ec2.model.Instance
  * Default implementation of InstanceConverter that converts EC2 instances to PushpinServer objects.
  */
 class DefaultInstanceConverter : InstanceConverter {
-    override fun toPushpinServer(instance: Instance, properties: AwsDiscoveryProperties): PushpinServer {
+    override fun toPushpinServer(
+        instance: Instance,
+        properties: AwsDiscoveryProperties,
+    ): PushpinServer {
         // Get appropriate IP address based on configuration
-        val host = if (properties.privateIp) {
-            instance.privateIpAddress()
-        } else {
-            instance.publicIpAddress() ?: instance.privateIpAddress()
-        }
+        val host =
+            if (properties.privateIp) {
+                instance.privateIpAddress()
+            } else {
+                instance.publicIpAddress() ?: instance.privateIpAddress()
+            }
 
         // Get server ID from instance ID or Name tag
         val nameTag = instance.tags().find { it.key() == "Name" }

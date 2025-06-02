@@ -7,48 +7,78 @@ import java.util.concurrent.TimeUnit
  * This interface provides methods for recording various metrics without high-cardinality tags.
  */
 interface MetricsService {
-
     /**
      * Records a message sent.
      * Note: We don't include channel as a tag to avoid high cardinality.
      */
-    fun recordMessageSent(server: String, transport: String, status: String = "success")
+    fun recordMessageSent(
+        server: String,
+        transport: String,
+        status: String = "success",
+    )
 
     /**
      * Records a message received.
      */
-    fun recordMessageReceived(server: String, transport: String)
+    fun recordMessageReceived(
+        server: String,
+        transport: String,
+    )
 
     /**
      * Records a message error.
      */
-    fun recordMessageError(server: String, transport: String, errorType: String)
+    fun recordMessageError(
+        server: String,
+        transport: String,
+        errorType: String,
+    )
 
     /**
      * Records an operation duration.
      */
-    fun recordOperationDuration(operation: String, server: String?, duration: Long, unit: TimeUnit)
+    fun recordOperationDuration(
+        operation: String,
+        server: String?,
+        duration: Long,
+        unit: TimeUnit,
+    )
 
     /**
      * Records an operation with timing.
      */
-    fun <T> recordOperation(operation: String, server: String? = null, block: () -> T): T
+    fun <T> recordOperation(
+        operation: String,
+        server: String? = null,
+        block: () -> T,
+    ): T
 
     /**
      * Updates server health status.
      */
-    fun updateServerHealth(server: String, healthy: Boolean)
+    fun updateServerHealth(
+        server: String,
+        healthy: Boolean,
+    )
 
     /**
      * Records server response time.
      */
-    fun recordServerResponseTime(server: String, endpoint: String, responseTime: Long, unit: TimeUnit)
+    fun recordServerResponseTime(
+        server: String,
+        endpoint: String,
+        responseTime: Long,
+        unit: TimeUnit,
+    )
 
     /**
      * Updates total active connections count.
      * Note: We track total connections, not per-channel to avoid high cardinality.
      */
-    fun updateActiveConnections(transport: String, count: Long)
+    fun updateActiveConnections(
+        transport: String,
+        count: Long,
+    )
 
     /**
      * Increments active connections.
@@ -64,17 +94,26 @@ interface MetricsService {
      * Records total throughput in bytes.
      * Note: We don't break down by channel to avoid high cardinality.
      */
-    fun recordThroughput(transport: String, bytes: Long)
+    fun recordThroughput(
+        transport: String,
+        bytes: Long,
+    )
 
     /**
      * Records a publish error.
      */
-    fun recordPublishError(server: String, errorType: String)
+    fun recordPublishError(
+        server: String,
+        errorType: String,
+    )
 
     /**
      * Records connection events (opened, closed, error).
      */
-    fun recordConnectionEvent(transport: String, event: String)
+    fun recordConnectionEvent(
+        transport: String,
+        event: String,
+    )
 
     /**
      * Creates a timer sample for manual timing.
@@ -84,13 +123,20 @@ interface MetricsService {
     /**
      * Stops a timer sample and records the duration.
      */
-    fun stopTimer(sample: TimerSample, operation: String, server: String? = null)
+    fun stopTimer(
+        sample: TimerSample,
+        operation: String,
+        server: String? = null,
+    )
 
     /**
      * Timer sample interface for manual timing.
      */
     interface TimerSample {
-        fun stop(operation: String, server: String? = null)
+        fun stop(
+            operation: String,
+            server: String? = null,
+        )
     }
 }
 

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 class NoOpAuditServiceTest {
-
     private val auditService = NoOpAuditService()
 
     @Test

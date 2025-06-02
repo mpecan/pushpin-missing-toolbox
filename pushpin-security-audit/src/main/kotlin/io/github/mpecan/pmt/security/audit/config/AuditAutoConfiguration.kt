@@ -22,10 +22,7 @@ import org.springframework.context.annotation.Bean
     havingValue = "true",
 )
 class AuditAutoConfiguration {
-
     @Bean
     @ConditionalOnMissingBean(AuditService::class)
-    fun auditService(properties: AuditProperties): AuditService {
-        return DefaultAuditLogService(properties)
-    }
+    fun auditService(properties: AuditProperties): AuditService = DefaultAuditLogService(properties)
 }

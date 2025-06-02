@@ -11,11 +11,12 @@ class SubscriptionAuthorizationCache(
     cacheMaxSize: Long = 10000,
     cacheTtl: Long = 300000, // 5 minutes default
 ) {
-
-    private val cache: Cache<CacheKey, CacheValue> = Caffeine.newBuilder()
-        .maximumSize(cacheMaxSize)
-        .expireAfterWrite(cacheTtl, TimeUnit.MILLISECONDS)
-        .build()
+    private val cache: Cache<CacheKey, CacheValue> =
+        Caffeine
+            .newBuilder()
+            .maximumSize(cacheMaxSize)
+            .expireAfterWrite(cacheTtl, TimeUnit.MILLISECONDS)
+            .build()
 
     /**
      * Check if a subscription check is cached.
@@ -24,7 +25,10 @@ class SubscriptionAuthorizationCache(
      * @param channelId Channel ID to check
      * @return True if the user can subscribe to the channel, false otherwise, or null if not cached
      */
-    fun getSubscriptionCheck(userId: String, channelId: String): Boolean? {
+    fun getSubscriptionCheck(
+        userId: String,
+        channelId: String,
+    ): Boolean? {
         val key = CacheKey.forSubscriptionCheck(userId, channelId)
         val value = cache.getIfPresent(key)
         return value?.boolValue
@@ -37,7 +41,11 @@ class SubscriptionAuthorizationCache(
      * @param channelId Channel ID
      * @param canSubscribe Result of the subscription check
      */
-    fun cacheSubscriptionCheck(userId: String, channelId: String, canSubscribe: Boolean) {
+    fun cacheSubscriptionCheck(
+        userId: String,
+        channelId: String,
+        canSubscribe: Boolean,
+    ) {
         val key = CacheKey.forSubscriptionCheck(userId, channelId)
         cache.put(key, CacheValue.ofBoolean(canSubscribe))
     }
@@ -60,7 +68,10 @@ class SubscriptionAuthorizationCache(
      * @param userId User ID
      * @param channels List of channel IDs
      */
-    fun cacheSubscribableChannels(userId: String, channels: List<String>) {
+    fun cacheSubscribableChannels(
+        userId: String,
+        channels: List<String>,
+    ) {
         val key = CacheKey.forChannelsList(userId)
         cache.put(key, CacheValue.ofList(channels))
     }
@@ -72,7 +83,10 @@ class SubscriptionAuthorizationCache(
      * @param pattern Channel pattern
      * @return List of channel IDs, or null if not cached
      */
-    fun getSubscribableChannelsByPattern(userId: String, pattern: String): List<String>? {
+    fun getSubscribableChannelsByPattern(
+        userId: String,
+        pattern: String,
+    ): List<String>? {
         val key = CacheKey.forPatternChannels(userId, pattern)
         val value = cache.getIfPresent(key)
         return value?.listValue
@@ -85,7 +99,11 @@ class SubscriptionAuthorizationCache(
      * @param pattern Channel pattern
      * @param channels List of channel IDs
      */
-    fun cacheSubscribableChannelsByPattern(userId: String, pattern: String, channels: List<String>) {
+    fun cacheSubscribableChannelsByPattern(
+        userId: String,
+        pattern: String,
+        channels: List<String>,
+    ) {
         val key = CacheKey.forPatternChannels(userId, pattern)
         cache.put(key, CacheValue.ofList(channels))
     }
@@ -108,17 +126,17 @@ class SubscriptionAuthorizationCache(
         val pattern: String? = null,
     ) {
         companion object {
-            fun forSubscriptionCheck(userId: String, channelId: String): CacheKey {
-                return CacheKey(CacheType.SUBSCRIPTION_CHECK, userId, channelId = channelId)
-            }
+            fun forSubscriptionCheck(
+                userId: String,
+                channelId: String,
+            ): CacheKey = CacheKey(CacheType.SUBSCRIPTION_CHECK, userId, channelId = channelId)
 
-            fun forChannelsList(userId: String): CacheKey {
-                return CacheKey(CacheType.CHANNELS_LIST, userId)
-            }
+            fun forChannelsList(userId: String): CacheKey = CacheKey(CacheType.CHANNELS_LIST, userId)
 
-            fun forPatternChannels(userId: String, pattern: String): CacheKey {
-                return CacheKey(CacheType.PATTERN_CHANNELS, userId, pattern = pattern)
-            }
+            fun forPatternChannels(
+                userId: String,
+                pattern: String,
+            ): CacheKey = CacheKey(CacheType.PATTERN_CHANNELS, userId, pattern = pattern)
         }
     }
 
@@ -139,13 +157,9 @@ class SubscriptionAuthorizationCache(
         val listValue: List<String>? = null,
     ) {
         companion object {
-            fun ofBoolean(value: Boolean): CacheValue {
-                return CacheValue(boolValue = value)
-            }
+            fun ofBoolean(value: Boolean): CacheValue = CacheValue(boolValue = value)
 
-            fun ofList(value: List<String>): CacheValue {
-                return CacheValue(listValue = value)
-            }
+            fun ofList(value: List<String>): CacheValue = CacheValue(listValue = value)
         }
     }
 }

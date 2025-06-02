@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/http-response")
 class HttpResponseController {
-
     /**
      * Returns a simple HTTP response for a channel.
      * * This endpoint demonstrates how Pushpin can be used for regular HTTP responses.
@@ -26,16 +25,20 @@ class HttpResponseController {
      * @return A simple HTTP response with Grip-Channel header
      */
     @GetMapping("/{channel}")
-    fun getResponse(@PathVariable channel: String): ResponseEntity<Map<String, Any>> {
+    fun getResponse(
+        @PathVariable channel: String,
+    ): ResponseEntity<Map<String, Any>> {
         // Create a simple response
-        val response = mapOf(
-            "success" to true,
-            "message" to "This is a non-streaming HTTP response",
-            "channel" to channel,
-        )
+        val response =
+            mapOf(
+                "success" to true,
+                "message" to "This is a non-streaming HTTP response",
+                "channel" to channel,
+            )
 
         // Return the response with GRIP headers using the new API
-        return GripApi.headers()
+        return GripApi
+            .headers()
             .channel(channel)
             .applyTo(ResponseEntity.ok())
             .contentType(MediaType.APPLICATION_JSON)

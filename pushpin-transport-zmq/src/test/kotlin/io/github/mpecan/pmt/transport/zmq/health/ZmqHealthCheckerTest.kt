@@ -13,7 +13,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class ZmqHealthCheckerTest {
-
     private lateinit var healthChecker: ZmqHealthChecker
     private lateinit var objectMapper: ObjectMapper
     private lateinit var mockServerContext: ZContext
@@ -57,18 +56,20 @@ class ZmqHealthCheckerTest {
         Thread.sleep(100) // Give it a moment to fully initialize
 
         // Given
-        val server = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 5561,
-            controlPort = controlPort,
-        )
+        val server =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 5561,
+                controlPort = controlPort,
+            )
 
         // When
         val result = healthChecker.checkHealth(server)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(true)
             .verifyComplete()
     }
@@ -84,18 +85,20 @@ class ZmqHealthCheckerTest {
         Thread.sleep(100)
 
         // Given
-        val server = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 5561,
-            publishPort = 5560,
-        )
+        val server =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 5561,
+                publishPort = 5560,
+            )
 
         // When
         val result = healthChecker.checkConnectivity(server)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(true)
             .verifyComplete()
     }
@@ -105,18 +108,20 @@ class ZmqHealthCheckerTest {
         // Given - no server running
         // Note: ZMQ PUSH sockets will connect and send even if no PULL socket is listening
         // This is by design - ZMQ queues messages internally
-        val server = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 5561,
-            publishPort = 5560,
-        )
+        val server =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 5561,
+                publishPort = 5560,
+            )
 
         // When
         val result = healthChecker.checkConnectivity(server)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(true) // ZMQ will return true even with no server
             .verifyComplete()
     }
@@ -127,53 +132,58 @@ class ZmqHealthCheckerTest {
         assert(healthChecker.getTransportType() == "zmq")
     }
 
-    private fun startMockStatsServer(port: Int, responseHandler: (String) -> String) {
+    private fun startMockStatsServer(
+        port: Int,
+        responseHandler: (String) -> String,
+    ) {
         mockServerRunning = true
-        mockServerThread = Thread {
-            val socket = mockServerContext.createSocket(SocketType.REP)
-            try {
-                socket.bind("tcp://localhost:$port")
+        mockServerThread =
+            Thread {
+                val socket = mockServerContext.createSocket(SocketType.REP)
+                try {
+                    socket.bind("tcp://localhost:$port")
 
-                while (mockServerRunning && !Thread.currentThread().isInterrupted) {
-                    val request = socket.recv(ZMQ.DONTWAIT)
-                    if (request != null) {
-                        val requestStr = String(request)
-                        val response = responseHandler(requestStr)
-                        socket.send(response.toByteArray(), 0)
+                    while (mockServerRunning && !Thread.currentThread().isInterrupted) {
+                        val request = socket.recv(ZMQ.DONTWAIT)
+                        if (request != null) {
+                            val requestStr = String(request)
+                            val response = responseHandler(requestStr)
+                            socket.send(response.toByteArray(), 0)
+                        }
+                        Thread.sleep(10)
                     }
-                    Thread.sleep(10)
+                } catch (e: Exception) {
+                    if (mockServerRunning) {
+                        e.printStackTrace()
+                    }
+                } finally {
+                    socket.close()
                 }
-            } catch (e: Exception) {
-                if (mockServerRunning) {
-                    e.printStackTrace()
-                }
-            } finally {
-                socket.close()
             }
-        }
         mockServerThread?.start()
     }
 
     private fun startMockPullServer(port: Int) {
         mockServerRunning = true
-        mockServerThread = Thread {
-            val socket = mockServerContext.createSocket(SocketType.PULL)
-            try {
-                socket.bind("tcp://localhost:$port")
+        mockServerThread =
+            Thread {
+                val socket = mockServerContext.createSocket(SocketType.PULL)
+                try {
+                    socket.bind("tcp://localhost:$port")
 
-                while (mockServerRunning && !Thread.currentThread().isInterrupted) {
-                    // Just receive and discard messages
-                    socket.recv(ZMQ.DONTWAIT)
-                    Thread.sleep(10)
+                    while (mockServerRunning && !Thread.currentThread().isInterrupted) {
+                        // Just receive and discard messages
+                        socket.recv(ZMQ.DONTWAIT)
+                        Thread.sleep(10)
+                    }
+                } catch (e: Exception) {
+                    if (mockServerRunning) {
+                        e.printStackTrace()
+                    }
+                } finally {
+                    socket.close()
                 }
-            } catch (e: Exception) {
-                if (mockServerRunning) {
-                    e.printStackTrace()
-                }
-            } finally {
-                socket.close()
             }
-        }
         mockServerThread?.start()
     }
 }

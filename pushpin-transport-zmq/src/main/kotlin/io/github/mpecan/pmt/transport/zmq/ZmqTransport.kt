@@ -125,7 +125,10 @@ class ZmqTransport(
      * Publishes a message to the specified servers.
      * This is the core implementation that all other publish methods use.
      */
-    private fun publishToServers(servers: List<PushpinServer>, message: Message): Mono<Boolean> {
+    private fun publishToServers(
+        servers: List<PushpinServer>,
+        message: Message,
+    ): Mono<Boolean> {
         if (servers.isEmpty()) {
             logger.warn("No servers to publish to")
             return Mono.just(false)
@@ -137,45 +140,50 @@ class ZmqTransport(
         val dataString = "J${messageSerializationService.serialize(pushpinMessage)}"
         val data = dataString.toByteArray()
 
-        return Mono.fromCallable {
-            val results = servers.map { server ->
-                try {
-                    val socket = getSocket(server)
-                    logger.debug(
-                        "Publishing to channel: '${message.channel}' via ZMQ PUSH socket to server: ${server.id}",
-                    )
+        return Mono
+            .fromCallable {
+                val results =
+                    servers.map { server ->
+                        try {
+                            val socket = getSocket(server)
+                            logger.debug(
+                                "Publishing to channel: '${message.channel}' via ZMQ PUSH socket to server: ${server.id}",
+                            )
 
-                    val sendResult = socket.send(data, 0)
+                            val sendResult = socket.send(data, 0)
 
-                    if (sendResult) {
-                        logger.debug(
-                            "Successfully published message to server ${server.id} on channel: ${message.channel}",
-                        )
-                        true
-                    } else {
-                        logger.error("Failed to send message to server ${server.id} on channel: ${message.channel}")
-                        if (!zmqProperties.connectionPoolEnabled) {
-                            socket.close()
+                            if (sendResult) {
+                                logger.debug(
+                                    "Successfully published message to server ${server.id} on channel: ${message.channel}",
+                                )
+                                true
+                            } else {
+                                logger.error(
+                                    "Failed to send message to server ${server.id} on channel: ${message.channel}",
+                                )
+                                if (!zmqProperties.connectionPoolEnabled) {
+                                    socket.close()
+                                }
+                                false
+                            }
+                        } catch (e: Exception) {
+                            logger.error("Failed to publish message to server ${server.id}: ${e.message}", e)
+                            false
                         }
-                        false
                     }
-                } catch (e: Exception) {
-                    logger.error("Failed to publish message to server ${server.id}: ${e.message}", e)
-                    false
-                }
-            }
 
-            results.all { it }
-        }.subscribeOn(Schedulers.boundedElastic())
+                results.all { it }
+            }.subscribeOn(Schedulers.boundedElastic())
     }
 
     /**
      * Publishes a message to the specified servers.
      * This method is provided for backward compatibility and testing.
      */
-    fun publish(servers: List<PushpinServer>, message: Message): Mono<Boolean> {
-        return publishToServers(servers, message)
-    }
+    fun publish(
+        servers: List<PushpinServer>,
+        message: Message,
+    ): Mono<Boolean> = publishToServers(servers, message)
 
     /**
      * Closes all ZMQ sockets and the context when the bean is destroyed.

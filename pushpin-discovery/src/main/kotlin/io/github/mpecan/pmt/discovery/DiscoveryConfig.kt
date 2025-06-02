@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 @EnableConfigurationProperties(DiscoveryProperties::class)
 class DiscoveryConfig {
-
     /**
      * Creates a ConfigurationBasedDiscovery bean.
      */
@@ -21,12 +20,11 @@ class DiscoveryConfig {
     fun configurationBasedDiscovery(
         discoveryProperties: DiscoveryProperties,
         pushpinProperties: PushpinProperties,
-    ): ConfigurationBasedDiscovery {
-        return ConfigurationBasedDiscovery(
+    ): ConfigurationBasedDiscovery =
+        ConfigurationBasedDiscovery(
             discoveryProperties.configuration,
             pushpinProperties,
         )
-    }
 
     // AwsDiscovery bean is now provided by discovery-aws module via auto-configuration
 
@@ -37,18 +35,15 @@ class DiscoveryConfig {
     fun pushpinDiscoveryManager(
         discoveryProperties: DiscoveryProperties,
         discoveries: List<PushpinDiscovery>,
-    ): PushpinDiscoveryManager {
-        return PushpinDiscoveryManager(
+    ): PushpinDiscoveryManager =
+        PushpinDiscoveryManager(
             discoveryProperties,
             discoveries,
         )
-    }
 
     /**
      * Creates a bean for the discovery properties to be used in the @Scheduled annotation.
      */
     @Bean
-    fun discoveryProperties(discoveryProperties: DiscoveryProperties): DiscoveryProperties {
-        return discoveryProperties
-    }
+    fun discoveryProperties(discoveryProperties: DiscoveryProperties): DiscoveryProperties = discoveryProperties
 }

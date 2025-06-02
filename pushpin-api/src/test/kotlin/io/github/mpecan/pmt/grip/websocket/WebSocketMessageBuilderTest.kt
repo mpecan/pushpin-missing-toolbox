@@ -6,14 +6,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class WebSocketMessageBuilderTest {
-
     private val objectMapper = ObjectMapper()
 
     @Test
     fun `should build OPEN event`() {
-        val message = WebSocketMessageBuilder()
-            .open()
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .open()
+                .build()
 
         assertEquals("OPEN\r\n", message)
     }
@@ -21,9 +21,10 @@ class WebSocketMessageBuilderTest {
     @Test
     fun `should build TEXT event`() {
         val content = "Hello World"
-        val message = WebSocketMessageBuilder()
-            .text(content)
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .text(content)
+                .build()
 
         val expected = "TEXT b\r\nHello World\r\n"
         assertEquals(expected, message)
@@ -32,9 +33,10 @@ class WebSocketMessageBuilderTest {
     @Test
     fun `should build message with prefix`() {
         val data = mapOf("status" to "ok", "count" to 42)
-        val message = WebSocketMessageBuilder()
-            .message(data)
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .message(data)
+                .build()
 
         // Parse the result to verify structure
         val events = WebSocketEventParser.parse(message)
@@ -51,9 +53,10 @@ class WebSocketMessageBuilderTest {
 
     @Test
     fun `should build subscribe control message`() {
-        val message = WebSocketMessageBuilder()
-            .subscribe("test-channel", "prev-123")
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .subscribe("test-channel", "prev-123")
+                .build()
 
         val events = WebSocketEventParser.parse(message)
         assertEquals(1, events.size)
@@ -68,9 +71,10 @@ class WebSocketMessageBuilderTest {
 
     @Test
     fun `should build keep-alive control message`() {
-        val message = WebSocketMessageBuilder()
-            .keepAlive(timeout = 30, content = "{}")
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .keepAlive(timeout = 30, content = "{}")
+                .build()
 
         val events = WebSocketEventParser.parse(message)
         assertEquals(1, events.size)
@@ -85,12 +89,13 @@ class WebSocketMessageBuilderTest {
 
     @Test
     fun `should build complex message sequence`() {
-        val message = WebSocketMessageBuilder()
-            .open()
-            .subscribe("notifications")
-            .keepAlive(timeout = 30)
-            .message(mapOf("ready" to true))
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .open()
+                .subscribe("notifications")
+                .keepAlive(timeout = 30)
+                .message(mapOf("ready" to true))
+                .build()
 
         val events = WebSocketEventParser.parse(message)
         assertEquals(4, events.size)
@@ -106,10 +111,11 @@ class WebSocketMessageBuilderTest {
 
     @Test
     fun `should build PING and PONG events`() {
-        val message = WebSocketMessageBuilder()
-            .ping()
-            .pong()
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .ping()
+                .pong()
+                .build()
 
         assertEquals("PING\r\nPONG\r\n", message)
     }
@@ -117,9 +123,10 @@ class WebSocketMessageBuilderTest {
     @Test
     fun `should build CLOSE event with reason`() {
         val reason = "1000 Normal closure"
-        val message = WebSocketMessageBuilder()
-            .close(reason)
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .close(reason)
+                .build()
 
         val expected = "CLOSE 13\r\n1000 Normal closure\r\n"
         assertEquals(expected, message)
@@ -127,9 +134,10 @@ class WebSocketMessageBuilderTest {
 
     @Test
     fun `should build DISCONNECT event`() {
-        val message = WebSocketMessageBuilder()
-            .disconnect()
-            .build()
+        val message =
+            WebSocketMessageBuilder()
+                .disconnect()
+                .build()
 
         assertEquals("DISCONNECT\r\n", message)
     }

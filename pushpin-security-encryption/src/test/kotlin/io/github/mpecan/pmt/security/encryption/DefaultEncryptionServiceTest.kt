@@ -10,18 +10,18 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class DefaultEncryptionServiceTest {
-
     private lateinit var encryptionService: DefaultEncryptionService
     private lateinit var properties: EncryptionProperties
 
     @BeforeEach
     fun setUp() {
-        properties = EncryptionProperties(
-            enabled = true,
-            algorithm = "AES/GCM/NoPadding",
-            secretKey = "", // Let the service generate a random key
-            keySize = 256,
-        )
+        properties =
+            EncryptionProperties(
+                enabled = true,
+                algorithm = "AES/GCM/NoPadding",
+                secretKey = "", // Let the service generate a random key
+                keySize = 256,
+            )
         encryptionService = DefaultEncryptionService(properties)
     }
 
@@ -123,10 +123,11 @@ class DefaultEncryptionServiceTest {
         val secretKey = encryptionService.generateSecretKey()
 
         // Create a new instance with a configured secret key
-        val configuredProperties = EncryptionProperties(
-            enabled = true,
-            secretKey = secretKey,
-        )
+        val configuredProperties =
+            EncryptionProperties(
+                enabled = true,
+                secretKey = secretKey,
+            )
         val configuredService = DefaultEncryptionService(configuredProperties)
 
         // Act

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 class SecurityContextTest {
-
     @AfterEach
     fun cleanup() {
         SecurityContextHolder.clearContext()
@@ -13,11 +12,12 @@ class SecurityContextTest {
 
     @Test
     fun `should store and retrieve security context`() {
-        val context = SecurityContext(
-            principal = "test-user",
-            authenticated = true,
-            attributes = mapOf("role" to "ADMIN"),
-        )
+        val context =
+            SecurityContext(
+                principal = "test-user",
+                authenticated = true,
+                attributes = mapOf("role" to "ADMIN"),
+            )
 
         SecurityContextHolder.setContext(context)
         val retrieved = SecurityContextHolder.getContext()
@@ -51,9 +51,10 @@ class SecurityContextTest {
 
     @Test
     fun `should add attributes to context`() {
-        val context = SecurityContext(principal = "test-user")
-            .withAttribute("role", "USER")
-            .withAttribute("tenant", "test-tenant")
+        val context =
+            SecurityContext(principal = "test-user")
+                .withAttribute("role", "USER")
+                .withAttribute("tenant", "test-tenant")
 
         assertThat(context.getAttribute<String>("role")).isEqualTo("USER")
         assertThat(context.getAttribute<String>("tenant")).isEqualTo("test-tenant")
@@ -61,14 +62,15 @@ class SecurityContextTest {
 
     @Test
     fun `should add multiple attributes to context`() {
-        val context = SecurityContext(principal = "test-user")
-            .withAttributes(
-                mapOf(
-                    "role" to "USER",
-                    "tenant" to "test-tenant",
-                    "permissions" to listOf("READ", "WRITE"),
-                ),
-            )
+        val context =
+            SecurityContext(principal = "test-user")
+                .withAttributes(
+                    mapOf(
+                        "role" to "USER",
+                        "tenant" to "test-tenant",
+                        "permissions" to listOf("READ", "WRITE"),
+                    ),
+                )
 
         assertThat(context.getAttribute<String>("role")).isEqualTo("USER")
         assertThat(context.getAttribute<String>("tenant")).isEqualTo("test-tenant")
@@ -84,10 +86,11 @@ class SecurityContextTest {
         SecurityContextHolder.setContext(context1)
 
         // In a different thread
-        val thread = Thread {
-            SecurityContextHolder.setContext(context2)
-            assertThat(SecurityContextHolder.getContext().principal).isEqualTo("user2")
-        }
+        val thread =
+            Thread {
+                SecurityContextHolder.setContext(context2)
+                assertThat(SecurityContextHolder.getContext().principal).isEqualTo("user2")
+            }
         thread.start()
         thread.join()
 

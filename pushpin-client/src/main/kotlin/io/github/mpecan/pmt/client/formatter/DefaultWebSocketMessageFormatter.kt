@@ -12,8 +12,8 @@ import io.github.mpecan.pmt.model.WebSocketFormat
 class DefaultWebSocketMessageFormatter(
     serializationService: MessageSerializationService,
     options: FormatterOptions = FormatterOptions(),
-) : AbstractMessageFormatter<WebSocketFormat>(serializationService, options), WebSocketMessageFormatter {
-
+) : AbstractMessageFormatter<WebSocketFormat>(serializationService, options),
+    WebSocketMessageFormatter {
     /**
      * Additional WebSocket-specific options.
      */
@@ -35,9 +35,7 @@ class DefaultWebSocketMessageFormatter(
      * @throws MessageFormattingException If there is an error during formatting
      */
     @Throws(MessageFormattingException::class)
-    override fun format(message: Message): WebSocketFormat {
-        return formatWithHooks(message)
-    }
+    override fun format(message: Message): WebSocketFormat = formatWithHooks(message)
 
     /**
      * Performs the actual formatting of the message.
@@ -79,29 +77,28 @@ class DefaultWebSocketMessageFormatter(
     /**
      * Creates a new formatter with custom WebSocket type.
      */
-    fun withType(type: String): DefaultWebSocketMessageFormatter {
-        return DefaultWebSocketMessageFormatter(
+    fun withType(type: String): DefaultWebSocketMessageFormatter =
+        DefaultWebSocketMessageFormatter(
             serializationService,
             options.withOption(OPTION_WS_TYPE, type),
         )
-    }
 
     /**
      * Creates a new formatter with custom WebSocket action.
      */
-    fun withAction(action: String): DefaultWebSocketMessageFormatter {
-        return DefaultWebSocketMessageFormatter(
+    fun withAction(action: String): DefaultWebSocketMessageFormatter =
+        DefaultWebSocketMessageFormatter(
             serializationService,
             options.withOption(OPTION_WS_ACTION, action),
         )
-    }
 
     /**
      * Creates a new formatter for closing WebSocket connections.
      */
     fun withCloseAction(closeCode: Int? = null): DefaultWebSocketMessageFormatter {
-        val opts = options
-            .withOption(OPTION_WS_ACTION, WebSocketFormat.ACTION_CLOSE)
+        val opts =
+            options
+                .withOption(OPTION_WS_ACTION, WebSocketFormat.ACTION_CLOSE)
 
         return if (closeCode != null) {
             DefaultWebSocketMessageFormatter(

@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.test.StepVerifier
 
 class HttpTransportTest {
-
     private lateinit var messageSerializer: MessageSerializer
     private lateinit var httpTransport: HttpTransport
     private lateinit var discoveryManager: PushpinDiscoveryManager
@@ -37,13 +36,14 @@ class HttpTransportTest {
         whenever(messageSerializer.serialize(message)).thenReturn(pushpinMessage)
         whenever(discoveryManager.getAllServers()).thenReturn(listOf(server))
         // When - This will fail due to no actual server, but we can verify the serialization part
-        val result = try {
-            httpTransport.publish(message).block()
-            true
-        } catch (e: Exception) {
-            // Expected to fail due to connection, but serialization should work
-            true
-        }
+        val result =
+            try {
+                httpTransport.publish(message).block()
+                true
+            } catch (e: Exception) {
+                // Expected to fail due to connection, but serialization should work
+                true
+            }
 
         // Then - Just verify we got past the serialization step
         assert(result)
@@ -55,7 +55,8 @@ class HttpTransportTest {
         val message = Message.simple("test-channel", "test-data")
         whenever(discoveryManager.getAllServers()).thenReturn(emptyList())
         // When & Then
-        StepVerifier.create(httpTransport.publish(message))
+        StepVerifier
+            .create(httpTransport.publish(message))
             .expectNext(false)
             .verifyComplete()
     }

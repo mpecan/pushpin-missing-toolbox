@@ -24,10 +24,7 @@ class TestHmacSignatureFilter(
     properties: HmacProperties,
     auditService: AuditService,
 ) : HmacSignatureFilter(hmacService, properties, auditService) {
-
-    public override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return super.shouldNotFilter(request)
-    }
+    public override fun shouldNotFilter(request: HttpServletRequest): Boolean = super.shouldNotFilter(request)
 
     public override fun doFilterInternal(
         request: HttpServletRequest,
@@ -39,13 +36,13 @@ class TestHmacSignatureFilter(
 }
 
 class HmacSignatureFilterTest {
-
     private val hmacService: HmacService = mock()
     private val auditService: AuditService = mock()
-    private val properties = HmacProperties(
-        enabled = true,
-        excludedPaths = listOf("/public/", "/health/"),
-    )
+    private val properties =
+        HmacProperties(
+            enabled = true,
+            excludedPaths = listOf("/public/", "/health/"),
+        )
 
     private val filter = TestHmacSignatureFilter(hmacService, properties, auditService)
     private val filterChain: FilterChain = mock()

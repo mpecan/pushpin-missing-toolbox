@@ -27,12 +27,13 @@ class DefaultChannelSubscriptionExtractorService(
             // First try simple array format: ["channel1", "channel2"]
             val channelsList = claimExtractorService.extractListClaim(jwt, getChannelsClaimPath())
             if (channelsList.isNotEmpty()) {
-                val subscriptions = channelsList.map { channelId ->
-                    ChannelSubscription(
-                        channelId = channelId,
-                        allowed = true,
-                    )
-                }
+                val subscriptions =
+                    channelsList.map { channelId ->
+                        ChannelSubscription(
+                            channelId = channelId,
+                            allowed = true,
+                        )
+                    }
                 return ChannelSubscriptions(
                     principal = principal,
                     subscriptions = subscriptions,
@@ -43,18 +44,22 @@ class DefaultChannelSubscriptionExtractorService(
             // Try map format: { "channel1": {}, "channel2": { "expires": "2024-12-31" } }
             val channelsMap = claimExtractorService.extractMapClaim(jwt, getChannelsClaimPath())
             if (channelsMap.isNotEmpty()) {
-                val subscriptions = channelsMap.map { (channelId, metadata) ->
-                    val metadataMap = when (metadata) {
-                        is Map<*, *> -> metadata.mapKeys { it.key.toString() }
-                            .mapValues { it.value?.toString() ?: "" }
-                        else -> emptyMap()
+                val subscriptions =
+                    channelsMap.map { (channelId, metadata) ->
+                        val metadataMap =
+                            when (metadata) {
+                                is Map<*, *> ->
+                                    metadata
+                                        .mapKeys { it.key.toString() }
+                                        .mapValues { it.value?.toString() ?: "" }
+                                else -> emptyMap()
+                            }
+                        ChannelSubscription(
+                            channelId = channelId,
+                            allowed = true,
+                            metadata = metadataMap,
+                        )
                     }
-                    ChannelSubscription(
-                        channelId = channelId,
-                        allowed = true,
-                        metadata = metadataMap,
-                    )
-                }
                 return ChannelSubscriptions(
                     principal = principal,
                     subscriptions = subscriptions,
@@ -78,11 +83,10 @@ class DefaultChannelSubscriptionExtractorService(
         return null
     }
 
-    override fun getChannelsClaimPath(): String {
-        return properties.claimExtraction.extractClaims
+    override fun getChannelsClaimPath(): String =
+        properties.claimExtraction.extractClaims
             .find { it.contains("channel") || it.contains("subscription") }
             ?: "$.channels"
-    }
 
     override fun isClaimExtractionEnabled(): Boolean = properties.claimExtraction.enabled
 
@@ -98,14 +102,16 @@ class DefaultChannelSubscriptionExtractorService(
                 val channelObject = claimExtractorService.extractMapClaim(jwt, "${getChannelsClaimPath()}[$index]")
                 if (channelObject.isEmpty()) break
 
-                val channelId = channelObject["id"] as? String ?: channelObject["channelId"] as? String
-                    ?: channelObject["channel"] as? String
-                    ?: continue
+                val channelId =
+                    channelObject["id"] as? String ?: channelObject["channelId"] as? String
+                        ?: channelObject["channel"] as? String
+                        ?: continue
 
                 // Extract metadata (everything except the channel ID)
-                val metadata = channelObject
-                    .filterKeys { it !in setOf("id", "channelId", "channel") }
-                    .mapValues { it.value.toString() }
+                val metadata =
+                    channelObject
+                        .filterKeys { it !in setOf("id", "channelId", "channel") }
+                        .mapValues { it.value.toString() }
 
                 results.add(
                     ChannelSubscription(

@@ -21,21 +21,19 @@ class HttpHealthChecker(
     /**
      * Checks the health of a single server via HTTP.
      */
-    override fun checkHealth(server: PushpinServer): Mono<Boolean> {
-        return webClient.get()
+    override fun checkHealth(server: PushpinServer): Mono<Boolean> =
+        webClient
+            .get()
             .uri(server.getHealthCheckUrl())
             .retrieve()
             .bodyToMono(String::class.java)
             .doOnSuccess { response ->
                 logger.debug("Health check response from server ${server.id}: $response")
-            }
-            .doOnError {
+            }.doOnError {
                 logger.error("Error checking health of server ${server.id}: ${it.message}")
-            }
-            .timeout(Duration.ofMillis(defaultTimeout))
+            }.timeout(Duration.ofMillis(defaultTimeout))
             .map { true }
             .onErrorReturn(false)
-    }
 
     /**
      * Returns the transport type for this health checker.

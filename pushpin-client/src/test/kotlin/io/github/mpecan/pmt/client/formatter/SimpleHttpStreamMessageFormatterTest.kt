@@ -13,7 +13,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 class SimpleHttpStreamMessageFormatterTest {
-
     @Mock
     private lateinit var serializationService: MessageSerializationService
 

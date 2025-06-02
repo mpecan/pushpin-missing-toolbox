@@ -8,10 +8,14 @@ import java.time.Duration
 /**
  * Client for consuming HTTP Long-Polling responses.
  */
-class LongPollingClient(baseUrl: String) {
-    private val webClient = WebClient.builder()
-        .baseUrl(baseUrl)
-        .build()
+class LongPollingClient(
+    baseUrl: String,
+) {
+    private val webClient =
+        WebClient
+            .builder()
+            .baseUrl(baseUrl)
+            .build()
 
     /**
      * Consumes messages from a long-polling endpoint.
@@ -24,10 +28,14 @@ class LongPollingClient(baseUrl: String) {
      * @param pollCount The number of times to poll (default: 3)
      * @return A Flux of response objects
      */
-    fun consumeMessages(endpoint: String, pollCount: Int = 3): Flux<Map<String, Any>> {
+    fun consumeMessages(
+        endpoint: String,
+        pollCount: Int = 3,
+    ): Flux<Map<String, Any>> {
         // Create a function that performs a single poll
         val pollOnce: () -> Mono<Map<String, Any>> = {
-            webClient.get()
+            webClient
+                .get()
                 .uri(endpoint)
                 .retrieve()
                 .bodyToMono(Map::class.java)
@@ -37,7 +45,8 @@ class LongPollingClient(baseUrl: String) {
         }
 
         // Create a Flux that repeatedly polls
-        return Flux.range(1, pollCount)
+        return Flux
+            .range(1, pollCount)
             .delayElements(Duration.ofMillis(500))
             .concatMap { pollOnce() }
             .doOnError { t -> println("Error in long-polling: ${t.message}") }

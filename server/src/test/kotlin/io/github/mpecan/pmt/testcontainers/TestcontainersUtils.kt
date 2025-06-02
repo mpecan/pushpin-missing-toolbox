@@ -32,7 +32,6 @@ import org.springframework.test.context.DynamicPropertyRegistry
  * ```
  */
 object TestcontainersUtils {
-
     /**
      * Creates a new Pushpin container configured for the given host application port.
      * * This is a convenience method that creates a container with:
@@ -42,12 +41,11 @@ object TestcontainersUtils {
      * * @param hostPort The port your Spring Boot application runs on
      * @return A configured PushpinContainer ready to start
      */
-    fun createPushpinContainer(hostPort: Int): PushpinContainer {
-        return PushpinContainerBuilder()
+    fun createPushpinContainer(hostPort: Int): PushpinContainer =
+        PushpinContainerBuilder()
             .withHostApplicationPort(hostPort)
             .withSimpleHostRoute()
             .build()
-    }
 
     /**
      * Configures Spring Boot application properties for a single Pushpin container.
@@ -61,7 +59,10 @@ object TestcontainersUtils {
      * * @param registry The Spring dynamic property registry
      * @param pushpinContainer The Pushpin container to configure properties for
      */
-    fun configurePushpinProperties(registry: DynamicPropertyRegistry, pushpinContainer: PushpinContainer) {
+    fun configurePushpinProperties(
+        registry: DynamicPropertyRegistry,
+        pushpinContainer: PushpinContainer,
+    ) {
         configurePushpinServer(registry, pushpinContainer, 0)
         configureCommonProperties(registry)
     }
@@ -98,7 +99,11 @@ object TestcontainersUtils {
      * Configures a single Pushpin server at the specified index.
      * This method encapsulates the common pattern of configuring server properties.
      */
-    private fun configurePushpinServer(registry: DynamicPropertyRegistry, container: PushpinContainer, index: Int) {
+    private fun configurePushpinServer(
+        registry: DynamicPropertyRegistry,
+        container: PushpinContainer,
+        index: Int,
+    ) {
         val serverId = if (index == 0) "pushpin-test" else "pushpin-test-$index"
 
         registry.add("pushpin.servers[$index].id") { serverId }

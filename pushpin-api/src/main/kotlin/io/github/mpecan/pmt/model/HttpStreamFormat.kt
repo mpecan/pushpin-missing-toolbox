@@ -12,10 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class HttpStreamFormat(
     val content: String? = null,
-
     @get:JsonProperty("content-bin")
     val contentBin: String? = null,
-
     val action: String = "send",
 ) : PushpinFormat {
     companion object {
@@ -26,30 +24,27 @@ data class HttpStreamFormat(
         /**
          * Creates an HTTP stream format for sending text data.
          */
-        fun send(content: String): HttpStreamFormat {
-            return HttpStreamFormat(
+        fun send(content: String): HttpStreamFormat =
+            HttpStreamFormat(
                 content = content,
                 action = ACTION_SEND,
             )
-        }
 
         /**
          * Creates an HTTP stream format for sending binary data.
          */
-        fun sendBinary(contentBin: String): HttpStreamFormat {
-            return HttpStreamFormat(
+        fun sendBinary(contentBin: String): HttpStreamFormat =
+            HttpStreamFormat(
                 contentBin = contentBin,
                 action = ACTION_SEND,
             )
-        }
 
         /**
          * Creates an HTTP stream format for closing the connection.
          */
-        fun close(): HttpStreamFormat {
-            return HttpStreamFormat(
+        fun close(): HttpStreamFormat =
+            HttpStreamFormat(
                 action = ACTION_CLOSE,
             )
-        }
     }
 }

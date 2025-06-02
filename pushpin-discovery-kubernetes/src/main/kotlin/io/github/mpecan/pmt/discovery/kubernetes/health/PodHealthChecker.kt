@@ -15,7 +15,10 @@ interface PodHealthChecker {
      * @param properties The Kubernetes discovery properties.
      * @return True if the pod is healthy, false otherwise.
      */
-    fun isHealthy(pod: V1Pod, properties: KubernetesDiscoveryProperties): Boolean
+    fun isHealthy(
+        pod: V1Pod,
+        properties: KubernetesDiscoveryProperties,
+    ): Boolean
 }
 
 /**
@@ -24,7 +27,10 @@ interface PodHealthChecker {
 class DefaultPodHealthChecker : PodHealthChecker {
     private val logger = LoggerFactory.getLogger(DefaultPodHealthChecker::class.java)
 
-    override fun isHealthy(pod: V1Pod, properties: KubernetesDiscoveryProperties): Boolean {
+    override fun isHealthy(
+        pod: V1Pod,
+        properties: KubernetesDiscoveryProperties,
+    ): Boolean {
         val podName = pod.metadata?.name ?: "unknown-pod"
 
         // If health checks are disabled, just check if the pod is running
@@ -62,9 +68,10 @@ class DefaultPodHealthChecker : PodHealthChecker {
         val conditions = pod.status?.conditions ?: return false
 
         // Find the "Ready" condition
-        val readyCondition = conditions.find { condition ->
-            condition.type == "Ready"
-        }
+        val readyCondition =
+            conditions.find { condition ->
+                condition.type == "Ready"
+            }
 
         // Check if the "Ready" condition is true
         return readyCondition?.status == "True"

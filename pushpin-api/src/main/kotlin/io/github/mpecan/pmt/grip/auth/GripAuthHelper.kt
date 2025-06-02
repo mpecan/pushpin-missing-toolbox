@@ -4,7 +4,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import java.nio.charset.StandardCharsets
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import javax.crypto.SecretKey
 
 /**
@@ -12,7 +12,6 @@ import javax.crypto.SecretKey
  */
 @Suppress("unused")
 object GripAuthHelper {
-
     /**
      * Creates a GRIP signature JWT token.
      *
@@ -21,7 +20,11 @@ object GripAuthHelper {
      * @param expiresIn Expiration time in seconds from now (optional)
      * @return The JWT token string
      */
-    fun createGripSignature(iss: String, key: String, expiresIn: Long? = null): String {
+    fun createGripSignature(
+        iss: String,
+        key: String,
+        expiresIn: Long? = null,
+    ): String {
         val secretKey = Keys.hmacShaKeyFor(key.toByteArray(StandardCharsets.UTF_8))
         return createGripSignature(iss, secretKey, expiresIn)
     }
@@ -34,10 +37,16 @@ object GripAuthHelper {
      * @param expiresIn Expiration time in seconds from now (optional)
      * @return The JWT token string
      */
-    fun createGripSignature(iss: String, key: SecretKey, expiresIn: Long? = null): String {
-        val builder = Jwts.builder()
-            .issuer(iss)
-            .issuedAt(Date.from(Instant.now()))
+    fun createGripSignature(
+        iss: String,
+        key: SecretKey,
+        expiresIn: Long? = null,
+    ): String {
+        val builder =
+            Jwts
+                .builder()
+                .issuer(iss)
+                .issuedAt(Date.from(Instant.now()))
 
         if (expiresIn != null) {
             builder.expiration(Date.from(Instant.now().plusSeconds(expiresIn)))
@@ -55,14 +64,16 @@ object GripAuthHelper {
      * @param key The secret key as a string
      * @return True if the token is valid, false otherwise
      */
-    fun validateGripSignature(token: String, key: String): Boolean {
-        return try {
+    fun validateGripSignature(
+        token: String,
+        key: String,
+    ): Boolean =
+        try {
             val secretKey = Keys.hmacShaKeyFor(key.toByteArray(StandardCharsets.UTF_8))
             validateGripSignature(token, secretKey)
         } catch (e: Exception) {
             false
         }
-    }
 
     /**
      * Validates a GRIP signature JWT token.
@@ -71,9 +82,13 @@ object GripAuthHelper {
      * @param key The secret key
      * @return True if the token is valid, false otherwise
      */
-    fun validateGripSignature(token: String, key: SecretKey): Boolean {
-        return try {
-            Jwts.parser()
+    fun validateGripSignature(
+        token: String,
+        key: SecretKey,
+    ): Boolean =
+        try {
+            Jwts
+                .parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
@@ -81,7 +96,6 @@ object GripAuthHelper {
         } catch (e: Exception) {
             false
         }
-    }
 
     /**
      * Extracts the issuer from a GRIP signature JWT token.
@@ -90,14 +104,16 @@ object GripAuthHelper {
      * @param key The secret key as a string
      * @return The issuer claim, or null if invalid
      */
-    fun extractIssuer(token: String, key: String): String? {
-        return try {
+    fun extractIssuer(
+        token: String,
+        key: String,
+    ): String? =
+        try {
             val secretKey = Keys.hmacShaKeyFor(key.toByteArray(StandardCharsets.UTF_8))
             extractIssuer(token, secretKey)
         } catch (e: Exception) {
             null
         }
-    }
 
     /**
      * Extracts the issuer from a GRIP signature JWT token.
@@ -106,16 +122,20 @@ object GripAuthHelper {
      * @param key The secret key
      * @return The issuer claim, or null if invalid
      */
-    fun extractIssuer(token: String, key: SecretKey): String? {
-        return try {
-            val claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .payload
+    fun extractIssuer(
+        token: String,
+        key: SecretKey,
+    ): String? =
+        try {
+            val claims =
+                Jwts
+                    .parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .payload
             claims.issuer
         } catch (e: Exception) {
             null
         }
-    }
 }

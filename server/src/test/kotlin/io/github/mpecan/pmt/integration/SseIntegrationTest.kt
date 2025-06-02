@@ -12,7 +12,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 /**
  * Integration tests for Server-Sent Events (SSE) functionality.
@@ -58,17 +58,18 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val sseFlux = sseClient.consumeEvents("/api/events/$channel")
 
         // Use StepVerifier to test the SSE stream
-        val stepVerifier = StepVerifier.create(sseFlux)
-            .expectNext(
-                ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel",
-                ).build(),
-            )
-            .expectNext(
-                ServerSentEvent.builder(messageText).build(),
-            )
-            .thenCancel()
-            .verifyLater()
+        val stepVerifier =
+            StepVerifier
+                .create(sseFlux)
+                .expectNext(
+                    ServerSentEvent
+                        .builder(
+                            "Successfully subscribed to channel: $channel",
+                        ).build(),
+                ).expectNext(
+                    ServerSentEvent.builder(messageText).build(),
+                ).thenCancel()
+                .verifyLater()
 
         // Wait a bit to ensure the connection is established
         waitForConnection(1000)
@@ -96,23 +97,22 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val sseFlux = sseClient.consumeEvents("/api/events/$channel")
 
         // Use StepVerifier to test the SSE stream
-        val stepVerifier = StepVerifier.create(sseFlux)
-            .expectNext(
-                ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel",
-                ).build(),
-            )
-            .expectNext(
-                ServerSentEvent.builder(message1.replace("", "")).build(),
-            )
-            .expectNext(
-                ServerSentEvent.builder(message2.replace("", "")).build(),
-            )
-            .expectNext(
-                ServerSentEvent.builder(message3.replace("", "")).build(),
-            )
-            .thenCancel()
-            .verifyLater()
+        val stepVerifier =
+            StepVerifier
+                .create(sseFlux)
+                .expectNext(
+                    ServerSentEvent
+                        .builder(
+                            "Successfully subscribed to channel: $channel",
+                        ).build(),
+                ).expectNext(
+                    ServerSentEvent.builder(message1.replace("", "")).build(),
+                ).expectNext(
+                    ServerSentEvent.builder(message2.replace("", "")).build(),
+                ).expectNext(
+                    ServerSentEvent.builder(message3.replace("", "")).build(),
+                ).thenCancel()
+                .verifyLater()
 
         // Wait a bit to ensure the connection is established
         waitForConnection(1000)
@@ -141,19 +141,21 @@ class SseIntegrationTest : PushpinIntegrationTest() {
         val sseFlux = sseClient.consumeEvents("/api/events/$channel")
 
         // Use StepVerifier to test the SSE stream
-        val stepVerifier = StepVerifier.create(sseFlux)
-            .expectNext(
-                ServerSentEvent.builder(
-                    "Successfully subscribed to channel: $channel",
-                ).build(),
-            )
-            .expectNext(
-                ServerSentEvent.builder(messageText)
-                    .event(eventType)
-                    .build(),
-            )
-            .thenCancel()
-            .verifyLater()
+        val stepVerifier =
+            StepVerifier
+                .create(sseFlux)
+                .expectNext(
+                    ServerSentEvent
+                        .builder(
+                            "Successfully subscribed to channel: $channel",
+                        ).build(),
+                ).expectNext(
+                    ServerSentEvent
+                        .builder(messageText)
+                        .event(eventType)
+                        .build(),
+                ).thenCancel()
+                .verifyLater()
 
         // Wait a bit to ensure the connection is established
         waitForConnection(1000)

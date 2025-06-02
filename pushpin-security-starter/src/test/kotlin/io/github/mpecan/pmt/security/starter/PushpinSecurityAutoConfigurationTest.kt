@@ -7,9 +7,9 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class PushpinSecurityAutoConfigurationTest {
-
-    private val contextRunner = WebApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(PushpinSecurityAutoConfiguration::class.java))
+    private val contextRunner =
+        WebApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(PushpinSecurityAutoConfiguration::class.java))
 
     @Test
     fun `should load autoconfiguration without errors`() {
@@ -28,8 +28,7 @@ class PushpinSecurityAutoConfigurationTest {
             .withPropertyValues(
                 "pushpin.security.enabled=true",
                 "spring.main.web-application-type=servlet",
-            )
-            .run { context ->
+            ).run { context ->
                 assertNotNull(context)
                 assertTrue(context.isRunning)
             }
@@ -39,13 +38,14 @@ class PushpinSecurityAutoConfigurationTest {
     fun `should load all autoconfiguration classes`() {
         // This test verifies that the autoconfiguration classes can be loaded
         // without throwing ClassNotFoundException
-        val autoConfigurations = listOf(
-            "io.github.mpecan.pmt.security.core.config.SecurityCoreAutoConfiguration",
-            "io.github.mpecan.pmt.security.audit.config.AuditAutoConfiguration",
-            "io.github.mpecan.pmt.security.encryption.config.EncryptionAutoConfiguration",
-            "io.github.mpecan.pmt.security.hmac.config.HmacAutoConfiguration",
-            "io.github.mpecan.pmt.security.jwt.config.JwtAutoConfiguration",
-        )
+        val autoConfigurations =
+            listOf(
+                "io.github.mpecan.pmt.security.core.config.SecurityCoreAutoConfiguration",
+                "io.github.mpecan.pmt.security.audit.config.AuditAutoConfiguration",
+                "io.github.mpecan.pmt.security.encryption.config.EncryptionAutoConfiguration",
+                "io.github.mpecan.pmt.security.hmac.config.HmacAutoConfiguration",
+                "io.github.mpecan.pmt.security.jwt.config.JwtAutoConfiguration",
+            )
 
         autoConfigurations.forEach { className ->
             assertNotNull(Class.forName(className), "Could not load $className")

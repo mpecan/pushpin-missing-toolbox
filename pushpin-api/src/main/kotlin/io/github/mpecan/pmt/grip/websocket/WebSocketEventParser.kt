@@ -4,7 +4,6 @@ package io.github.mpecan.pmt.grip.websocket
  * Parser for WebSocket events in GRIP format.
  */
 object WebSocketEventParser {
-
     /**
      * Parses WebSocket events from a GRIP WebSocket-over-HTTP request body.
      *
@@ -35,33 +34,35 @@ object WebSocketEventParser {
                 continue
             }
 
-            val contentSize = if (parts.size > 1) {
-                try {
-                    parts[1].toInt(16)
-                } catch (e: NumberFormatException) {
-                    // Invalid size, skip this event
-                    break
+            val contentSize =
+                if (parts.size > 1) {
+                    try {
+                        parts[1].toInt(16)
+                    } catch (e: NumberFormatException) {
+                        // Invalid size, skip this event
+                        break
+                    }
+                } else {
+                    0
                 }
-            } else {
-                0
-            }
 
             index = lineEnd + 2 // Skip \r\n
 
             // Extract content if present
-            val content = if (contentSize > 0) {
-                val contentEnd = index + contentSize
-                if (contentEnd <= body.length) {
-                    val contentStr = body.substring(index, contentEnd)
-                    index = contentEnd + 2 // Skip \r\n after content
-                    contentStr
+            val content =
+                if (contentSize > 0) {
+                    val contentEnd = index + contentSize
+                    if (contentEnd <= body.length) {
+                        val contentStr = body.substring(index, contentEnd)
+                        index = contentEnd + 2 // Skip \r\n after content
+                        contentStr
+                    } else {
+                        // Malformed event, skip it
+                        break
+                    }
                 } else {
-                    // Malformed event, skip it
-                    break
+                    ""
                 }
-            } else {
-                ""
-            }
 
             events.add(WebSocketEvent(eventType, content))
         }
@@ -75,7 +76,5 @@ object WebSocketEventParser {
      * @param events The events to encode
      * @return The encoded events as a string
      */
-    fun encode(events: List<WebSocketEvent>): String {
-        return events.joinToString("") { it.encode() }
-    }
+    fun encode(events: List<WebSocketEvent>): String = events.joinToString("") { it.encode() }
 }

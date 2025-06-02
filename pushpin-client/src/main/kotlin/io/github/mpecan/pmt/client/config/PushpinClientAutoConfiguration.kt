@@ -32,16 +32,14 @@ import org.springframework.context.annotation.Bean
 class PushpinClientAutoConfiguration(
     private val properties: PushpinClientProperties,
 ) {
-
     /**
      * Creates a message serialization service bean if none is provided.
      * This service properly handles escaping of special characters in JSON strings.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun messageSerializationService(objectMapper: ObjectMapper): MessageSerializationService {
-        return JacksonMessageSerializationService(objectMapper)
-    }
+    fun messageSerializationService(objectMapper: ObjectMapper): MessageSerializationService =
+        JacksonMessageSerializationService(objectMapper)
 
     /**
      * Creates a WebSocket message formatter bean if none is provided.
@@ -50,27 +48,27 @@ class PushpinClientAutoConfiguration(
     @ConditionalOnMissingBean
     fun webSocketMessageFormatter(serializationService: MessageSerializationService): WebSocketMessageFormatter {
         // Create formatter options from properties
-        val options = FormatterOptions()
-            .let {
-                if (properties.webSocket.type != null) {
-                    it.withOption(
-                        DefaultWebSocketMessageFormatter.OPTION_WS_TYPE,
-                        properties.webSocket.type,
-                    )
-                } else {
-                    it
+        val options =
+            FormatterOptions()
+                .let {
+                    if (properties.webSocket.type != null) {
+                        it.withOption(
+                            DefaultWebSocketMessageFormatter.OPTION_WS_TYPE,
+                            properties.webSocket.type,
+                        )
+                    } else {
+                        it
+                    }
+                }.let {
+                    if (properties.webSocket.action != null) {
+                        it.withOption(
+                            DefaultWebSocketMessageFormatter.OPTION_WS_ACTION,
+                            properties.webSocket.action,
+                        )
+                    } else {
+                        it
+                    }
                 }
-            }
-            .let {
-                if (properties.webSocket.action != null) {
-                    it.withOption(
-                        DefaultWebSocketMessageFormatter.OPTION_WS_ACTION,
-                        properties.webSocket.action,
-                    )
-                } else {
-                    it
-                }
-            }
 
         return DefaultWebSocketMessageFormatter(serializationService, options)
     }
@@ -80,52 +78,46 @@ class PushpinClientAutoConfiguration(
      */
     @Bean
     @ConditionalOnMissingBean
-    fun httpSseStreamMessageFormatter(serializationService: MessageSerializationService): SSEStreamMessageFormatter {
-        return HttpSSEStreamMessageFormatter(serializationService)
-    }
+    fun httpSseStreamMessageFormatter(serializationService: MessageSerializationService): SSEStreamMessageFormatter =
+        HttpSSEStreamMessageFormatter(serializationService)
 
     /**
      * Creates an HTTP response message formatter bean if none is provided.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun httpResponseMessageFormatter(serializationService: MessageSerializationService): HttpResponseMessageFormatter {
-        return DefaultHttpResponseMessageFormatter(serializationService)
-    }
+    fun httpResponseMessageFormatter(serializationService: MessageSerializationService): HttpResponseMessageFormatter =
+        DefaultHttpResponseMessageFormatter(serializationService)
 
     /**
      * Creates an HTTP stream message formatter bean if none is provided.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun httpStreamMessageFormatter(serializationService: MessageSerializationService): HttpStreamMessageFormatter {
-        return SimpleHttpStreamMessageFormatter(serializationService)
-    }
+    fun httpStreamMessageFormatter(serializationService: MessageSerializationService): HttpStreamMessageFormatter =
+        SimpleHttpStreamMessageFormatter(serializationService)
 
     /**
      * Creates a long-polling message formatter bean if none is provided.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun longPollingMessageFormatter(serializationService: MessageSerializationService): LongPollingMessageFormatter {
-        return DefaultLongPollingMessageFormatter(serializationService)
-    }
+    fun longPollingMessageFormatter(serializationService: MessageSerializationService): LongPollingMessageFormatter =
+        DefaultLongPollingMessageFormatter(serializationService)
 
     /**
      * Creates a message serializer bean if none is provided.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun messageSerializer(formatterFactory: FormatterFactory): MessageSerializer {
-        return MessageSerializerBuilder.defaultSerializer(formatterFactory)
-    }
+    fun messageSerializer(formatterFactory: FormatterFactory): MessageSerializer =
+        MessageSerializerBuilder.defaultSerializer(formatterFactory)
 
     /**
      * Creates customized message formatter factories.
      * These factories can be used to create customized formatters.
      */
     @Bean
-    fun formatterFactory(serializationService: MessageSerializationService): FormatterFactory {
-        return DefaultFormatterFactory(serializationService)
-    }
+    fun formatterFactory(serializationService: MessageSerializationService): FormatterFactory =
+        DefaultFormatterFactory(serializationService)
 }

@@ -9,7 +9,6 @@ import java.util.UUID
  * It ensures that code using EncryptionService will not fail if no encryption module is included.
  */
 class NoOpEncryptionService : EncryptionService {
-
     override fun encrypt(plaintext: String): String {
         // Pass through without encryption
         return plaintext
@@ -20,9 +19,7 @@ class NoOpEncryptionService : EncryptionService {
         return encryptedData
     }
 
-    override fun isEncryptionEnabled(): Boolean {
-        return false
-    }
+    override fun isEncryptionEnabled(): Boolean = false
 
     override fun generateSecretKey(): String {
         // Generate a dummy key that looks real but isn't used

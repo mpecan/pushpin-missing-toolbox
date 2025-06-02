@@ -15,7 +15,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class MessageSerializerBuilderTest {
-
     @Test
     fun `should build with all formatters provided`() {
         // Given
@@ -26,13 +25,15 @@ class MessageSerializerBuilderTest {
         val longPollingFormatter = mock<LongPollingMessageFormatter>()
 
         // When
-        val serializer = MessageSerializerBuilder.builder()
-            .withWebSocketFormatter(webSocketFormatter)
-            .withHttpSseStreamFormatter(httpSseStreamFormatter)
-            .withHttpStreamFormatter(httpStreamFormatter)
-            .withHttpResponseFormatter(httpResponseFormatter)
-            .withLongPollingFormatter(longPollingFormatter)
-            .build()
+        val serializer =
+            MessageSerializerBuilder
+                .builder()
+                .withWebSocketFormatter(webSocketFormatter)
+                .withHttpSseStreamFormatter(httpSseStreamFormatter)
+                .withHttpStreamFormatter(httpStreamFormatter)
+                .withHttpResponseFormatter(httpResponseFormatter)
+                .withLongPollingFormatter(longPollingFormatter)
+                .build()
 
         // Then
         assertNotNull(serializer)
@@ -64,9 +65,11 @@ class MessageSerializerBuilderTest {
         whenever(formatterFactory.createLongPollingFormatter()).thenReturn(longPollingFormatter)
 
         // When
-        val serializer = MessageSerializerBuilder.builder()
-            .withFormatterFactory(formatterFactory)
-            .build()
+        val serializer =
+            MessageSerializerBuilder
+                .builder()
+                .withFormatterFactory(formatterFactory)
+                .build()
 
         // Then
         assertNotNull(serializer)
@@ -96,10 +99,12 @@ class MessageSerializerBuilderTest {
         whenever(formatterFactory.createLongPollingFormatter()).thenReturn(longPollingFormatter)
 
         // When
-        val serializer = MessageSerializerBuilder.builder()
-            .withFormatterFactory(formatterFactory)
-            .withWebSocketFormatter(customWebSocketFormatter)
-            .build()
+        val serializer =
+            MessageSerializerBuilder
+                .builder()
+                .withFormatterFactory(formatterFactory)
+                .withWebSocketFormatter(customWebSocketFormatter)
+                .build()
 
         // Then
         assertNotNull(serializer)

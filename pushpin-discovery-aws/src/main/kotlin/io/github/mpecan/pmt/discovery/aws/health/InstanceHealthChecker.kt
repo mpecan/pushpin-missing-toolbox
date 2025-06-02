@@ -10,5 +10,8 @@ interface InstanceHealthChecker {
     /**
      * Checks if an EC2 instance is healthy.
      */
-    fun isHealthy(instance: Instance, properties: AwsDiscoveryProperties): Boolean
+    fun isHealthy(
+        instance: Instance,
+        properties: AwsDiscoveryProperties,
+    ): Boolean
 }

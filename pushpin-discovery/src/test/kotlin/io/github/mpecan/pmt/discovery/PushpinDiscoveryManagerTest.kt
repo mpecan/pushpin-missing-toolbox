@@ -9,7 +9,6 @@ import reactor.core.publisher.Flux
 import java.time.Duration
 
 class PushpinDiscoveryManagerTest {
-
     private val discoveryProperties: DiscoveryProperties = mock()
     private val discovery1: PushpinDiscovery = mock()
     private val discovery2: PushpinDiscovery = mock()
@@ -26,16 +25,18 @@ class PushpinDiscoveryManagerTest {
     @Test
     fun `should initialize and refresh servers on startup`() {
         // Given
-        val server1 = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 7999,
-        )
-        val server2 = PushpinServer(
-            id = "server2",
-            host = "localhost",
-            port = 8000,
-        )
+        val server1 =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 7999,
+            )
+        val server2 =
+            PushpinServer(
+                id = "server2",
+                host = "localhost",
+                port = 8000,
+            )
         whenever(discoveryProperties.refreshInterval).thenReturn(Duration.ofMinutes(1))
 
         whenever(discovery1.isEnabled()).thenReturn(true)
@@ -72,11 +73,12 @@ class PushpinDiscoveryManagerTest {
     @Test
     fun `should handle errors from discovery mechanisms`() {
         // Given
-        val server1 = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 7999,
-        )
+        val server1 =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 7999,
+            )
 
         whenever(discovery1.isEnabled()).thenReturn(true)
         whenever(discovery2.isEnabled()).thenReturn(true)
@@ -98,16 +100,18 @@ class PushpinDiscoveryManagerTest {
     @Test
     fun `should get server by ID`() {
         // Given
-        val server1 = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 7999,
-        )
-        val server2 = PushpinServer(
-            id = "server2",
-            host = "localhost",
-            port = 8000,
-        )
+        val server1 =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 7999,
+            )
+        val server2 =
+            PushpinServer(
+                id = "server2",
+                host = "localhost",
+                port = 8000,
+            )
 
         whenever(discovery1.isEnabled()).thenReturn(true)
         whenever(discovery2.isEnabled()).thenReturn(true)

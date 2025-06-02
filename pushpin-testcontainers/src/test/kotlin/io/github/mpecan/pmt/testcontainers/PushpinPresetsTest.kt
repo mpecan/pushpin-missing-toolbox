@@ -7,7 +7,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class PushpinPresetsTest {
-
     @Test
     fun `minimal preset should have debug enabled`() {
         val config = PushpinPresets.minimal()

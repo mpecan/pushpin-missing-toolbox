@@ -14,7 +14,6 @@ import reactor.test.StepVerifier
 import java.time.Duration
 
 class HttpHealthCheckerTest {
-
     private lateinit var webClient: WebClient
     private lateinit var requestSpec: RequestHeadersUriSpec<*>
     private lateinit var responseSpec: ResponseSpec
@@ -31,12 +30,13 @@ class HttpHealthCheckerTest {
     @Test
     fun `checkHealth should return true when server responds successfully`() {
         // Given
-        val server = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 5561,
-            healthCheckPath = "/api/health/check",
-        )
+        val server =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 5561,
+                healthCheckPath = "/api/health/check",
+            )
 
         whenever(webClient.get()).thenReturn(requestSpec)
         whenever(requestSpec.uri("http://localhost:5561/api/health/check")).thenReturn(requestSpec)
@@ -47,7 +47,8 @@ class HttpHealthCheckerTest {
         val result = healthChecker.checkHealth(server)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(true)
             .verifyComplete()
     }
@@ -55,11 +56,12 @@ class HttpHealthCheckerTest {
     @Test
     fun `checkHealth should return false when server returns error`() {
         // Given
-        val server = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 5561,
-        )
+        val server =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 5561,
+            )
 
         whenever(webClient.get()).thenReturn(requestSpec)
         whenever(requestSpec.uri(any<String>())).thenReturn(requestSpec)
@@ -72,7 +74,8 @@ class HttpHealthCheckerTest {
         val result = healthChecker.checkHealth(server)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(false)
             .verifyComplete()
     }
@@ -80,11 +83,12 @@ class HttpHealthCheckerTest {
     @Test
     fun `checkHealth should timeout after specified duration`() {
         // Given
-        val server = PushpinServer(
-            id = "server1",
-            host = "localhost",
-            port = 5561,
-        )
+        val server =
+            PushpinServer(
+                id = "server1",
+                host = "localhost",
+                port = 5561,
+            )
         val healthCheckerWithShortTimeout = HttpHealthChecker(webClient, 100L)
 
         whenever(webClient.get()).thenReturn(requestSpec)
@@ -98,7 +102,8 @@ class HttpHealthCheckerTest {
         val result = healthCheckerWithShortTimeout.checkHealth(server)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(false)
             .verifyComplete()
     }
@@ -140,11 +145,11 @@ class HttpHealthCheckerTest {
         val result = healthChecker.checkAllServers(servers)
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNextMatches { map ->
                 map.size == 2 && map["server1"] == true && map["server2"] == false
-            }
-            .verifyComplete()
+            }.verifyComplete()
     }
 
     @Test
@@ -153,7 +158,8 @@ class HttpHealthCheckerTest {
         val result = healthChecker.checkAllServers(emptyList())
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNext(emptyMap())
             .verifyComplete()
     }

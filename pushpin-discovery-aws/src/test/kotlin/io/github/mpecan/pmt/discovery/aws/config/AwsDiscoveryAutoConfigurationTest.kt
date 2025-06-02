@@ -22,9 +22,9 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AwsDiscoveryAutoConfigurationTest {
-
-    private val contextRunner = ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(AwsDiscoveryAutoConfiguration::class.java))
+    private val contextRunner =
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(AwsDiscoveryAutoConfiguration::class.java))
 
     @Test
     fun `configuration is not loaded when Ec2Client is not on classpath`() {
@@ -93,21 +93,14 @@ class AwsDiscoveryAutoConfigurationTest {
 
     @Configuration
     class CustomBeansConfig {
+        @Bean
+        fun ec2InstancesProvider(): Ec2InstancesProvider = CustomEc2InstancesProvider()
 
         @Bean
-        fun ec2InstancesProvider(): Ec2InstancesProvider {
-            return CustomEc2InstancesProvider()
-        }
+        fun instanceHealthChecker(): InstanceHealthChecker = CustomInstanceHealthChecker()
 
         @Bean
-        fun instanceHealthChecker(): InstanceHealthChecker {
-            return CustomInstanceHealthChecker()
-        }
-
-        @Bean
-        fun instanceConverter(): InstanceConverter {
-            return CustomInstanceConverter()
-        }
+        fun instanceConverter(): InstanceConverter = CustomInstanceConverter()
     }
 
     class CustomEc2InstancesProvider : Ec2InstancesProvider {
@@ -115,11 +108,16 @@ class AwsDiscoveryAutoConfigurationTest {
     }
 
     class CustomInstanceHealthChecker : InstanceHealthChecker {
-        override fun isHealthy(instance: Instance, properties: AwsDiscoveryProperties) = true
+        override fun isHealthy(
+            instance: Instance,
+            properties: AwsDiscoveryProperties,
+        ) = true
     }
 
     class CustomInstanceConverter : InstanceConverter {
-        override fun toPushpinServer(instance: Instance, properties: AwsDiscoveryProperties) =
-            mock(io.github.mpecan.pmt.model.PushpinServer::class.java)
+        override fun toPushpinServer(
+            instance: Instance,
+            properties: AwsDiscoveryProperties,
+        ) = mock(io.github.mpecan.pmt.model.PushpinServer::class.java)
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 /**
  * Integration tests for non-streaming HTTP response functionality.
@@ -21,7 +21,6 @@ import java.util.*
  */
 @AutoConfigureWebTestClient
 class HttpResponseIntegrationTest : PushpinIntegrationTest() {
-
     companion object {
         val definedPort = PortProvider.getPort()
 
@@ -51,20 +50,22 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
 
         // When: Make a request through Pushpin
         val pushpinPort = pushpinProperties.servers[0].port
-        val responseFlux = webClient.get()
-            .uri("http://localhost:$pushpinPort/api/http-response/$channel")
-            .retrieve()
-            .bodyToMono(Map::class.java)
-            .map { it as Map<String, Any> }
+        val responseFlux =
+            webClient
+                .get()
+                .uri("http://localhost:$pushpinPort/api/http-response/$channel")
+                .retrieve()
+                .bodyToMono(Map::class.java)
+                .map { it as Map<String, Any> }
 
         // Then: Verify the response
-        StepVerifier.create(responseFlux)
+        StepVerifier
+            .create(responseFlux)
             .expectNextMatches { response ->
                 response["success"] == true &&
                     response["message"] == "This is a non-streaming HTTP response" &&
                     response["channel"] == channel
-            }
-            .expectComplete()
+            }.expectComplete()
             .verify(Duration.ofSeconds(10))
     }
 
@@ -76,14 +77,16 @@ class HttpResponseIntegrationTest : PushpinIntegrationTest() {
 
         // First, make a request to establish the channel
         val pushpinPort = pushpinProperties.servers[0].port
-        webClient.get()
+        webClient
+            .get()
             .uri("http://localhost:$pushpinPort/api/http-response/$channel")
             .retrieve()
             .bodyToMono(Map::class.java)
             .block(Duration.ofSeconds(5))
 
         // When: Publish a message to the channel
-        webClient.post()
+        webClient
+            .post()
             .uri("http://localhost:$port/api/pushpin/publish/$channel")
             .contentType(MediaType.TEXT_PLAIN)
             .bodyValue(messageText)

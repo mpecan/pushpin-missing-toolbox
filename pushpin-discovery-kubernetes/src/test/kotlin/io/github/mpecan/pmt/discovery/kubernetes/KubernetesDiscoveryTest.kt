@@ -15,33 +15,35 @@ import reactor.test.StepVerifier
 import java.time.Duration
 
 class KubernetesDiscoveryTest {
-
     private val podProvider: KubernetesPodProvider = mock()
     private val podHealthChecker: PodHealthChecker = mock()
     private val podConverter: PodConverter = mock()
-    private val properties = KubernetesDiscoveryProperties(
-        enabled = true,
-        namespace = "test-namespace",
-        labelSelector = "app=pushpin",
-        refreshCacheSeconds = 10,
-    )
+    private val properties =
+        KubernetesDiscoveryProperties(
+            enabled = true,
+            namespace = "test-namespace",
+            labelSelector = "app=pushpin",
+            refreshCacheSeconds = 10,
+        )
 
     @Test
     fun `should return empty flux when disabled`() {
         // Given
         val disabledProperties = KubernetesDiscoveryProperties(enabled = false)
-        val discovery = KubernetesDiscovery(
-            properties = disabledProperties,
-            podProvider = podProvider,
-            podHealthChecker = podHealthChecker,
-            podConverter = podConverter,
-        )
+        val discovery =
+            KubernetesDiscovery(
+                properties = disabledProperties,
+                podProvider = podProvider,
+                podHealthChecker = podHealthChecker,
+                podConverter = podConverter,
+            )
 
         // When
         val result = discovery.discoverServers()
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectComplete()
             .verify(Duration.ofSeconds(1))
     }
@@ -49,12 +51,13 @@ class KubernetesDiscoveryTest {
     @Test
     fun `should discover servers from kubernetes pods`() {
         // Given
-        val discovery = KubernetesDiscovery(
-            properties = properties,
-            podProvider = podProvider,
-            podHealthChecker = podHealthChecker,
-            podConverter = podConverter,
-        )
+        val discovery =
+            KubernetesDiscovery(
+                properties = properties,
+                podProvider = podProvider,
+                podHealthChecker = podHealthChecker,
+                podConverter = podConverter,
+            )
 
         val pod1 = createPod("pod-1", "192.168.1.1")
         val pod2 = createPod("pod-2", "192.168.1.2")
@@ -74,7 +77,8 @@ class KubernetesDiscoveryTest {
         val result = discovery.discoverServers()
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNextMatches { server -> server.id == "pod-1" || server.id == "pod-2" }
             .expectNextMatches { server -> server.id == "pod-1" || server.id == "pod-2" }
             .expectComplete()
@@ -84,12 +88,13 @@ class KubernetesDiscoveryTest {
     @Test
     fun `should filter unhealthy pods`() {
         // Given
-        val discovery = KubernetesDiscovery(
-            properties = properties,
-            podProvider = podProvider,
-            podHealthChecker = podHealthChecker,
-            podConverter = podConverter,
-        )
+        val discovery =
+            KubernetesDiscovery(
+                properties = properties,
+                podProvider = podProvider,
+                podHealthChecker = podHealthChecker,
+                podConverter = podConverter,
+            )
 
         val pod1 = createPod("pod-1", "192.168.1.1")
         val pod2 = createPod("pod-2", "192.168.1.2")
@@ -107,15 +112,18 @@ class KubernetesDiscoveryTest {
         val result = discovery.discoverServers()
 
         // Then
-        StepVerifier.create(result)
+        StepVerifier
+            .create(result)
             .expectNextMatches { server -> server.id == "pod-1" }
             .expectComplete()
             .verify(Duration.ofSeconds(1))
     }
 
-    private fun createPod(name: String, podIp: String): V1Pod {
-        return V1Pod()
+    private fun createPod(
+        name: String,
+        podIp: String,
+    ): V1Pod =
+        V1Pod()
             .metadata(V1ObjectMeta().name(name))
             .status(V1PodStatus().podIP(podIp))
-    }
 }

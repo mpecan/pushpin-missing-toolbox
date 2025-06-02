@@ -12,23 +12,20 @@ data class SecurityContext(
     /**
      * Get an attribute from the security context.
      */
-    inline fun <reified T> getAttribute(key: String): T? {
-        return attributes[key] as? T
-    }
+    inline fun <reified T> getAttribute(key: String): T? = attributes[key] as? T
 
     /**
      * Create a new SecurityContext with an additional attribute.
      */
-    fun withAttribute(key: String, value: Any): SecurityContext {
-        return copy(attributes = attributes + (key to value))
-    }
+    fun withAttribute(
+        key: String,
+        value: Any,
+    ): SecurityContext = copy(attributes = attributes + (key to value))
 
     /**
      * Create a new SecurityContext with multiple additional attributes.
      */
-    fun withAttributes(newAttributes: Map<String, Any>): SecurityContext {
-        return copy(attributes = attributes + newAttributes)
-    }
+    fun withAttributes(newAttributes: Map<String, Any>): SecurityContext = copy(attributes = attributes + newAttributes)
 }
 
 /**
@@ -41,9 +38,7 @@ object SecurityContextHolder {
     /**
      * Get the current security context.
      */
-    fun getContext(): SecurityContext {
-        return contextHolder.get() ?: SecurityContext()
-    }
+    fun getContext(): SecurityContext = contextHolder.get() ?: SecurityContext()
 
     /**
      * Set the security context.

@@ -8,7 +8,5 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/health")
 class PushpinHealthController {
     @GetMapping("/check")
-    fun healthCheck(): String {
-        return "OK"
-    }
+    fun healthCheck(): String = "OK"
 }

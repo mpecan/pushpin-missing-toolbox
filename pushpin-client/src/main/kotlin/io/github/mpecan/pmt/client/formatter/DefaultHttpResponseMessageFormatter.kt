@@ -10,9 +10,8 @@ import io.github.mpecan.pmt.model.HttpResponseFormat
 class DefaultHttpResponseMessageFormatter(
     private val serializationService: MessageSerializationService,
 ) : HttpResponseMessageFormatter {
-    override fun format(message: Message): HttpResponseFormat {
-        return HttpResponseFormat(
+    override fun format(message: Message): HttpResponseFormat =
+        HttpResponseFormat(
             body = serializationService.serialize(message.data),
         )
-    }
 }

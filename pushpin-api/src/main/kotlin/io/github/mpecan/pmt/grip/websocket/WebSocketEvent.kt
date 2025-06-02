@@ -10,8 +10,8 @@ data class WebSocketEvent(
     /**
      * Encodes the event into GRIP WebSocket-over-HTTP format.
      */
-    fun encode(): String {
-        return when (type) {
+    fun encode(): String =
+        when (type) {
             WebSocketEventType.OPEN,
             WebSocketEventType.PING,
             WebSocketEventType.PONG,
@@ -32,13 +32,14 @@ data class WebSocketEvent(
                 }
             }
         }
-    }
 }
 
 /**
  * WebSocket event types supported by GRIP.
  */
-enum class WebSocketEventType(val value: String) {
+enum class WebSocketEventType(
+    val value: String,
+) {
     OPEN("OPEN"),
     TEXT("TEXT"),
     BINARY("BINARY"),
@@ -49,8 +50,6 @@ enum class WebSocketEventType(val value: String) {
     ;
 
     companion object {
-        fun fromString(value: String): WebSocketEventType? {
-            return entries.find { it.value == value }
-        }
+        fun fromString(value: String): WebSocketEventType? = entries.find { it.value == value }
     }
 }

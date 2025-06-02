@@ -23,7 +23,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(MockitoExtension::class)
 class DefaultInstanceHealthCheckerTest {
-
     @Mock
     private lateinit var ec2ClientProvider: Ec2ClientProvider
 
@@ -34,23 +33,28 @@ class DefaultInstanceHealthCheckerTest {
     private lateinit var properties: AwsDiscoveryProperties
 
     // Test instances
-    private val runningInstance = Instance.builder()
-        .instanceId("i-running")
-        .state(InstanceState.builder().name(InstanceStateName.RUNNING).build())
-        .build()
+    private val runningInstance =
+        Instance
+            .builder()
+            .instanceId("i-running")
+            .state(InstanceState.builder().name(InstanceStateName.RUNNING).build())
+            .build()
 
-    private val stoppedInstance = Instance.builder()
-        .instanceId("i-stopped")
-        .state(InstanceState.builder().name(InstanceStateName.STOPPED).build())
-        .build()
+    private val stoppedInstance =
+        Instance
+            .builder()
+            .instanceId("i-stopped")
+            .state(InstanceState.builder().name(InstanceStateName.STOPPED).build())
+            .build()
 
     @BeforeEach
     fun setUp() {
         healthChecker = DefaultInstanceHealthChecker(ec2ClientProvider)
-        properties = AwsDiscoveryProperties(
-            enabled = true,
-            instanceHealthCheckEnabled = true,
-        )
+        properties =
+            AwsDiscoveryProperties(
+                enabled = true,
+                instanceHealthCheckEnabled = true,
+            )
     }
 
     @Test
@@ -74,15 +78,19 @@ class DefaultInstanceHealthCheckerTest {
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
 
         // Create mock status response with healthy status
-        val healthyStatus = InstanceStatus.builder()
-            .instanceId("i-running")
-            .instanceStatus(InstanceStatusSummary.builder().status(SummaryStatus.OK).build())
-            .systemStatus(InstanceStatusSummary.builder().status(SummaryStatus.OK).build())
-            .build()
+        val healthyStatus =
+            InstanceStatus
+                .builder()
+                .instanceId("i-running")
+                .instanceStatus(InstanceStatusSummary.builder().status(SummaryStatus.OK).build())
+                .systemStatus(InstanceStatusSummary.builder().status(SummaryStatus.OK).build())
+                .build()
 
-        val statusResponse = DescribeInstanceStatusResponse.builder()
-            .instanceStatuses(healthyStatus)
-            .build()
+        val statusResponse =
+            DescribeInstanceStatusResponse
+                .builder()
+                .instanceStatuses(healthyStatus)
+                .build()
 
         // Mock EC2 client response
         `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(
@@ -102,15 +110,19 @@ class DefaultInstanceHealthCheckerTest {
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
 
         // Create mock status response with impaired status
-        val impairedStatus = InstanceStatus.builder()
-            .instanceId("i-running")
-            .instanceStatus(InstanceStatusSummary.builder().status(SummaryStatus.IMPAIRED).build())
-            .systemStatus(InstanceStatusSummary.builder().status(SummaryStatus.OK).build())
-            .build()
+        val impairedStatus =
+            InstanceStatus
+                .builder()
+                .instanceId("i-running")
+                .instanceStatus(InstanceStatusSummary.builder().status(SummaryStatus.IMPAIRED).build())
+                .systemStatus(InstanceStatusSummary.builder().status(SummaryStatus.OK).build())
+                .build()
 
-        val statusResponse = DescribeInstanceStatusResponse.builder()
-            .instanceStatuses(impairedStatus)
-            .build()
+        val statusResponse =
+            DescribeInstanceStatusResponse
+                .builder()
+                .instanceStatuses(impairedStatus)
+                .build()
 
         // Mock EC2 client response
         `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(
@@ -130,9 +142,11 @@ class DefaultInstanceHealthCheckerTest {
         `when`(ec2ClientProvider.getClient(properties)).thenReturn(ec2Client)
 
         // Create empty status response
-        val emptyStatusResponse = DescribeInstanceStatusResponse.builder()
-            .instanceStatuses(emptyList())
-            .build()
+        val emptyStatusResponse =
+            DescribeInstanceStatusResponse
+                .builder()
+                .instanceStatuses(emptyList())
+                .build()
 
         // Mock EC2 client response
         `when`(ec2Client.describeInstanceStatus(org.mockito.kotlin.any<DescribeInstanceStatusRequest>())).thenReturn(

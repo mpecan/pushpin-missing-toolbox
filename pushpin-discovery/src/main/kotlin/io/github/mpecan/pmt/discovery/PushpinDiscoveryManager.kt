@@ -47,18 +47,18 @@ class PushpinDiscoveryManager(
             return
         }
 
-        Flux.fromIterable(enabledDiscoveries)
+        Flux
+            .fromIterable(enabledDiscoveries)
             .flatMap { discovery ->
-                discovery.discoverServers()
+                discovery
+                    .discoverServers()
                     .doOnNext { server ->
                         logger.debug("Discovered server from ${discovery.id}: ${server.id} at ${server.getBaseUrl()}")
-                    }
-                    .onErrorResume { e ->
+                    }.onErrorResume { e ->
                         logger.error("Error discovering servers from ${discovery.id}: ${e.message}", e)
                         Flux.empty()
                     }
-            }
-            .collectList()
+            }.collectList()
             .subscribe { discoveredServers ->
                 // Update the servers map
                 servers.clear()
@@ -72,14 +72,10 @@ class PushpinDiscoveryManager(
     /**
      * Gets all discovered servers.
      */
-    fun getAllServers(): List<PushpinServer> {
-        return servers.values.toList()
-    }
+    fun getAllServers(): List<PushpinServer> = servers.values.toList()
 
     /**
      * Gets a server by ID.
      */
-    fun getServerById(id: String): PushpinServer? {
-        return servers[id]
-    }
+    fun getServerById(id: String): PushpinServer? = servers[id]
 }

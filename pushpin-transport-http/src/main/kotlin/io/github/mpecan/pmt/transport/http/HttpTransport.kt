@@ -28,12 +28,16 @@ class HttpTransport(
     /**
      * Publishes a message to a single Pushpin server via HTTP.
      */
-    private fun publishToServer(server: PushpinServer, message: Message): Mono<Boolean> {
+    private fun publishToServer(
+        server: PushpinServer,
+        message: Message,
+    ): Mono<Boolean> {
         logger.info("Publishing message to server: ${server.id} via HTTP")
         val pushpinMessage = messageSerializer.serialize(message)
         val httpMessage = PushpinHttpMessage(listOf(pushpinMessage))
 
-        return webClient.post()
+        return webClient
+            .post()
             .uri("${server.getHttpUrl()}/publish")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(httpMessage)
@@ -49,36 +53,37 @@ class HttpTransport(
                     logger.error("Failed to publish message to server: ${server.id} at ${server.getBaseUrl()}")
                     Mono.error(RuntimeException("Failed to publish message: ${clientResponse.statusCode()}"))
                 },
-            )
-            .bodyToMono<String>()
+            ).bodyToMono<String>()
             .doOnSuccess {
                 logger.info("Message published to Pushpin server ${server.id}: $it")
-            }
-            .map { true }
+            }.map { true }
             .onErrorResume { error ->
                 logger.error("Error publishing message to Pushpin server ${server.id}: ${error.message}")
                 Mono.just(false)
-            }
-            .timeout(Duration.ofMillis(defaultTimeout))
+            }.timeout(Duration.ofMillis(defaultTimeout))
     }
 
     /**
      * Publishes a message to the specified servers.
      * This method is provided for backward compatibility and testing.
      */
-    fun publishMessage(servers: List<PushpinServer>, message: Message): Mono<Boolean> {
+    fun publishMessage(
+        servers: List<PushpinServer>,
+        message: Message,
+    ): Mono<Boolean> {
         if (servers.isEmpty()) {
             logger.warn("No servers to publish to")
             return Mono.just(false)
         }
 
-        return Flux.merge(
-            servers.map { server ->
-                publishToServer(server, message)
-            },
-        ).reduce { acc, value ->
-            acc && value
-        }
+        return Flux
+            .merge(
+                servers.map { server ->
+                    publishToServer(server, message)
+                },
+            ).reduce { acc, value ->
+                acc && value
+            }
     }
 
     /**

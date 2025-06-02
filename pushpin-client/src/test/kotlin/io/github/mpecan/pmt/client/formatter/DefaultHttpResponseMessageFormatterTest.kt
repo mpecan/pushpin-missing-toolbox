@@ -10,7 +10,6 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 class DefaultHttpResponseMessageFormatterTest {
-
     private val serializationService: MessageSerializationService = mock()
 
     private lateinit var formatter: DefaultHttpResponseMessageFormatter

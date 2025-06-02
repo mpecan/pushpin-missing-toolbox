@@ -2,7 +2,7 @@ package io.github.mpecan.pmt.security.encryption
 
 import io.github.mpecan.pmt.security.core.EncryptionService
 import java.security.SecureRandom
-import java.util.*
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -15,7 +15,6 @@ import javax.crypto.spec.SecretKeySpec
 class DefaultEncryptionService(
     private val properties: EncryptionProperties,
 ) : EncryptionService {
-
     companion object {
         private const val GCM_IV_LENGTH = 12
         private const val GCM_TAG_LENGTH = 128
@@ -114,9 +113,7 @@ class DefaultEncryptionService(
      *
      * @return true if encryption is enabled, false otherwise
      */
-    override fun isEncryptionEnabled(): Boolean {
-        return properties.enabled
-    }
+    override fun isEncryptionEnabled(): Boolean = properties.enabled
 
     /**
      * Generate a new random secret key for encryption.

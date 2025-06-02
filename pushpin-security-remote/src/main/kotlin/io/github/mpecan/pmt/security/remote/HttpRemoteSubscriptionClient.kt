@@ -24,7 +24,10 @@ class HttpRemoteSubscriptionClient(
 ) : RemoteAuthorizationClient {
     private val logger = LoggerFactory.getLogger(HttpRemoteSubscriptionClient::class.java)
 
-    override fun canSubscribe(request: HttpServletRequest, channelId: String): Boolean {
+    override fun canSubscribe(
+        request: HttpServletRequest,
+        channelId: String,
+    ): Boolean {
         val userId = getCurrentUserId()
         if (userId == null) {
             auditService.logAuthFailure(
@@ -57,10 +60,11 @@ class HttpRemoteSubscriptionClient(
 
         val startTime = System.currentTimeMillis()
         try {
-            val result = when (properties.method.uppercase()) {
-                "GET" -> checkSubscriptionWithGet(request, userId, channelId)
-                else -> checkSubscriptionWithPost(request, userId, channelId)
-            }
+            val result =
+                when (properties.method.uppercase()) {
+                    "GET" -> checkSubscriptionWithGet(request, userId, channelId)
+                    else -> checkSubscriptionWithPost(request, userId, channelId)
+                }
 
             val duration = System.currentTimeMillis() - startTime
 
@@ -118,10 +122,11 @@ class HttpRemoteSubscriptionClient(
 
         val startTime = System.currentTimeMillis()
         try {
-            val result = when (properties.method.uppercase()) {
-                "GET" -> getSubscribableChannelsWithGet(request, userId)
-                else -> getSubscribableChannelsWithPost(request, userId)
-            }
+            val result =
+                when (properties.method.uppercase()) {
+                    "GET" -> getSubscribableChannelsWithGet(request, userId)
+                    else -> getSubscribableChannelsWithPost(request, userId)
+                }
 
             val duration = System.currentTimeMillis() - startTime
 
@@ -151,7 +156,10 @@ class HttpRemoteSubscriptionClient(
         }
     }
 
-    override fun getSubscribableChannelsByPattern(request: HttpServletRequest, pattern: String): List<String> {
+    override fun getSubscribableChannelsByPattern(
+        request: HttpServletRequest,
+        pattern: String,
+    ): List<String> {
         val userId = getCurrentUserId()
         if (userId == null) {
             auditService.logAuthFailure(
@@ -184,10 +192,11 @@ class HttpRemoteSubscriptionClient(
 
         val startTime = System.currentTimeMillis()
         try {
-            val result = when (properties.method.uppercase()) {
-                "GET" -> getChannelsByPatternWithGet(request, userId, pattern)
-                else -> getChannelsByPatternWithPost(request, userId, pattern)
-            }
+            val result =
+                when (properties.method.uppercase()) {
+                    "GET" -> getChannelsByPatternWithGet(request, userId, pattern)
+                    else -> getChannelsByPatternWithPost(request, userId, pattern)
+                }
 
             val duration = System.currentTimeMillis() - startTime
 
@@ -212,8 +221,9 @@ class HttpRemoteSubscriptionClient(
                 username = userId,
                 ipAddress = request.remoteAddr,
                 channelId = null,
-                error = "Channel list by pattern failed - ${e.javaClass.simpleName}: " +
-                    "${e.message ?: "Unknown error"} (pattern: $pattern)",
+                error =
+                    "Channel list by pattern failed - ${e.javaClass.simpleName}: " +
+                        "${e.message ?: "Unknown error"} (pattern: $pattern)",
             )
             return emptyList()
         }
@@ -222,21 +232,28 @@ class HttpRemoteSubscriptionClient(
     /**
      * Check subscription using HTTP GET.
      */
-    private fun checkSubscriptionWithGet(request: HttpServletRequest, userId: String, channelId: String): Boolean {
-        val uri = UriComponentsBuilder.fromUriString(properties.url)
-            .path("/subscribe/check")
-            .queryParam("userId", userId)
-            .queryParam("channelId", channelId)
-            .build()
-            .toUri()
+    private fun checkSubscriptionWithGet(
+        request: HttpServletRequest,
+        userId: String,
+        channelId: String,
+    ): Boolean {
+        val uri =
+            UriComponentsBuilder
+                .fromUriString(properties.url)
+                .path("/subscribe/check")
+                .queryParam("userId", userId)
+                .queryParam("channelId", channelId)
+                .build()
+                .toUri()
 
         val headers = createHeaders(request)
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            HttpEntity<Void>(headers),
-            SubscriptionResponse::class.java,
-        )
+        val response =
+            restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                HttpEntity<Void>(headers),
+                SubscriptionResponse::class.java,
+            )
 
         return response.body?.allowed ?: false
     }
@@ -244,23 +261,29 @@ class HttpRemoteSubscriptionClient(
     /**
      * Check subscription using HTTP POST.
      */
-    private fun checkSubscriptionWithPost(request: HttpServletRequest, userId: String, channelId: String): Boolean {
+    private fun checkSubscriptionWithPost(
+        request: HttpServletRequest,
+        userId: String,
+        channelId: String,
+    ): Boolean {
         val uri = URI.create("${properties.url}/subscribe/check")
 
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val body = mapOf(
-            "userId" to userId,
-            "channelId" to channelId,
-        )
+        val body =
+            mapOf(
+                "userId" to userId,
+                "channelId" to channelId,
+            )
 
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.POST,
-            HttpEntity(body, headers),
-            SubscriptionResponse::class.java,
-        )
+        val response =
+            restTemplate.exchange(
+                uri,
+                HttpMethod.POST,
+                HttpEntity(body, headers),
+                SubscriptionResponse::class.java,
+            )
 
         return response.body?.allowed ?: false
     }
@@ -268,20 +291,26 @@ class HttpRemoteSubscriptionClient(
     /**
      * Get subscribable channels using HTTP GET.
      */
-    private fun getSubscribableChannelsWithGet(request: HttpServletRequest, userId: String): List<String> {
-        val uri = UriComponentsBuilder.fromUriString(properties.url)
-            .path("/subscribe/channels")
-            .queryParam("userId", userId)
-            .build()
-            .toUri()
+    private fun getSubscribableChannelsWithGet(
+        request: HttpServletRequest,
+        userId: String,
+    ): List<String> {
+        val uri =
+            UriComponentsBuilder
+                .fromUriString(properties.url)
+                .path("/subscribe/channels")
+                .queryParam("userId", userId)
+                .build()
+                .toUri()
 
         val headers = createHeaders(request)
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            HttpEntity<Void>(headers),
-            ChannelsResponse::class.java,
-        )
+        val response =
+            restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                HttpEntity<Void>(headers),
+                ChannelsResponse::class.java,
+            )
 
         return response.body?.channels ?: emptyList()
     }
@@ -289,7 +318,10 @@ class HttpRemoteSubscriptionClient(
     /**
      * Get subscribable channels using HTTP POST.
      */
-    private fun getSubscribableChannelsWithPost(request: HttpServletRequest, userId: String): List<String> {
+    private fun getSubscribableChannelsWithPost(
+        request: HttpServletRequest,
+        userId: String,
+    ): List<String> {
         val uri = URI.create("${properties.url}/subscribe/channels")
 
         val headers = createHeaders(request)
@@ -297,12 +329,13 @@ class HttpRemoteSubscriptionClient(
 
         val body = mapOf("userId" to userId)
 
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.POST,
-            HttpEntity(body, headers),
-            ChannelsResponse::class.java,
-        )
+        val response =
+            restTemplate.exchange(
+                uri,
+                HttpMethod.POST,
+                HttpEntity(body, headers),
+                ChannelsResponse::class.java,
+            )
 
         return response.body?.channels ?: emptyList()
     }
@@ -315,20 +348,23 @@ class HttpRemoteSubscriptionClient(
         userId: String,
         pattern: String,
     ): List<String> {
-        val uri = UriComponentsBuilder.fromUriString(properties.url)
-            .path("/subscribe/channels/pattern")
-            .queryParam("userId", userId)
-            .queryParam("pattern", pattern)
-            .build()
-            .toUri()
+        val uri =
+            UriComponentsBuilder
+                .fromUriString(properties.url)
+                .path("/subscribe/channels/pattern")
+                .queryParam("userId", userId)
+                .queryParam("pattern", pattern)
+                .build()
+                .toUri()
 
         val headers = createHeaders(request)
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            HttpEntity<Void>(headers),
-            ChannelsResponse::class.java,
-        )
+        val response =
+            restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                HttpEntity<Void>(headers),
+                ChannelsResponse::class.java,
+            )
 
         return response.body?.channels ?: emptyList()
     }
@@ -346,17 +382,19 @@ class HttpRemoteSubscriptionClient(
         val headers = createHeaders(request)
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val body = mapOf(
-            "userId" to userId,
-            "pattern" to pattern,
-        )
+        val body =
+            mapOf(
+                "userId" to userId,
+                "pattern" to pattern,
+            )
 
-        val response = restTemplate.exchange(
-            uri,
-            HttpMethod.POST,
-            HttpEntity(body, headers),
-            ChannelsResponse::class.java,
-        )
+        val response =
+            restTemplate.exchange(
+                uri,
+                HttpMethod.POST,
+                HttpEntity(body, headers),
+                ChannelsResponse::class.java,
+            )
 
         return response.body?.channels ?: emptyList()
     }
@@ -401,5 +439,7 @@ class HttpRemoteSubscriptionClient(
     /**
      * Response from the authorization service for channel lists.
      */
-    internal data class ChannelsResponse(val channels: List<String>)
+    internal data class ChannelsResponse(
+        val channels: List<String>,
+    )
 }

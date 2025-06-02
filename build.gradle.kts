@@ -9,13 +9,13 @@ val kotlinVersion: String by project
 val springBootVersion: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
+    kotlin("jvm") version "2.1.21"
+    kotlin("plugin.spring") version "2.1.21"
     id("org.springframework.boot") version "3.5.0" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
     id("jacoco-report-aggregation")
-    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
+    id("org.jlleitschuh.gradle.ktlint") version "13.0.0-rc.1"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("com.vanniktech.maven.publish") version "0.32.0"
 }
@@ -172,9 +172,9 @@ subprojects {
 
     // Common configurations for all subprojects
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "17"
+        compilerOptions {
+            freeCompilerArgs.set(listOf("-Xjsr305=strict"))
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 
@@ -349,10 +349,12 @@ val installGitHook by tasks.registering {
 
     doLast {
         // Skip if running in CI environment
-        val isCI = System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null ||
-            System.getenv("JENKINS_HOME") != null ||
-            System.getenv("GITLAB_CI") != null ||
-            System.getenv("CIRCLECI") != null
+        val isCI =
+            System.getenv("CI") != null ||
+                System.getenv("GITHUB_ACTIONS") != null ||
+                System.getenv("JENKINS_HOME") != null ||
+                System.getenv("GITLAB_CI") != null ||
+                System.getenv("CIRCLECI") != null
 
         if (isCI) {
             logger.lifecycle("Skipping git hook installation in CI environment")
@@ -360,7 +362,8 @@ val installGitHook by tasks.registering {
         }
 
         val hookFile = file(".git/hooks/pre-commit")
-        val hookContent = """
+        val hookContent =
+            """
             |#!/bin/sh
             |
             |# Run ktlintCheck before commit
@@ -383,7 +386,7 @@ val installGitHook by tasks.registering {
             |
             |echo "✅ All ktlint checks passed!"
             |exit 0
-        """.trimMargin()
+            """.trimMargin()
 
         if (!hookFile.parentFile.exists()) {
             logger.warn("Git hooks directory not found. Skipping pre-commit hook installation.")

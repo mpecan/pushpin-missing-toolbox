@@ -13,7 +13,10 @@ interface ClaimExtractorService {
      * @param claimPath Path to the claim using the syntax defined by the implementation
      * @return The extracted claim value, or null if not found
      */
-    fun extractStringClaim(jwt: Jwt, claimPath: String): String?
+    fun extractStringClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): String?
 
     /**
      * Extract a list claim from the JWT token.
@@ -22,7 +25,10 @@ interface ClaimExtractorService {
      * @param claimPath Path to the claim using the syntax defined by the implementation
      * @return The extracted claim values as a list, or empty list if not found
      */
-    fun extractListClaim(jwt: Jwt, claimPath: String): List<String>
+    fun extractListClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): List<String>
 
     /**
      * Extract a map claim from the JWT token.
@@ -31,7 +37,10 @@ interface ClaimExtractorService {
      * @param claimPath Path to the claim using the syntax defined by the implementation
      * @return The extracted claim values as a map, or empty map if not found
      */
-    fun extractMapClaim(jwt: Jwt, claimPath: String): Map<String, Any>
+    fun extractMapClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): Map<String, Any>
 
     /**
      * Check if a claim exists in the JWT token.
@@ -40,5 +49,8 @@ interface ClaimExtractorService {
      * @param claimPath Path to the claim using the syntax defined by the implementation
      * @return True if the claim exists, false otherwise
      */
-    fun hasClaim(jwt: Jwt, claimPath: String): Boolean
+    fun hasClaim(
+        jwt: Jwt,
+        claimPath: String,
+    ): Boolean
 }

@@ -8,21 +8,22 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class DefaultPodConverterTest {
-
     private val converter = DefaultPodConverter()
-    private val properties = KubernetesDiscoveryProperties(
-        port = 7999,
-        controlPort = 5564,
-        publishPort = 5560,
-        healthCheckPath = "/test/health",
-    )
+    private val properties =
+        KubernetesDiscoveryProperties(
+            port = 7999,
+            controlPort = 5564,
+            publishPort = 5560,
+            healthCheckPath = "/test/health",
+        )
 
     @Test
     fun `should convert pod to pushpin server using pod IP`() {
         // Given
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
-            .status(V1PodStatus().podIP("192.168.1.1").hostIP("10.0.0.1"))
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
+                .status(V1PodStatus().podIP("192.168.1.1").hostIP("10.0.0.1"))
 
         // When
         val server = converter.toPushpinServer(pod, properties)
@@ -40,16 +41,18 @@ class DefaultPodConverterTest {
     @Test
     fun `should convert pod to pushpin server using host IP when nodePort is true`() {
         // Given
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
-            .status(V1PodStatus().podIP("192.168.1.1").hostIP("10.0.0.1"))
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
+                .status(V1PodStatus().podIP("192.168.1.1").hostIP("10.0.0.1"))
 
-        val nodePortProperties = KubernetesDiscoveryProperties(
-            useNodePort = true,
-            port = 30999, // NodePort is typically in the 30000-32767 range
-            controlPort = 30564,
-            publishPort = 30560,
-        )
+        val nodePortProperties =
+            KubernetesDiscoveryProperties(
+                useNodePort = true,
+                port = 30999, // NodePort is typically in the 30000-32767 range
+                controlPort = 30564,
+                publishPort = 30560,
+            )
 
         // When
         val server = converter.toPushpinServer(pod, nodePortProperties)
@@ -65,20 +68,21 @@ class DefaultPodConverterTest {
     @Test
     fun `should use custom port values from annotations`() {
         // Given
-        val annotations = mapOf(
-            "pushpin.io/http-port" to "8080",
-            "pushpin.io/control-port" to "6000",
-            "pushpin.io/publish-port" to "6001",
-        )
-
-        val pod = V1Pod()
-            .metadata(
-                V1ObjectMeta()
-                    .name("test-pod")
-                    .namespace("test-namespace")
-                    .annotations(annotations),
+        val annotations =
+            mapOf(
+                "pushpin.io/http-port" to "8080",
+                "pushpin.io/control-port" to "6000",
+                "pushpin.io/publish-port" to "6001",
             )
-            .status(V1PodStatus().podIP("192.168.1.1"))
+
+        val pod =
+            V1Pod()
+                .metadata(
+                    V1ObjectMeta()
+                        .name("test-pod")
+                        .namespace("test-namespace")
+                        .annotations(annotations),
+                ).status(V1PodStatus().podIP("192.168.1.1"))
 
         // When
         val server = converter.toPushpinServer(pod, properties)
@@ -93,9 +97,10 @@ class DefaultPodConverterTest {
     @Test
     fun `should fallback to localhost if no IP is available`() {
         // Given
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
-            .status(V1PodStatus()) // No IP addresses
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod").namespace("test-namespace"))
+                .status(V1PodStatus()) // No IP addresses
 
         // When
         val server = converter.toPushpinServer(pod, properties)

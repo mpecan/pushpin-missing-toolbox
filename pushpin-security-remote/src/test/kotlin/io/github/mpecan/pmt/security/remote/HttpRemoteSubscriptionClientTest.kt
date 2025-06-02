@@ -36,7 +36,6 @@ import kotlin.test.assertTrue
 @ExtendWith(MockitoExtension::class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class HttpRemoteSubscriptionClientTest {
-
     @Mock
     private lateinit var mockCache: SubscriptionAuthorizationCache
 
@@ -78,18 +77,20 @@ class HttpRemoteSubscriptionClientTest {
         method: String = "POST",
         includeHeaders: List<String> = listOf("Authorization"),
     ) {
-        properties = RemoteAuthorizationProperties(
-            enabled = authEnabled,
-            url = AUTH_URL,
-            method = method,
-            timeout = 5000,
-            includeHeaders = includeHeaders,
-            cache = RemoteAuthorizationProperties.CacheProperties(
-                enabled = cacheEnabled,
-                ttl = 300000,
-                maxSize = 1000,
-            ),
-        )
+        properties =
+            RemoteAuthorizationProperties(
+                enabled = authEnabled,
+                url = AUTH_URL,
+                method = method,
+                timeout = 5000,
+                includeHeaders = includeHeaders,
+                cache =
+                    RemoteAuthorizationProperties.CacheProperties(
+                        enabled = cacheEnabled,
+                        ttl = 300000,
+                        maxSize = 1000,
+                    ),
+            )
     }
 
     private fun setupDefaultMocks() {
@@ -104,12 +105,13 @@ class HttpRemoteSubscriptionClientTest {
     }
 
     private fun createClientUnderTest() {
-        httpRemoteSubscriptionClient = HttpRemoteSubscriptionClient(
-            properties,
-            mockCache,
-            mockRestTemplate,
-            mockAuditService,
-        )
+        httpRemoteSubscriptionClient =
+            HttpRemoteSubscriptionClient(
+                properties,
+                mockCache,
+                mockRestTemplate,
+                mockAuditService,
+            )
     }
 
     private fun setupAuthenticatedUser(userId: String = TEST_USER) {
@@ -120,7 +122,6 @@ class HttpRemoteSubscriptionClientTest {
 
     @Nested
     inner class CanSubscribeTests {
-
         @Test
         fun `should return cached result when cache is enabled and has entry`() {
             setupAuthenticatedUser()
@@ -281,7 +282,6 @@ class HttpRemoteSubscriptionClientTest {
 
     @Nested
     inner class GetSubscribableChannelsTests {
-
         @Test
         fun `should return cached channels when available`() {
             setupAuthenticatedUser()
@@ -362,7 +362,6 @@ class HttpRemoteSubscriptionClientTest {
 
     @Nested
     inner class GetSubscribableChannelsByPatternTests {
-
         @Test
         fun `should return cached channels when available`() {
             setupAuthenticatedUser()

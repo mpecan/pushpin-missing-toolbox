@@ -16,7 +16,10 @@ interface PodConverter {
      * @param properties The Kubernetes discovery properties.
      * @return A PushpinServer instance.
      */
-    fun toPushpinServer(pod: V1Pod, properties: KubernetesDiscoveryProperties): PushpinServer
+    fun toPushpinServer(
+        pod: V1Pod,
+        properties: KubernetesDiscoveryProperties,
+    ): PushpinServer
 }
 
 /**
@@ -25,7 +28,10 @@ interface PodConverter {
 class DefaultPodConverter : PodConverter {
     private val logger = LoggerFactory.getLogger(DefaultPodConverter::class.java)
 
-    override fun toPushpinServer(pod: V1Pod, properties: KubernetesDiscoveryProperties): PushpinServer {
+    override fun toPushpinServer(
+        pod: V1Pod,
+        properties: KubernetesDiscoveryProperties,
+    ): PushpinServer {
         // Get pod information
         val podName = pod.metadata?.name ?: "unknown-pod"
         val namespace = pod.metadata?.namespace ?: "default"
@@ -33,17 +39,18 @@ class DefaultPodConverter : PodConverter {
         val podIp = pod.status?.podIP
 
         // Get appropriate IP address based on configuration
-        val host = when {
-            // If using NodePort, use the host IP
-            properties.useNodePort && hostIp != null -> hostIp
-            // Otherwise use pod IP
-            podIp != null -> podIp
-            // Fallback (should not happen with healthy pods)
-            else -> {
-                logger.warn("Pod $podName has no IP address, using localhost")
-                "localhost"
+        val host =
+            when {
+                // If using NodePort, use the host IP
+                properties.useNodePort && hostIp != null -> hostIp
+                // Otherwise use pod IP
+                podIp != null -> podIp
+                // Fallback (should not happen with healthy pods)
+                else -> {
+                    logger.warn("Pod $podName has no IP address, using localhost")
+                    "localhost"
+                }
             }
-        }
 
         // Extract custom port values from annotations if present
         val annotations = pod.metadata?.annotations ?: emptyMap()
