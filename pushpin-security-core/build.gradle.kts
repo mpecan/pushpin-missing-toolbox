@@ -30,6 +30,7 @@ dependencies {
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
     testImplementation("org.springframework:spring-test")
