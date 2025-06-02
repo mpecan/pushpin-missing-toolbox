@@ -48,9 +48,9 @@ mavenPublishing {
         url = "https://github.com/mpecan/pushpin-missing-toolbox"
         licenses {
             license {
-                name = "Apache License 2.0"
-                url = "https://www.apache.org/licenses/LICENSE-2.0"
-                distribution = "https://www.apache.org/licenses/LICENSE-2.0"
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
+                distribution = "https://opensource.org/licenses/MIT"
             }
         }
         developers {
@@ -230,9 +230,9 @@ subprojects {
                 url = "https://github.com/mpecan/pushpin-missing-toolbox"
                 licenses {
                     license {
-                        name = "Apache License 2.0"
-                        url = "https://www.apache.org/licenses/LICENSE-2.0"
-                        distribution = "https://www.apache.org/licenses/LICENSE-2.0"
+                        name = "MIT License"
+                        url = "https://opensource.org/licenses/MIT"
+                        distribution = "https://opensource.org/licenses/MIT"
                     }
                 }
                 developers {
