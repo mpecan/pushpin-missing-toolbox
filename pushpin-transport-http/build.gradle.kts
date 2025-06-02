@@ -1,8 +1,4 @@
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    `maven-publish`
-}
+// All configuration is inherited from root project
 
 dependencies {
     api(project(":pushpin-api"))
@@ -16,6 +12,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${project.findProperty("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("io.projectreactor:reactor-test")
 }

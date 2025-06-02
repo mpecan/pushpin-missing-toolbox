@@ -1,8 +1,4 @@
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    id("org.springframework.boot") apply false
-}
+// All configuration is inherited from root project
 
 dependencies {
     // Dependencies from other modules

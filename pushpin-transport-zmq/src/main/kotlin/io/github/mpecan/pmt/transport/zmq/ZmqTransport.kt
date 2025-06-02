@@ -31,16 +31,13 @@ class ZmqTransport(
     private val zmqProperties: ZmqTransportProperties,
     private val messageSerializer: MessageSerializer,
     private val messageSerializationService: MessageSerializationService,
-    private val discoveryManager: PushpinDiscoveryManager? = null,
+    private val discoveryManager: PushpinDiscoveryManager,
 ) : PushpinTransport {
     private val logger = LoggerFactory.getLogger(ZmqTransport::class.java)
     private val context = ZContext()
     private val sockets = ConcurrentHashMap<String, ZMQ.Socket>()
     private val lock = ReentrantReadWriteLock()
     private val executor = Executors.newCachedThreadPool()
-
-    // For testing purposes
-    private var testServers: List<PushpinServer>? = null
 
     /**
      * Initializes the ZMQ transport.
@@ -50,13 +47,6 @@ class ZmqTransport(
             "Initializing ZMQ transport with PUSH socket type and connection pool: " +
                 "${zmqProperties.connectionPoolEnabled}",
         )
-    }
-
-    /**
-     * Sets servers for testing purposes.
-     */
-    fun setServersForTesting(servers: List<PushpinServer>) {
-        this.testServers = servers
     }
 
     /**
@@ -223,7 +213,7 @@ class ZmqTransport(
      * Publishes a message to all active Pushpin servers.
      */
     override fun publish(message: Message): Mono<Boolean> {
-        val servers = testServers ?: discoveryManager?.getAllServers() ?: emptyList()
+        val servers = discoveryManager?.getAllServers() ?: emptyList()
         return publishToServers(servers, message)
     }
 }

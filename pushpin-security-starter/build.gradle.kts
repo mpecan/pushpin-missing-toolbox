@@ -1,8 +1,4 @@
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    id("org.springframework.boot") apply false
-}
+// All configuration is inherited from root project
 
 dependencies {
     // Include all security modules
@@ -28,17 +24,6 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation(kotlin("test"))
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
