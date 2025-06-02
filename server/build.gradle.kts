@@ -61,7 +61,6 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("javax.servlet:javax.servlet-api")
     testImplementation("org.mockito.kotlin:mockito-kotlin")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
     testImplementation(project(":pushpin-testcontainers"))
 }

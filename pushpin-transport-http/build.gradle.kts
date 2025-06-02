@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("io.projectreactor:reactor-test")
