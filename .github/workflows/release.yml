@@ -75,7 +75,7 @@ jobs:
       run: ./gradlew publish --build-cache
     
     - name: Generate GitHub App token
-      uses: actions/create-github-app-token@v1
+      uses: actions/create-github-app-token@v2
       id: generate-token
       with:
         app-id: ${{ secrets.REPOSITORY_BUTLER_APP_ID }}
