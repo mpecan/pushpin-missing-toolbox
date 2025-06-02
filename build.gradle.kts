@@ -1,20 +1,23 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinJvm
+import com.vanniktech.maven.publish.SonatypeHost
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 // Get versions from gradle.properties
 val kotlinVersion: String by project
 val springBootVersion: String by project
-val springDependencyManagementVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.1.21"
     kotlin("plugin.spring") version "2.1.21"
-    id("org.springframework.boot") version "3.4.5" apply false
+    id("org.springframework.boot") version "3.5.0" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
     id("jacoco-report-aggregation")
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0-rc.1"
     id("com.github.ben-manes.versions") version "0.51.0"
-    `maven-publish`
-    signing
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
 // Group and version are defined in gradle.properties
@@ -29,14 +32,38 @@ repositories {
     mavenCentral()
 }
 
-// Configure Nexus publishing for Maven Central
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(project.findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME"))
-            password.set(project.findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD"))
+// Configure Maven publishing
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    signAllPublications()
+
+    coordinates("io.github.mpecan", "pushpin-missing-toolbox", version.toString())
+
+    pom {
+        name = "Pushpin Missing Toolbox"
+        description = "A comprehensive toolkit for working with Pushpin reverse proxy, " +
+            "providing essential features for real-time web applications"
+        inceptionYear = "2025"
+        url = "https://github.com/mpecan/pushpin-missing-toolbox"
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
+                distribution = "https://opensource.org/licenses/MIT"
+            }
+        }
+        developers {
+            developer {
+                id = "mpecan"
+                name = "Pushpin Missing Toolbox Team"
+                url = "https://github.com/mpecan/pushpin-missing-toolbox"
+            }
+        }
+        scm {
+            url = "https://github.com/mpecan/pushpin-missing-toolbox"
+            connection = "scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git"
+            developerConnection = "scm:git:ssh://git@github.com/mpecan/pushpin-missing-toolbox.git"
         }
     }
 }
@@ -56,12 +83,10 @@ subprojects {
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("io.spring.dependency-management")
         plugin("org.jlleitschuh.gradle.ktlint")
-        plugin("maven-publish")
-        plugin("signing")
+        plugin("com.vanniktech.maven.publish")
     }
 
     // Get all versions from gradle.properties
-    val jacocoVersion: String by project
     val testcontainersVersion: String by project
     val mockitoKotlinVersion: String by project
     val awsSdkVersion: String by project
@@ -76,8 +101,6 @@ subprojects {
     val micrometerVersion: String by project
     val kotlinxCoroutinesVersion: String by project
     val reactorKotlinExtensionsVersion: String by project
-    val jacksonVersion: String by project
-    val reactorVersion: String by project
     val logbackVersion: String by project
     val httpClientVersion: String by project
     val artemisVersion: String by project
@@ -163,7 +186,7 @@ subprojects {
         jvmToolchain(17)
     }
 
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    configure<KtlintExtension> {
         verbose.set(true)
         android.set(false)
         outputToConsole.set(true)
@@ -192,68 +215,38 @@ subprojects {
 
     // Configure publishing for all modules that start with "pushpin-" or are in the discovery modules
     if (project.name.startsWith("pushpin-") || project.name.startsWith("discovery")) {
-        // Configure Java compilation to include sources and javadoc
-        java {
-            withSourcesJar()
-            withJavadocJar()
-        }
+        mavenPublishing {
+            configure(
+                KotlinJvm(
+                    javadocJar = JavadocJar.Javadoc(),
+                    sourcesJar = true,
+                ),
+            )
+            coordinates("io.github.mpecan", project.name, version.toString())
 
-        // Publishing configuration
-        publishing {
-            publications {
-                create<MavenPublication>("maven") {
-                    from(components["java"])
-
-                    pom {
-                        name.set(project.name)
-                        description.set("Pushpin Missing Toolbox - ${project.name}")
-                        url.set("https://github.com/mpecan/pushpin-missing-toolbox")
-
-                        licenses {
-                            license {
-                                name.set("Apache License 2.0")
-                                url.set("https://www.apache.org/licenses/LICENSE-2.0")
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id.set("mpecan")
-                                name.set("Pushpin Missing Toolbox Team")
-                                email.set("pushpin-missing-toolbox@example.com")
-                            }
-                        }
-
-                        scm {
-                            connection.set("scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git")
-                            developerConnection.set("scm:git:ssh://github.com:mpecan/pushpin-missing-toolbox.git")
-                            url.set("https://github.com/mpecan/pushpin-missing-toolbox/tree/main")
-                        }
+            pom {
+                name = project.name
+                description = "Pushpin Missing Toolbox - ${project.name}"
+                url = "https://github.com/mpecan/pushpin-missing-toolbox"
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "https://opensource.org/licenses/MIT"
+                        distribution = "https://opensource.org/licenses/MIT"
                     }
                 }
-            }
-
-            repositories {
-                maven {
-                    name = "GitHubPackages"
-                    url = uri("https://maven.pkg.github.com/mpecan/pushpin-missing-toolbox")
-                    credentials {
-                        username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                        password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                developers {
+                    developer {
+                        id = "mpecan"
+                        name = "Pushpin Missing Toolbox Team"
+                        url = "https://github.com/mpecan/pushpin-missing-toolbox"
                     }
                 }
-            }
-        }
-
-        // Signing configuration
-        signing {
-            val signingKey: String? = project.findProperty("signingKey") as String? ?: System.getenv("SIGNING_KEY")
-            val signingPassword: String? =
-                project.findProperty("signingPassword") as String?
-                    ?: System.getenv("SIGNING_PASSWORD")
-            if (signingKey != null && signingPassword != null) {
-                useInMemoryPgpKeys(signingKey, signingPassword)
-                sign(publishing.publications["maven"])
+                scm {
+                    url = "https://github.com/mpecan/pushpin-missing-toolbox"
+                    connection = "scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git"
+                    developerConnection = "scm:git:ssh://git@github.com/mpecan/pushpin-missing-toolbox.git"
+                }
             }
         }
     }
@@ -342,7 +335,7 @@ tasks.register("testWithCoverage") {
     finalizedBy(jacocoAggregatedReport)
 }
 
-tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
     checkForGradleUpdate = true
     outputFormatter = "json"
     outputDir = "build/reports/dependencyUpdates"
