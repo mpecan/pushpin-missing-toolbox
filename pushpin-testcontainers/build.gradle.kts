@@ -1,13 +1,9 @@
-plugins {
-    id("org.springframework.boot")
-    id("maven-publish")
-    id("java-library")
-}
+// All configuration is inherited from root project
 
 description = "Testcontainers support for Pushpin server"
 
 dependencies {
-    implementation("org.testcontainers:testcontainers:${property("testcontainersVersion")}")
+    implementation("org.testcontainers:testcontainers")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.slf4j:slf4j-api")
 
@@ -15,23 +11,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("ch.qos.logback:logback-classic")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.bootJar {
-    enabled = false
-}
-
-tasks.jar {
-    enabled = true
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }

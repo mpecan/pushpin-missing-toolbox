@@ -1,12 +1,4 @@
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    id("org.springframework.boot") apply false
-    id("io.spring.dependency-management")
-    `maven-publish`
-}
-
-apply(plugin = "io.spring.dependency-management")
+// All configuration is inherited from root project
 
 dependencies {
     // Core dependencies only - minimal footprint
@@ -32,37 +24,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.assertj:assertj-core")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockitoKotlinVersion")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("org.springframework:spring-test")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}")
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-
-            pom {
-                name.set("Pushpin Security Core")
-                description.set("Core security interfaces and models for Pushpin Missing Toolbox")
-                url.set("https://github.com/mpecan/pushpin-missing-toolbox")
-
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                    }
-                }
-            }
-        }
-    }
-}
-
-tasks.test {
-    useJUnitPlatform()
 }

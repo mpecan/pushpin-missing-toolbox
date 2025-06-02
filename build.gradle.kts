@@ -12,6 +12,9 @@ plugins {
     id("jacoco-report-aggregation")
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
     id("com.github.ben-manes.versions") version "0.51.0"
+    `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 // Group and version are defined in gradle.properties
@@ -24,6 +27,18 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+// Configure Nexus publishing for Maven Central
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(project.findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME"))
+            password.set(project.findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD"))
+        }
+    }
 }
 
 // Centralized dependency declarations for all subprojects
@@ -41,6 +56,8 @@ subprojects {
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("io.spring.dependency-management")
         plugin("org.jlleitschuh.gradle.ktlint")
+        plugin("maven-publish")
+        plugin("signing")
     }
 
     // Get all versions from gradle.properties
@@ -157,6 +174,86 @@ subprojects {
         filter {
             exclude("**/generated/**")
             exclude("**/build/**")
+        }
+    }
+
+    // Configure library modules (all except server)
+    if (project.name != "server") {
+        // Apply Spring Boot plugin for dependency management
+        apply(plugin = "org.springframework.boot")
+        // Disable bootJar and enable regular jar for libraries
+        tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+            enabled = false
+        }
+        tasks.named<Jar>("jar") {
+            enabled = true
+        }
+    }
+
+    // Configure publishing for all modules that start with "pushpin-" or are in the discovery modules
+    if (project.name.startsWith("pushpin-") || project.name.startsWith("discovery")) {
+        // Configure Java compilation to include sources and javadoc
+        java {
+            withSourcesJar()
+            withJavadocJar()
+        }
+
+        // Publishing configuration
+        publishing {
+            publications {
+                create<MavenPublication>("maven") {
+                    from(components["java"])
+
+                    pom {
+                        name.set(project.name)
+                        description.set("Pushpin Missing Toolbox - ${project.name}")
+                        url.set("https://github.com/mpecan/pushpin-missing-toolbox")
+
+                        licenses {
+                            license {
+                                name.set("Apache License 2.0")
+                                url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id.set("mpecan")
+                                name.set("Pushpin Missing Toolbox Team")
+                                email.set("pushpin-missing-toolbox@example.com")
+                            }
+                        }
+
+                        scm {
+                            connection.set("scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git")
+                            developerConnection.set("scm:git:ssh://github.com:mpecan/pushpin-missing-toolbox.git")
+                            url.set("https://github.com/mpecan/pushpin-missing-toolbox/tree/main")
+                        }
+                    }
+                }
+            }
+
+            repositories {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/mpecan/pushpin-missing-toolbox")
+                    credentials {
+                        username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+                        password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                    }
+                }
+            }
+        }
+
+        // Signing configuration
+        signing {
+            val signingKey: String? = project.findProperty("signingKey") as String? ?: System.getenv("SIGNING_KEY")
+            val signingPassword: String? = project.findProperty("signingPassword") as String?
+                ?: System.getenv("SIGNING_PASSWORD")
+            if (signingKey != null && signingPassword != null) {
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign(publishing.publications["maven"])
+            }
         }
     }
 }

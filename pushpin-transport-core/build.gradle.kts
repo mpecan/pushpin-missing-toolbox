@@ -1,8 +1,4 @@
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    `maven-publish`
-}
+// All configuration is inherited from root project
 
 dependencies {
     api(project(":pushpin-api"))

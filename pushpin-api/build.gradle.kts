@@ -1,8 +1,4 @@
-plugins {
-    id("org.springframework.boot")
-}
-
-// Group and version are inherited from root project
+// All configuration is inherited from root project
 
 dependencies {
     testImplementation(kotlin("test"))
@@ -14,12 +10,4 @@ dependencies {
 
     // Spring framework for ResponseEntity
     compileOnly("org.springframework:spring-web")
-}
-
-tasks.bootJar {
-    enabled = false
-}
-
-tasks.jar {
-    enabled = true
 }

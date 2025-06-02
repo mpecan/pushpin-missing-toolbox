@@ -1,8 +1,4 @@
-plugins {
-    id("org.jetbrains.kotlin.jvm")
-    id("java-library")
-    id("io.spring.dependency-management")
-}
+// All configuration is inherited from root project
 
 dependencies {
     // Spring Boot for autoconfiguration
@@ -23,18 +19,4 @@ dependencies {
     testImplementation("io.micrometer:micrometer-core")
     testImplementation("io.micrometer:micrometer-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}")
-    }
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
