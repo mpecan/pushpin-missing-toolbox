@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 class KubernetesDiscoveryAutoConfigurationTest {
-
-    private val contextRunner = ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(KubernetesDiscoveryAutoConfiguration::class.java))
+    private val contextRunner =
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(KubernetesDiscoveryAutoConfiguration::class.java))
 
     @Test
     fun `should not create beans when disabled`() {

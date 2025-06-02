@@ -16,12 +16,9 @@ import org.springframework.web.reactive.function.client.WebClient
 @AutoConfiguration
 @ConditionalOnProperty(value = ["pushpin.transport"], havingValue = "http", matchIfMissing = true)
 class HttpTransportAutoConfiguration {
-
     @Bean
     @ConditionalOnMissingBean
-    fun webClient(): WebClient {
-        return WebClient.builder().build()
-    }
+    fun webClient(): WebClient = WebClient.builder().build()
 
     @Bean
     @ConditionalOnMissingBean
@@ -29,13 +26,9 @@ class HttpTransportAutoConfiguration {
         webClient: WebClient,
         messageSerializer: MessageSerializer,
         discoveryManager: PushpinDiscoveryManager,
-    ): HttpTransport {
-        return HttpTransport(webClient, messageSerializer, discoveryManager)
-    }
+    ): HttpTransport = HttpTransport(webClient, messageSerializer, discoveryManager)
 
     @Bean
     @ConditionalOnMissingBean
-    fun httpHealthChecker(webClient: WebClient): HttpHealthChecker {
-        return HttpHealthChecker(webClient)
-    }
+    fun httpHealthChecker(webClient: WebClient): HttpHealthChecker = HttpHealthChecker(webClient)
 }

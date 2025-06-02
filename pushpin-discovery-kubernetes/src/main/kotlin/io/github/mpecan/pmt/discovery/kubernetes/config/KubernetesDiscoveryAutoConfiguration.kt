@@ -33,42 +33,34 @@ import org.springframework.context.annotation.Bean
     matchIfMissing = false,
 )
 class KubernetesDiscoveryAutoConfiguration {
-
     /**
      * Creates a KubernetesClientProvider bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun kubernetesClientProvider(): KubernetesClientProvider {
-        return KubernetesClientProvider()
-    }
+    fun kubernetesClientProvider(): KubernetesClientProvider = KubernetesClientProvider()
 
     /**
      * Creates a DefaultKubernetesPodProvider bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun kubernetesPodProvider(clientProvider: KubernetesClientProvider): KubernetesPodProvider {
-        return DefaultKubernetesPodProvider(clientProvider)
-    }
+    fun kubernetesPodProvider(clientProvider: KubernetesClientProvider): KubernetesPodProvider =
+        DefaultKubernetesPodProvider(clientProvider)
 
     /**
      * Creates a DefaultPodHealthChecker bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun podHealthChecker(): PodHealthChecker {
-        return DefaultPodHealthChecker()
-    }
+    fun podHealthChecker(): PodHealthChecker = DefaultPodHealthChecker()
 
     /**
      * Creates a DefaultPodConverter bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun podConverter(): PodConverter {
-        return DefaultPodConverter()
-    }
+    fun podConverter(): PodConverter = DefaultPodConverter()
 
     /**
      * Creates a KubernetesDiscovery bean.
@@ -80,12 +72,11 @@ class KubernetesDiscoveryAutoConfiguration {
         podProvider: KubernetesPodProvider,
         podHealthChecker: PodHealthChecker,
         podConverter: PodConverter,
-    ): KubernetesDiscovery {
-        return KubernetesDiscovery(
+    ): KubernetesDiscovery =
+        KubernetesDiscovery(
             properties = properties,
             podProvider = podProvider,
             podHealthChecker = podHealthChecker,
             podConverter = podConverter,
         )
-    }
 }

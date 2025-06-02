@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class DefaultPodHealthCheckerTest {
-
     private val healthChecker = DefaultPodHealthChecker()
     private val properties = KubernetesDiscoveryProperties(healthCheckEnabled = true)
     private val propertiesWithoutHealthCheck = KubernetesDiscoveryProperties(healthCheckEnabled = false)
@@ -18,9 +17,10 @@ class DefaultPodHealthCheckerTest {
     @Test
     fun `should return false for non-running pod`() {
         // Given
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod"))
-            .status(V1PodStatus().phase("Pending"))
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod"))
+                .status(V1PodStatus().phase("Pending"))
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, properties)
@@ -32,17 +32,19 @@ class DefaultPodHealthCheckerTest {
     @Test
     fun `should return true for running pod with ready condition`() {
         // Given
-        val readyCondition = V1PodCondition()
-            .type("Ready")
-            .status("True")
+        val readyCondition =
+            V1PodCondition()
+                .type("Ready")
+                .status("True")
 
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod"))
-            .status(
-                V1PodStatus()
-                    .phase("Running")
-                    .conditions(listOf(readyCondition)),
-            )
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod"))
+                .status(
+                    V1PodStatus()
+                        .phase("Running")
+                        .conditions(listOf(readyCondition)),
+                )
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, properties)
@@ -54,17 +56,19 @@ class DefaultPodHealthCheckerTest {
     @Test
     fun `should return false for running pod without ready condition`() {
         // Given
-        val readyCondition = V1PodCondition()
-            .type("Ready")
-            .status("False")
+        val readyCondition =
+            V1PodCondition()
+                .type("Ready")
+                .status("False")
 
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod"))
-            .status(
-                V1PodStatus()
-                    .phase("Running")
-                    .conditions(listOf(readyCondition)),
-            )
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod"))
+                .status(
+                    V1PodStatus()
+                        .phase("Running")
+                        .conditions(listOf(readyCondition)),
+                )
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, properties)
@@ -77,17 +81,19 @@ class DefaultPodHealthCheckerTest {
     fun `should return true for running pod when health checks are disabled`() {
         // Given
         // The ready condition is False, but health checks are disabled
-        val readyCondition = V1PodCondition()
-            .type("Ready")
-            .status("False")
+        val readyCondition =
+            V1PodCondition()
+                .type("Ready")
+                .status("False")
 
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod"))
-            .status(
-                V1PodStatus()
-                    .phase("Running")
-                    .conditions(listOf(readyCondition)),
-            )
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod"))
+                .status(
+                    V1PodStatus()
+                        .phase("Running")
+                        .conditions(listOf(readyCondition)),
+                )
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, propertiesWithoutHealthCheck)
@@ -99,9 +105,10 @@ class DefaultPodHealthCheckerTest {
     @Test
     fun `should return false for non-running pod when health checks are disabled`() {
         // Given
-        val pod = V1Pod()
-            .metadata(V1ObjectMeta().name("test-pod"))
-            .status(V1PodStatus().phase("Failed"))
+        val pod =
+            V1Pod()
+                .metadata(V1ObjectMeta().name("test-pod"))
+                .status(V1PodStatus().phase("Failed"))
 
         // When
         val isHealthy = healthChecker.isHealthy(pod, propertiesWithoutHealthCheck)

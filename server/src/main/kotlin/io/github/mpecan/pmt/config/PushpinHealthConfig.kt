@@ -28,11 +28,12 @@ class PushpinHealthConfig {
         pushpinService: PushpinService,
         metricsService: MetricsService,
         @Value("\${pushpin.transport:http}") transportType: String,
-    ): PushpinHealthChecker = DefaultPushpinHealthChecker(
-        transportHealthCheckers,
-        pushpinProperties.healthCheckEnabled,
-        pushpinService,
-        metricsService,
-        transportType,
-    )
+    ): PushpinHealthChecker =
+        DefaultPushpinHealthChecker(
+            transportHealthCheckers,
+            pushpinProperties.healthCheckEnabled,
+            pushpinService,
+            metricsService,
+            transportType,
+        )
 }

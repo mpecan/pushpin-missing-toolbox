@@ -27,7 +27,6 @@ open class AwsDiscovery(
     private val instanceHealthChecker: InstanceHealthChecker = DefaultInstanceHealthChecker(),
     private val instanceConverter: InstanceConverter = DefaultInstanceConverter(),
 ) : PushpinDiscovery {
-
     private val logger = LoggerFactory.getLogger(AwsDiscovery::class.java)
 
     override val id: String = "aws"
@@ -50,13 +49,13 @@ open class AwsDiscovery(
         return Flux.defer {
             refreshInstanceCacheIfNeeded()
 
-            Flux.fromIterable(instanceCache.values)
+            Flux
+                .fromIterable(instanceCache.values)
                 .filter { instance -> instanceHealthChecker.isHealthy(instance, properties) }
                 .map { instance -> instanceConverter.toPushpinServer(instance, properties) }
                 .doOnNext { server ->
                     logger.debug("Discovered Pushpin server from AWS: ${server.id} at ${server.getBaseUrl()}")
-                }
-                .doOnError { error ->
+                }.doOnError { error ->
                     logger.error("Error discovering Pushpin servers from AWS: ${error.message}", error)
                 }
         }
@@ -89,7 +88,5 @@ open class AwsDiscovery(
         }
     }
 
-    override fun isEnabled(): Boolean {
-        return properties.enabled
-    }
+    override fun isEnabled(): Boolean = properties.enabled
 }

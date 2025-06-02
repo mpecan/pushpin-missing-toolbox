@@ -41,13 +41,14 @@ import io.github.mpecan.pmt.testcontainers.PushpinContainer.Companion.DEFAULT_SU
 @Suppress("unused")
 class PushpinContainerBuilder {
     private var dockerImage: String = PushpinContainer.DEFAULT_IMAGE
-    private var configuration: PushpinConfiguration = PushpinConfiguration(
-        commandPort = DEFAULT_CONTROL_PORT,
-        httpPort = DEFAULT_HTTP_PORT,
-        pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
-        pushInPort = DEFAULT_PUBLISH_PORT,
-        pushInSubPort = DEFAULT_SUB_PORT,
-    )
+    private var configuration: PushpinConfiguration =
+        PushpinConfiguration(
+            commandPort = DEFAULT_CONTROL_PORT,
+            httpPort = DEFAULT_HTTP_PORT,
+            pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
+            pushInPort = DEFAULT_PUBLISH_PORT,
+            pushInSubPort = DEFAULT_SUB_PORT,
+        )
     private var hostApplicationPort: Int = 8080
     private val routes = mutableMapOf<String, String>()
 
@@ -134,7 +135,10 @@ class PushpinContainerBuilder {
     /**
      * Add a route pattern.
      */
-    fun withRoute(pattern: String, target: String): PushpinContainerBuilder {
+    fun withRoute(
+        pattern: String,
+        target: String,
+    ): PushpinContainerBuilder {
         routes[pattern] = target
         return this
     }
@@ -207,8 +211,9 @@ class PushpinContainerBuilder {
      * Build the PushpinContainer.
      */
     fun build(): PushpinContainer {
-        val container = PushpinContainer(dockerImage, configuration)
-            .withHostApplicationPort(hostApplicationPort)
+        val container =
+            PushpinContainer(dockerImage, configuration)
+                .withHostApplicationPort(hostApplicationPort)
 
         // Add routes if any were specified
         if (routes.isNotEmpty()) {

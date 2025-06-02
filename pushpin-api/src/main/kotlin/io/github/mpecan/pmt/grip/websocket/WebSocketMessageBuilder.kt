@@ -47,30 +47,44 @@ class WebSocketMessageBuilder {
     /**
      * Adds a subscribe control message.
      */
-    fun subscribe(channel: String, prevId: String? = null): WebSocketMessageBuilder {
-        return control(io.github.mpecan.pmt.grip.GripSubscribeControl(channel, prevId = prevId))
-    }
+    fun subscribe(
+        channel: String,
+        prevId: String? = null,
+    ): WebSocketMessageBuilder =
+        control(
+            io.github.mpecan.pmt.grip
+                .GripSubscribeControl(channel, prevId = prevId),
+        )
 
     /**
      * Adds an unsubscribe control message.
      */
-    fun unsubscribe(channel: String): WebSocketMessageBuilder {
-        return control(io.github.mpecan.pmt.grip.GripUnsubscribeControl(channel))
-    }
+    fun unsubscribe(channel: String): WebSocketMessageBuilder =
+        control(
+            io.github.mpecan.pmt.grip
+                .GripUnsubscribeControl(channel),
+        )
 
     /**
      * Adds a keep-alive control message.
      */
-    fun keepAlive(timeout: Int? = null, content: String? = null): WebSocketMessageBuilder {
-        return control(io.github.mpecan.pmt.grip.GripKeepAliveControl(timeout, content))
-    }
+    fun keepAlive(
+        timeout: Int? = null,
+        content: String? = null,
+    ): WebSocketMessageBuilder =
+        control(
+            io.github.mpecan.pmt.grip
+                .GripKeepAliveControl(timeout, content),
+        )
 
     /**
      * Adds a detach control message.
      */
-    fun detach(): WebSocketMessageBuilder {
-        return control(io.github.mpecan.pmt.grip.GripDetachControl())
-    }
+    fun detach(): WebSocketMessageBuilder =
+        control(
+            io.github.mpecan.pmt.grip
+                .GripDetachControl(),
+        )
 
     /**
      * Adds a BINARY event with the given content.
@@ -115,14 +129,10 @@ class WebSocketMessageBuilder {
     /**
      * Builds the WebSocket message as a string.
      */
-    fun build(): String {
-        return WebSocketEventParser.encode(events)
-    }
+    fun build(): String = WebSocketEventParser.encode(events)
 
     /**
      * Gets the list of events.
      */
-    fun getEvents(): List<WebSocketEvent> {
-        return events.toList()
-    }
+    fun getEvents(): List<WebSocketEvent> = events.toList()
 }

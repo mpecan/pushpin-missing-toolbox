@@ -24,7 +24,6 @@ open class KubernetesDiscovery(
     private val podHealthChecker: PodHealthChecker,
     private val podConverter: PodConverter,
 ) : PushpinDiscovery {
-
     private val logger = LoggerFactory.getLogger(KubernetesDiscovery::class.java)
 
     override val id: String = "kubernetes"
@@ -47,13 +46,13 @@ open class KubernetesDiscovery(
         return Flux.defer {
             refreshPodCacheIfNeeded()
 
-            Flux.fromIterable(podCache.values)
+            Flux
+                .fromIterable(podCache.values)
                 .filter { pod -> podHealthChecker.isHealthy(pod, properties) }
                 .map { pod -> podConverter.toPushpinServer(pod, properties) }
                 .doOnNext { server ->
                     logger.debug("Discovered Pushpin server from Kubernetes: ${server.id} at ${server.getBaseUrl()}")
-                }
-                .doOnError { error ->
+                }.doOnError { error ->
                     logger.error("Error discovering Pushpin servers from Kubernetes: ${error.message}", error)
                 }
         }
@@ -89,7 +88,5 @@ open class KubernetesDiscovery(
         }
     }
 
-    override fun isEnabled(): Boolean {
-        return properties.enabled
-    }
+    override fun isEnabled(): Boolean = properties.enabled
 }

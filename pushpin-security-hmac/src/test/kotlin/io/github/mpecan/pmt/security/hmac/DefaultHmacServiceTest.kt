@@ -8,13 +8,13 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class DefaultHmacServiceTest {
-
-    private val properties = HmacProperties(
-        enabled = true,
-        secretKey = "test-secret-key",
-        algorithm = "HmacSHA256",
-        headerName = "X-Test-Signature",
-    )
+    private val properties =
+        HmacProperties(
+            enabled = true,
+            secretKey = "test-secret-key",
+            algorithm = "HmacSHA256",
+            headerName = "X-Test-Signature",
+        )
 
     private val service = DefaultHmacService(properties)
 

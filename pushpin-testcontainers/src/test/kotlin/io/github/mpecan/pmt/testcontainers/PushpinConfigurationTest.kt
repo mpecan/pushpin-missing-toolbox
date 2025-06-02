@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
 class PushpinConfigurationTest {
-
     @Test
     fun `default configuration should generate valid config file`() {
         val config = PushpinConfiguration()
@@ -25,12 +24,13 @@ class PushpinConfigurationTest {
 
     @Test
     fun `custom ports should be reflected in config`() {
-        val config = PushpinConfiguration(
-            httpPort = 8999,
-            pushInSpec = "tcp://*:6560",
-            commandSpec = "tcp://*:6563",
-            pushInHttpPort = 6561,
-        )
+        val config =
+            PushpinConfiguration(
+                httpPort = 8999,
+                pushInSpec = "tcp://*:6560",
+                commandSpec = "tcp://*:6563",
+                pushInHttpPort = 6561,
+            )
         val configString = config.toConfigString()
 
         assertTrue(configString.contains("http_port=8999"))
@@ -50,12 +50,13 @@ class PushpinConfigurationTest {
 
     @Test
     fun `debug and logging settings should be configurable`() {
-        val config = PushpinConfiguration(
-            debug = true,
-            logLevel = 10,
-            logFrom = true,
-            logUserAgent = true,
-        )
+        val config =
+            PushpinConfiguration(
+                debug = true,
+                logLevel = 10,
+                logFrom = true,
+                logUserAgent = true,
+            )
         val configString = config.toConfigString()
 
         assertTrue(configString.contains("debug=true"))

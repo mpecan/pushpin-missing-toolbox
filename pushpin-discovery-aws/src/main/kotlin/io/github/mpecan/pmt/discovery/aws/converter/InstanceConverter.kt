@@ -11,5 +11,8 @@ interface InstanceConverter {
     /**
      * Converts an EC2 instance to a PushpinServer.
      */
-    fun toPushpinServer(instance: Instance, properties: AwsDiscoveryProperties): PushpinServer
+    fun toPushpinServer(
+        instance: Instance,
+        properties: AwsDiscoveryProperties,
+    ): PushpinServer
 }

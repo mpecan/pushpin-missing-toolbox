@@ -16,9 +16,9 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class JwtAutoConfigurationTest {
-
-    private val contextRunner = ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(JwtAutoConfiguration::class.java))
+    private val contextRunner =
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(JwtAutoConfiguration::class.java))
 
     @Test
     fun `should create DefaultJwtDecoderService when enabled`() {
@@ -27,8 +27,7 @@ class JwtAutoConfigurationTest {
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
                 "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
-            )
-            .run { context ->
+            ).run { context ->
                 val jwtDecoderService = context.getBean(JwtDecoderService::class.java)
                 assertNotNull(jwtDecoderService)
                 assertTrue(jwtDecoderService is DefaultJwtDecoderService)
@@ -55,8 +54,7 @@ class JwtAutoConfigurationTest {
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
                 "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
-            )
-            .run { context ->
+            ).run { context ->
                 val claimExtractorService = context.getBean(ClaimExtractorService::class.java)
                 assertNotNull(claimExtractorService)
                 assertTrue(claimExtractorService is JsonPathClaimExtractorService)
@@ -81,8 +79,7 @@ class JwtAutoConfigurationTest {
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
                 "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
-            )
-            .run { context ->
+            ).run { context ->
                 val extractorService = context.getBean(ChannelSubscriptionExtractorService::class.java)
                 assertNotNull(extractorService)
                 assertTrue(extractorService is DefaultChannelSubscriptionExtractorService)
@@ -96,8 +93,7 @@ class JwtAutoConfigurationTest {
                 "pushpin.security.jwt.enabled=true",
                 "pushpin.security.jwt.provider=symmetric",
                 "pushpin.security.jwt.secret=test-secret-key-32-characters-long",
-            )
-            .run { context ->
+            ).run { context ->
                 assertTrue(context.containsBean("jwtAuthenticationConverter"))
             }
     }

@@ -28,16 +28,12 @@ class GripHeaderBuilder {
     /**
      * Sets the GRIP hold mode to response.
      */
-    fun holdResponse(): GripHeaderBuilder {
-        return hold(GripConstants.HOLD_MODE_RESPONSE)
-    }
+    fun holdResponse(): GripHeaderBuilder = hold(GripConstants.HOLD_MODE_RESPONSE)
 
     /**
      * Sets the GRIP hold mode to stream.
      */
-    fun holdStream(): GripHeaderBuilder {
-        return hold(GripConstants.HOLD_MODE_STREAM)
-    }
+    fun holdStream(): GripHeaderBuilder = hold(GripConstants.HOLD_MODE_STREAM)
 
     /**
      * Adds a channel to subscribe to.
@@ -114,7 +110,10 @@ class GripHeaderBuilder {
     /**
      * Adds a custom header.
      */
-    fun header(name: String, value: String): GripHeaderBuilder {
+    fun header(
+        name: String,
+        value: String,
+    ): GripHeaderBuilder {
         headers[name] = value
         return this
     }

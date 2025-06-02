@@ -32,33 +32,26 @@ import software.amazon.awssdk.services.ec2.Ec2Client
     matchIfMissing = false,
 )
 class AwsDiscoveryAutoConfiguration {
-
     /**
      * Creates a DefaultEc2InstancesProvider bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun ec2InstancesProvider(): Ec2InstancesProvider {
-        return DefaultEc2InstancesProvider()
-    }
+    fun ec2InstancesProvider(): Ec2InstancesProvider = DefaultEc2InstancesProvider()
 
     /**
      * Creates a DefaultInstanceHealthChecker bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun instanceHealthChecker(): InstanceHealthChecker {
-        return DefaultInstanceHealthChecker()
-    }
+    fun instanceHealthChecker(): InstanceHealthChecker = DefaultInstanceHealthChecker()
 
     /**
      * Creates a DefaultInstanceConverter bean if none exists.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun instanceConverter(): InstanceConverter {
-        return DefaultInstanceConverter()
-    }
+    fun instanceConverter(): InstanceConverter = DefaultInstanceConverter()
 
     /**
      * Creates an AwsDiscovery bean.
@@ -70,12 +63,11 @@ class AwsDiscoveryAutoConfiguration {
         instancesProvider: Ec2InstancesProvider,
         instanceHealthChecker: InstanceHealthChecker,
         instanceConverter: InstanceConverter,
-    ): AwsDiscovery {
-        return AwsDiscovery(
+    ): AwsDiscovery =
+        AwsDiscovery(
             properties = properties,
             instancesProvider = instancesProvider,
             instanceHealthChecker = instanceHealthChecker,
             instanceConverter = instanceConverter,
         )
-    }
 }

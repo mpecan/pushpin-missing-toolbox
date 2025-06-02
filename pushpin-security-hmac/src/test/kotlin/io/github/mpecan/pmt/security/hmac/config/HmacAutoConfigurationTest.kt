@@ -16,10 +16,10 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class HmacAutoConfigurationTest {
-
-    private val contextRunner = ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(HmacAutoConfiguration::class.java))
-        .withUserConfiguration(TestConfiguration::class.java)
+    private val contextRunner =
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(HmacAutoConfiguration::class.java))
+            .withUserConfiguration(TestConfiguration::class.java)
 
     @Test
     fun `should create DefaultHmacService when enabled`() {
@@ -27,8 +27,7 @@ class HmacAutoConfigurationTest {
             .withPropertyValues(
                 "pushpin.security.hmac.enabled=true",
                 "pushpin.security.hmac.secret-key=test-secret",
-            )
-            .run { context ->
+            ).run { context ->
                 val hmacService = context.getBean(HmacService::class.java)
                 assertNotNull(hmacService)
                 assertTrue(hmacService is DefaultHmacService)
@@ -54,8 +53,7 @@ class HmacAutoConfigurationTest {
             .withPropertyValues(
                 "pushpin.security.hmac.enabled=true",
                 "pushpin.security.hmac.secret-key=test-secret",
-            )
-            .run { context ->
+            ).run { context ->
                 val filter = context.getBean(HmacSignatureFilter::class.java)
                 assertNotNull(filter)
             }
@@ -77,8 +75,7 @@ class HmacAutoConfigurationTest {
                 "pushpin.security.hmac.enabled=true",
                 "pushpin.security.hmac.secret-key=test-secret",
                 "pushpin.security.hmac.algorithm=HmacSHA512",
-            )
-            .run { context ->
+            ).run { context ->
                 val hmacService = context.getBean(HmacService::class.java)
                 assertEquals("HmacSHA512", hmacService.getAlgorithm())
             }

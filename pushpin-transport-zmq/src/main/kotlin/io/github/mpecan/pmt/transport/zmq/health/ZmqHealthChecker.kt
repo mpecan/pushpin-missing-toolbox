@@ -28,12 +28,12 @@ class ZmqHealthChecker(
      * * Sends a {"method": "get-stats"} request to the Pushpin stats endpoint
      * and expects a valid response to consider the server healthy.
      */
-    override fun checkHealth(server: PushpinServer): Mono<Boolean> {
-        return Mono.fromCallable {
-            checkHealthSync(server)
-        }.subscribeOn(Schedulers.boundedElastic())
+    override fun checkHealth(server: PushpinServer): Mono<Boolean> =
+        Mono
+            .fromCallable {
+                checkHealthSync(server)
+            }.subscribeOn(Schedulers.boundedElastic())
             .onErrorReturn(false)
-    }
 
     private fun checkHealthSync(server: PushpinServer): Boolean {
         var socket: ZMQ.Socket? = null
@@ -74,42 +74,42 @@ class ZmqHealthChecker(
      * Alternative health check method using simple socket connectivity test.
      * This can be used if the stats endpoint is not available.
      */
-    fun checkConnectivity(server: PushpinServer): Mono<Boolean> {
-        return Mono.fromCallable {
-            var socket: ZMQ.Socket? = null
-            try {
-                // Try to connect to the publish socket
-                socket = context.createSocket(SocketType.PUSH)
-                socket.setHWM(1)
-                socket.linger = 0
-                socket.setSendTimeOut(500)
+    fun checkConnectivity(server: PushpinServer): Mono<Boolean> =
+        Mono
+            .fromCallable {
+                var socket: ZMQ.Socket? = null
+                try {
+                    // Try to connect to the publish socket
+                    socket = context.createSocket(SocketType.PUSH)
+                    socket.setHWM(1)
+                    socket.linger = 0
+                    socket.setSendTimeOut(500)
 
-                val publishUrl = server.getPublishUrl()
-                logger.debug("Testing ZMQ connectivity to: $publishUrl for server ${server.id}")
+                    val publishUrl = server.getPublishUrl()
+                    logger.debug("Testing ZMQ connectivity to: $publishUrl for server ${server.id}")
 
-                socket.connect(publishUrl)
+                    socket.connect(publishUrl)
 
-                // Try to send a small test message to verify connectivity
-                // ZMQ connect is asynchronous, so we need to try sending to verify
-                val testMessage = "ping".toByteArray()
-                val sent = socket.send(testMessage, ZMQ.DONTWAIT)
+                    // Try to send a small test message to verify connectivity
+                    // ZMQ connect is asynchronous, so we need to try sending to verify
+                    val testMessage = "ping".toByteArray()
+                    val sent = socket.send(testMessage, ZMQ.DONTWAIT)
 
-                if (sent) {
-                    logger.debug("ZMQ socket connected and operational for server ${server.id}")
-                    true
-                } else {
-                    logger.debug("ZMQ socket could not send to server ${server.id}")
+                    if (sent) {
+                        logger.debug("ZMQ socket connected and operational for server ${server.id}")
+                        true
+                    } else {
+                        logger.debug("ZMQ socket could not send to server ${server.id}")
+                        false
+                    }
+                } catch (e: Exception) {
+                    logger.error("Failed to connect to ZMQ socket for server ${server.id}: ${e.message}")
                     false
+                } finally {
+                    socket?.close()
                 }
-            } catch (e: Exception) {
-                logger.error("Failed to connect to ZMQ socket for server ${server.id}: ${e.message}")
-                false
-            } finally {
-                socket?.close()
-            }
-        }.subscribeOn(Schedulers.boundedElastic())
+            }.subscribeOn(Schedulers.boundedElastic())
             .onErrorReturn(false)
-    }
 
     /**
      * Returns the transport type for this health checker.

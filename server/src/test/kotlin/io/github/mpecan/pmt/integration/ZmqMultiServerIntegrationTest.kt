@@ -17,7 +17,8 @@ import org.testcontainers.containers.Network
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
-import java.util.*
+import java.util.Collections
+import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.random.Random
 
@@ -46,7 +47,6 @@ import kotlin.random.Random
 )
 @Testcontainers
 class ZmqMultiServerIntegrationTest {
-
     companion object {
         private val network = Network.newNetwork()
         private val serverPort = Random.nextInt(12000, 13000)
@@ -54,21 +54,23 @@ class ZmqMultiServerIntegrationTest {
         // Create individual Pushpin containers with shared network
         @Container
         @JvmStatic
-        private val pushpinContainer1 = PushpinContainerBuilder()
-            .withHostApplicationPort(serverPort)
-            .withSimpleHostRoute()
-            .build()
-            .withNetwork(network)
-            .withNetworkAliases("pushpin-0")
+        private val pushpinContainer1 =
+            PushpinContainerBuilder()
+                .withHostApplicationPort(serverPort)
+                .withSimpleHostRoute()
+                .build()
+                .withNetwork(network)
+                .withNetworkAliases("pushpin-0")
 
         @Container
         @JvmStatic
-        private val pushpinContainer2 = PushpinContainerBuilder()
-            .withHostApplicationPort(serverPort)
-            .withSimpleHostRoute()
-            .build()
-            .withNetwork(network)
-            .withNetworkAliases("pushpin-1")
+        private val pushpinContainer2 =
+            PushpinContainerBuilder()
+                .withHostApplicationPort(serverPort)
+                .withSimpleHostRoute()
+                .build()
+                .withNetwork(network)
+                .withNetworkAliases("pushpin-1")
 
         // List of containers for convenience
         private val pushpinContainers by lazy { listOf(pushpinContainer1, pushpinContainer2) }
@@ -164,21 +166,23 @@ class ZmqMultiServerIntegrationTest {
         val flux2 = client2.consumeMessages("/api/ws/$channel")
 
         // Setup subscriptions with message capture for verification
-        val subscription1 = flux1.subscribe(
-            { message ->
-                println("Client 1 received: $message")
-                client1Messages.add(message)
-            },
-            { error -> println("Client 1 error: ${error.message}") },
-        )
+        val subscription1 =
+            flux1.subscribe(
+                { message ->
+                    println("Client 1 received: $message")
+                    client1Messages.add(message)
+                },
+                { error -> println("Client 1 error: ${error.message}") },
+            )
 
-        val subscription2 = flux2.subscribe(
-            { message ->
-                println("Client 2 received: $message")
-                client2Messages.add(message)
-            },
-            { error -> println("Client 2 error: ${error.message}") },
-        )
+        val subscription2 =
+            flux2.subscribe(
+                { message ->
+                    println("Client 2 received: $message")
+                    client2Messages.add(message)
+                },
+                { error -> println("Client 2 error: ${error.message}") },
+            )
 
         try {
             // Wait for the WebSocket connections to be established
@@ -276,11 +280,12 @@ class ZmqMultiServerIntegrationTest {
     fun `should deliver multiple messages via ZMQ to clients connected to different servers`() {
         // Channel with random UUID to avoid conflicts
         val channel = "zmq-multi-message-channel-${UUID.randomUUID()}"
-        val messages = listOf(
-            "First ZMQ message from multi-server test",
-            "Second ZMQ message from multi-server test",
-            "Third ZMQ message from multi-server test",
-        )
+        val messages =
+            listOf(
+                "First ZMQ message from multi-server test",
+                "Second ZMQ message from multi-server test",
+                "Third ZMQ message from multi-server test",
+            )
 
         // Create message collectors for verification
         val client1Messages = Collections.synchronizedList(mutableListOf<String>())
@@ -300,21 +305,23 @@ class ZmqMultiServerIntegrationTest {
         val flux2 = client2.consumeMessages("/api/ws/$channel")
 
         // Setup subscriptions with message capture for verification
-        val subscription1 = flux1.subscribe(
-            { message ->
-                println("Client 1 (multi-message test) received: $message")
-                client1Messages.add(message)
-            },
-            { error -> println("Client 1 error: ${error.message}") },
-        )
+        val subscription1 =
+            flux1.subscribe(
+                { message ->
+                    println("Client 1 (multi-message test) received: $message")
+                    client1Messages.add(message)
+                },
+                { error -> println("Client 1 error: ${error.message}") },
+            )
 
-        val subscription2 = flux2.subscribe(
-            { message ->
-                println("Client 2 (multi-message test) received: $message")
-                client2Messages.add(message)
-            },
-            { error -> println("Client 2 error: ${error.message}") },
-        )
+        val subscription2 =
+            flux2.subscribe(
+                { message ->
+                    println("Client 2 (multi-message test) received: $message")
+                    client2Messages.add(message)
+                },
+                { error -> println("Client 2 error: ${error.message}") },
+            )
 
         try {
             // Wait for the WebSocket connections to be established
@@ -378,10 +385,11 @@ class ZmqMultiServerIntegrationTest {
             }
 
             // Check if any of our messages were received by either client
-            val anyMessageReceived = messages.any { messageText ->
-                client1Messages.any { it.contains(messageText) } ||
-                    client2Messages.any { it.contains(messageText) }
-            }
+            val anyMessageReceived =
+                messages.any { messageText ->
+                    client1Messages.any { it.contains(messageText) } ||
+                        client2Messages.any { it.contains(messageText) }
+                }
 
             // Only verify content if messages were received
             if (anyClientReceivedMessages) {
@@ -432,21 +440,23 @@ class ZmqMultiServerIntegrationTest {
         val flux2 = client2.consumeMessages("/api/ws/$channel2")
 
         // Setup subscriptions with message capture for verification
-        val subscription1 = flux1.subscribe(
-            { message ->
-                println("Client 1 (channel $channel1) received: $message")
-                client1Messages.add(message)
-            },
-            { error -> println("Client 1 error: ${error.message}") },
-        )
+        val subscription1 =
+            flux1.subscribe(
+                { message ->
+                    println("Client 1 (channel $channel1) received: $message")
+                    client1Messages.add(message)
+                },
+                { error -> println("Client 1 error: ${error.message}") },
+            )
 
-        val subscription2 = flux2.subscribe(
-            { message ->
-                println("Client 2 (channel $channel2) received: $message")
-                client2Messages.add(message)
-            },
-            { error -> println("Client 2 error: ${error.message}") },
-        )
+        val subscription2 =
+            flux2.subscribe(
+                { message ->
+                    println("Client 2 (channel $channel2) received: $message")
+                    client2Messages.add(message)
+                },
+                { error -> println("Client 2 error: ${error.message}") },
+            )
 
         try {
             // Wait for the WebSocket connections to be established
@@ -531,12 +541,14 @@ class ZmqMultiServerIntegrationTest {
             // Now test cross-channel isolation by creating clients for the opposite channels
             println("Testing channel isolation...")
 
-            val crossClient1 = WebSocketClient(
-                "ws://localhost:${pushpinContainer1.getHttpPort()}",
-            )
-            val crossClient2 = WebSocketClient(
-                "ws://localhost:${pushpinContainer2.getHttpPort()}",
-            )
+            val crossClient1 =
+                WebSocketClient(
+                    "ws://localhost:${pushpinContainer1.getHttpPort()}",
+                )
+            val crossClient2 =
+                WebSocketClient(
+                    "ws://localhost:${pushpinContainer2.getHttpPort()}",
+                )
             this.clients.add(crossClient1)
             this.clients.add(crossClient2)
 
@@ -548,21 +560,23 @@ class ZmqMultiServerIntegrationTest {
             val crossFlux2 = crossClient2.consumeMessages("/api/ws/$channel1")
 
             // Setup subscriptions
-            val crossSubscription1 = crossFlux1.subscribe(
-                { message ->
-                    println("Cross client 1 (channel $channel2) received: $message")
-                    crossMessages1.add(message)
-                },
-                { error -> println("Cross client 1 error: ${error.message}") },
-            )
+            val crossSubscription1 =
+                crossFlux1.subscribe(
+                    { message ->
+                        println("Cross client 1 (channel $channel2) received: $message")
+                        crossMessages1.add(message)
+                    },
+                    { error -> println("Cross client 1 error: ${error.message}") },
+                )
 
-            val crossSubscription2 = crossFlux2.subscribe(
-                { message ->
-                    println("Cross client 2 (channel $channel1) received: $message")
-                    crossMessages2.add(message)
-                },
-                { error -> println("Cross client 2 error: ${error.message}") },
-            )
+            val crossSubscription2 =
+                crossFlux2.subscribe(
+                    { message ->
+                        println("Cross client 2 (channel $channel1) received: $message")
+                        crossMessages2.add(message)
+                    },
+                    { error -> println("Cross client 2 error: ${error.message}") },
+                )
 
             // Wait for subscription messages
             Thread.sleep(2000)

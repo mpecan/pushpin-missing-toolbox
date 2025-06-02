@@ -17,17 +17,15 @@ import org.springframework.context.annotation.Configuration
     matchIfMissing = false,
 )
 class RateLimitBridgeConfig {
-
     /**
      * Creates a RateLimitProperties bean from PushpinProperties.
      * This allows the existing configuration to work with the new module.
      */
     @Bean
-    fun rateLimitProperties(pushpinProperties: PushpinProperties): RateLimitProperties {
-        return RateLimitProperties(
+    fun rateLimitProperties(pushpinProperties: PushpinProperties): RateLimitProperties =
+        RateLimitProperties(
             enabled = pushpinProperties.security.rateLimit.enabled,
             capacity = pushpinProperties.security.rateLimit.capacity,
             refillTimeInMillis = pushpinProperties.security.rateLimit.refillTimeInMillis,
         )
-    }
 }

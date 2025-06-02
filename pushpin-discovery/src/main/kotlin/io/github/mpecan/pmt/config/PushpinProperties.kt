@@ -45,17 +45,18 @@ data class PushpinProperties(
         /**
          * Converts to a PushpinServer model.
          */
-        fun toPushpinServer(): PushpinServer = PushpinServer(
-            id = id,
-            host = host,
-            port = port,
-            controlPort = controlPort,
-            publishPort = publishPort,
-            httpPort = httpPort,
-            active = active,
-            weight = weight,
-            healthCheckPath = healthCheckPath,
-        )
+        fun toPushpinServer(): PushpinServer =
+            PushpinServer(
+                id = id,
+                host = host,
+                port = port,
+                controlPort = controlPort,
+                publishPort = publishPort,
+                httpPort = httpPort,
+                active = active,
+                weight = weight,
+                healthCheckPath = healthCheckPath,
+            )
     }
 
     /**

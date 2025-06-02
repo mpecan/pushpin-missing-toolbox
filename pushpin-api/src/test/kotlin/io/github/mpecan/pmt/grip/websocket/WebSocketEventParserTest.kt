@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class WebSocketEventParserTest {
-
     @Test
     fun `should parse empty body`() {
         val events = WebSocketEventParser.parse("")
@@ -36,10 +35,11 @@ class WebSocketEventParserTest {
     fun `should parse multiple events`() {
         val message1 = "First message"
         val message2 = "Second message"
-        val body = "OPEN\r\n" +
-            "TEXT ${message1.length.toString(16)}\r\n$message1\r\n" +
-            "TEXT ${message2.length.toString(16)}\r\n$message2\r\n" +
-            "PING\r\n"
+        val body =
+            "OPEN\r\n" +
+                "TEXT ${message1.length.toString(16)}\r\n$message1\r\n" +
+                "TEXT ${message2.length.toString(16)}\r\n$message2\r\n" +
+                "PING\r\n"
 
         val events = WebSocketEventParser.parse(body)
 
@@ -65,11 +65,12 @@ class WebSocketEventParserTest {
 
     @Test
     fun `should encode events`() {
-        val events = listOf(
-            WebSocketEvent(WebSocketEventType.OPEN),
-            WebSocketEvent(WebSocketEventType.TEXT, "Hello"),
-            WebSocketEvent(WebSocketEventType.PONG),
-        )
+        val events =
+            listOf(
+                WebSocketEvent(WebSocketEventType.OPEN),
+                WebSocketEvent(WebSocketEventType.TEXT, "Hello"),
+                WebSocketEvent(WebSocketEventType.PONG),
+            )
 
         val encoded = WebSocketEventParser.encode(events)
         val expected = "OPEN\r\nTEXT 5\r\nHello\r\nPONG\r\n"

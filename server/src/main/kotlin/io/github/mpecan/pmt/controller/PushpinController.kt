@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import java.util.*
+import java.util.Date
 
 /**
  * Controller for Pushpin-related operations.
@@ -25,14 +25,16 @@ class PushpinController(
     private val pushpinService: PushpinService,
     private val pushpinHealthChecker: PushpinHealthChecker,
 ) {
-
     /**
      * Publishes a message to a channel.
      */
     @PostMapping("/publish")
-    fun publishMessage(@RequestBody message: Message): Mono<ResponseEntity<Map<String, Any>>> {
+    fun publishMessage(
+        @RequestBody message: Message,
+    ): Mono<ResponseEntity<Map<String, Any>>> {
         println("publishing message: $message")
-        return pushpinService.publishMessage(message)
+        return pushpinService
+            .publishMessage(message)
             .map { success ->
                 if (success) {
                     ResponseEntity.ok(
@@ -63,11 +65,12 @@ class PushpinController(
         @RequestParam(required = false) event: String?,
         @RequestBody data: Any,
     ): Mono<ResponseEntity<Map<String, Any>>> {
-        val message = if (event != null) {
-            Message.event(channel, event, data)
-        } else {
-            Message.simple(channel, data)
-        }
+        val message =
+            if (event != null) {
+                Message.event(channel, event, data)
+            } else {
+                Message.simple(channel, data)
+            }
 
         return publishMessage(message)
     }
@@ -77,31 +80,28 @@ class PushpinController(
         @PathVariable channel: String,
         @RequestParam(required = false) event: String?,
         @RequestBody data: String,
-    ): Mono<ResponseEntity<Map<String, Any>>> {
-        return publishToChannel(channel, event, data)
-    }
+    ): Mono<ResponseEntity<Map<String, Any>>> = publishToChannel(channel, event, data)
 
     /**
      * Gets all configured Pushpin servers.
      */
     @GetMapping("/servers")
-    fun getAllServers(): ResponseEntity<List<PushpinServer>> {
-        return ResponseEntity.ok(pushpinService.getAllServers())
-    }
+    fun getAllServers(): ResponseEntity<List<PushpinServer>> = ResponseEntity.ok(pushpinService.getAllServers())
 
     /**
      * Gets all healthy Pushpin servers.
      */
     @GetMapping("/servers/healthy")
-    fun getHealthyServers(): ResponseEntity<List<PushpinServer>> {
-        return ResponseEntity.ok(pushpinHealthChecker.getHealthyServers().values.toList())
-    }
+    fun getHealthyServers(): ResponseEntity<List<PushpinServer>> =
+        ResponseEntity.ok(pushpinHealthChecker.getHealthyServers().values.toList())
 
     /**
      * Gets a Pushpin server by ID.
      */
     @GetMapping("/servers/{id}")
-    fun getServerById(@PathVariable id: String): ResponseEntity<PushpinServer> {
+    fun getServerById(
+        @PathVariable id: String,
+    ): ResponseEntity<PushpinServer> {
         val server = pushpinService.getServerById(id)
         return if (server != null) {
             ResponseEntity.ok(server)

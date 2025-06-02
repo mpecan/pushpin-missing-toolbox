@@ -19,7 +19,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 @AutoConfigureWebTestClient
 abstract class PushpinIntegrationTest {
-
     @LocalServerPort
     protected var port: Int = 0
 
@@ -42,19 +41,22 @@ abstract class PushpinIntegrationTest {
         eventType: String? = null,
         contentType: MediaType = MediaType.TEXT_PLAIN,
     ): Boolean {
-        val uri = if (eventType != null) {
-            "http://localhost:$port/api/pushpin/publish/$channel?event=$eventType"
-        } else {
-            "http://localhost:$port/api/pushpin/publish/$channel"
-        }
+        val uri =
+            if (eventType != null) {
+                "http://localhost:$port/api/pushpin/publish/$channel?event=$eventType"
+            } else {
+                "http://localhost:$port/api/pushpin/publish/$channel"
+            }
 
-        val response = webClient.post()
-            .uri(uri)
-            .contentType(contentType)
-            .bodyValue(message)
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        val response =
+            webClient
+                .post()
+                .uri(uri)
+                .contentType(contentType)
+                .bodyValue(message)
+                .retrieve()
+                .toBodilessEntity()
+                .block()
 
         return response?.statusCode?.is2xxSuccessful ?: false
     }
@@ -74,25 +76,29 @@ abstract class PushpinIntegrationTest {
         transports: List<Any>,
         eventType: String? = null,
     ): Boolean {
-        val message = mapOf(
-            "channel" to channel,
-            "data" to data,
-            "transports" to transports,
-        )
+        val message =
+            mapOf(
+                "channel" to channel,
+                "data" to data,
+                "transports" to transports,
+            )
 
-        val uri = if (eventType != null) {
-            "http://localhost:$port/api/pushpin/publish?event=$eventType"
-        } else {
-            "http://localhost:$port/api/pushpin/publish"
-        }
+        val uri =
+            if (eventType != null) {
+                "http://localhost:$port/api/pushpin/publish?event=$eventType"
+            } else {
+                "http://localhost:$port/api/pushpin/publish"
+            }
 
-        val response = webClient.post()
-            .uri(uri)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(message)
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        val response =
+            webClient
+                .post()
+                .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(message)
+                .retrieve()
+                .toBodilessEntity()
+                .block()
 
         return response?.statusCode?.is2xxSuccessful ?: false
     }

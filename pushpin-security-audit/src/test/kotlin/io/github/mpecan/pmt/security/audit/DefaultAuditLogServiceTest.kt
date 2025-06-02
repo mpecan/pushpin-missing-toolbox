@@ -16,7 +16,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(MockitoExtension::class)
 class DefaultAuditLogServiceTest {
-
     private lateinit var auditService: DefaultAuditLogService
     private lateinit var properties: AuditProperties
     private lateinit var listAppender: ListAppender<ILoggingEvent>
@@ -24,14 +23,15 @@ class DefaultAuditLogServiceTest {
 
     @BeforeEach
     fun setUp() {
-        properties = AuditProperties(
-            enabled = true,
-            level = "INFO",
-            logSuccessfulAuth = true,
-            logFailedAuth = true,
-            logChannelAccess = true,
-            logAdminActions = true,
-        )
+        properties =
+            AuditProperties(
+                enabled = true,
+                level = "INFO",
+                logSuccessfulAuth = true,
+                logFailedAuth = true,
+                logChannelAccess = true,
+                logAdminActions = true,
+            )
 
         auditService = DefaultAuditLogService(properties)
 
@@ -189,12 +189,13 @@ class DefaultAuditLogServiceTest {
 
     @Test
     fun `should format event with all fields`() {
-        val event = AuditEvent(
-            type = AuditEventType.AUTHENTICATION_SUCCESS,
-            username = "testuser",
-            ipAddress = "192.168.1.1",
-            details = "Login successful",
-        )
+        val event =
+            AuditEvent(
+                type = AuditEventType.AUTHENTICATION_SUCCESS,
+                username = "testuser",
+                ipAddress = "192.168.1.1",
+                details = "Login successful",
+            )
 
         auditService.log(event)
 
@@ -211,12 +212,13 @@ class DefaultAuditLogServiceTest {
 
     @Test
     fun `should format event without username`() {
-        val event = AuditEvent(
-            type = AuditEventType.RATE_LIMIT_EXCEEDED,
-            username = null,
-            ipAddress = "192.168.1.1",
-            details = "Rate limit exceeded",
-        )
+        val event =
+            AuditEvent(
+                type = AuditEventType.RATE_LIMIT_EXCEEDED,
+                username = null,
+                ipAddress = "192.168.1.1",
+                details = "Rate limit exceeded",
+            )
 
         auditService.log(event)
 

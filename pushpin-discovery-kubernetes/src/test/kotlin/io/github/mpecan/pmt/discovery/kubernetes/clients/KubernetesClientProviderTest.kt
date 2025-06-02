@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
 class KubernetesClientProviderTest {
-
     private val provider = KubernetesClientProvider()
 
     @Test
@@ -26,9 +25,10 @@ class KubernetesClientProviderTest {
         // Since we can't easily mock the Kubernetes client creation process,
         // we'll just test that no exception is thrown with a non-existent path
         // This is a "loose" test that just ensures the code path is covered
-        val properties = KubernetesDiscoveryProperties(
-            kubeConfigPath = "/path/that/does/not/exist",
-        )
+        val properties =
+            KubernetesDiscoveryProperties(
+                kubeConfigPath = "/path/that/does/not/exist",
+            )
 
         try {
             // When

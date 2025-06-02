@@ -58,7 +58,6 @@ class PushpinContainer(
     dockerImageName: String = DEFAULT_IMAGE,
     private var configuration: PushpinConfiguration = PushpinConfiguration(),
 ) : GenericContainer<PushpinContainer>(DockerImageName.parse(dockerImageName)) {
-
     companion object {
         const val DEFAULT_IMAGE = "fanout/pushpin:1.40.1"
 
@@ -73,13 +72,14 @@ class PushpinContainer(
     }
 
     init {
-        configuration = configuration.copy(
-            commandPort = DEFAULT_CONTROL_PORT,
-            httpPort = DEFAULT_HTTP_PORT,
-            pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
-            pushInPort = DEFAULT_PUBLISH_PORT,
-            pushInSubPort = DEFAULT_SUB_PORT,
-        )
+        configuration =
+            configuration.copy(
+                commandPort = DEFAULT_CONTROL_PORT,
+                httpPort = DEFAULT_HTTP_PORT,
+                pushInHttpPort = DEFAULT_HTTP_PUBLISH_PORT,
+                pushInPort = DEFAULT_PUBLISH_PORT,
+                pushInSubPort = DEFAULT_SUB_PORT,
+            )
     }
 
     private var hostApplicationPort: Int = 8080
@@ -152,7 +152,10 @@ class PushpinContainer(
     /**
      * Add a single route.
      */
-    fun withRoute(pattern: String, target: String): PushpinContainer {
+    fun withRoute(
+        pattern: String,
+        target: String,
+    ): PushpinContainer {
         this.routes = routes + (pattern to target)
         return this
     }
@@ -172,9 +175,10 @@ class PushpinContainer(
 
         // Generate configuration and routes content
         val configContent = configuration.toConfigString()
-        val routesContent = routes.entries.joinToString("\n") { (pattern, target) ->
-            "$pattern $target"
-        }
+        val routesContent =
+            routes.entries.joinToString("\n") { (pattern, target) ->
+                "$pattern $target"
+            }
 
         // Set up the container with generated configuration
         withCopyToContainer(Transferable.of(configContent), "/etc/pushpin/pushpin.conf")
@@ -182,14 +186,15 @@ class PushpinContainer(
         logger.info("Pushpin routes:\n$routesContent")
         withCopyToContainer(
             Transferable.of(
-                """#!/bin/sh
-            echo '====== PUSHPIN CONFIG ======' >&2
-            cat /etc/pushpin/pushpin.conf 
-            echo '============================' >&2
-            echo '====== ROUTES CONFIG ======' >&2
-            cat /etc/pushpin/routes 
-            echo '============================' >&2
-            pushpin start --verbose
+                """
+                #!/bin/sh
+                echo '====== PUSHPIN CONFIG ======' >&2
+                cat /etc/pushpin/pushpin.conf 
+                echo '============================' >&2
+                echo '====== ROUTES CONFIG ======' >&2
+                cat /etc/pushpin/routes 
+                echo '============================' >&2
+                pushpin start --verbose
                 """.trimIndent(),
                 777,
             ),
@@ -200,7 +205,8 @@ class PushpinContainer(
         withCommand("/etc/pushpin/pushpin-start.sh")
         // Wait for Pushpin to be ready
         waitingFor(
-            Wait.forListeningPort()
+            Wait
+                .forListeningPort()
                 .withStartupTimeout(Duration.ofSeconds(60)),
         )
     }

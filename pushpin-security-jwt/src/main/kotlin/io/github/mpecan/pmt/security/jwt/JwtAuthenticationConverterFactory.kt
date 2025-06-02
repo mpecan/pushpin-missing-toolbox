@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 class JwtAuthenticationConverterFactory(
     private val properties: JwtProperties,
 ) {
-
     /**
      * Creates a converter that extracts authorities from JWT claims.
      */

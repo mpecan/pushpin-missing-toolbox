@@ -29,7 +29,9 @@ class HttpStreamingController(
      * @return A Flux that never completes, with GRIP headers
      */
     @GetMapping("/{channel}")
-    fun subscribe(@PathVariable channel: String): ResponseEntity<Flux<String>> {
+    fun subscribe(
+        @PathVariable channel: String,
+    ): ResponseEntity<Flux<String>> {
         val timer = metricsService.startTimer()
 
         // Record SSE connection

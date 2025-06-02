@@ -22,7 +22,6 @@ class DefaultMessageSerializer(
     private val httpResponseFormatter: HttpResponseMessageFormatter,
     private val longPollingFormatter: LongPollingMessageFormatter,
 ) : MessageSerializer {
-
     /**
      * Converts a Message to a PushpinMessage using the configured formatters.
      *
@@ -40,28 +39,32 @@ class DefaultMessageSerializer(
             formatMap["ws-message"] = webSocketFormatter.format(message)
 
             // Add HTTP Stream format if one of the HTTP stream transports is enabled
-            if (message.transports.contains(Transport.HttpStream) || message.transports.contains(
+            if (message.transports.contains(Transport.HttpStream) ||
+                message.transports.contains(
                     Transport.HttpStreamSSE,
                 )
             ) {
-                formatMap["http-stream"] = if (message.transports.contains(Transport.HttpStream)) {
-                    httpStreamMessageFormatter.format(message)
-                } else {
-                    httpSseStreamFormatter.format(message)
-                }
+                formatMap["http-stream"] =
+                    if (message.transports.contains(Transport.HttpStream)) {
+                        httpStreamMessageFormatter.format(message)
+                    } else {
+                        httpSseStreamFormatter.format(message)
+                    }
             }
 
             // Add HTTP Response format if one of the HTTP response transports is enabled
-            if (message.transports.contains(Transport.HttpResponse) || message.transports.contains(
+            if (message.transports.contains(Transport.HttpResponse) ||
+                message.transports.contains(
                     Transport.HttpResponseSSE,
                 ) ||
                 message.transports.contains(Transport.LongPolling)
             ) {
-                formatMap["http-response"] = if (message.transports.contains(Transport.LongPolling)) {
-                    longPollingFormatter.format(message)
-                } else {
-                    httpResponseFormatter.format(message)
-                }
+                formatMap["http-response"] =
+                    if (message.transports.contains(Transport.LongPolling)) {
+                        longPollingFormatter.format(message)
+                    } else {
+                        httpResponseFormatter.format(message)
+                    }
             }
 
             return PushpinMessage(

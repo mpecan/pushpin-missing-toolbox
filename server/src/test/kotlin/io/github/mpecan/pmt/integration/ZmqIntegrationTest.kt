@@ -12,7 +12,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 /**
  * Integration tests specifically for ZeroMQ message publishing.
@@ -23,7 +23,6 @@ import java.util.*
  * the messages aren't received. This is to facilitate ZMQ debugging and development.
  */
 class ZmqIntegrationTest : PushpinIntegrationTest() {
-
     companion object {
         val definedPort = PortProvider.getPort()
 
@@ -100,21 +99,22 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
         println("Successfully subscribed to WebSocket stream")
 
         // Subscribe to WebSocket to collect messages
-        val subscription = wsFlux.subscribe(
-            // onNext
-            { message ->
-                println("Received message: $message")
-                messages.add(message)
-            },
-            // onError
-            { error ->
-                println("❌ WebSocket error: ${error.message}")
-            },
-            // onComplete
-            {
-                println("WebSocket stream completed")
-            },
-        )
+        val subscription =
+            wsFlux.subscribe(
+                // onNext
+                { message ->
+                    println("Received message: $message")
+                    messages.add(message)
+                },
+                // onError
+                { error ->
+                    println("❌ WebSocket error: ${error.message}")
+                },
+                // onComplete
+                {
+                    println("WebSocket stream completed")
+                },
+            )
 
         // Wait a bit to ensure the connection is established
         println("Waiting for connection to be established...")
@@ -179,11 +179,12 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
     fun `should publish multiple messages via ZMQ and receive via WebSocket`() {
         // Given
         val channel = "zmq-multi-test-channel-${UUID.randomUUID()}"
-        val messages = listOf(
-            "First ZMQ message",
-            "Second ZMQ message",
-            "Third ZMQ message",
-        )
+        val messages =
+            listOf(
+                "First ZMQ message",
+                "Second ZMQ message",
+                "Third ZMQ message",
+            )
 
         // Create a WebSocket client that connects to the WebSocket endpoint through Pushpin
         val pushpinPort = pushpinProperties.servers[0].port
@@ -197,21 +198,22 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
         println("Successfully subscribed to WebSocket stream for multiple messages test")
 
         // Subscribe to WebSocket to collect messages
-        val subscription = wsFlux.subscribe(
-            // onNext
-            { message ->
-                println("Received message: $message")
-                receivedMessages.add(message)
-            },
-            // onError
-            { error ->
-                println("❌ WebSocket error: ${error.message}")
-            },
-            // onComplete
-            {
-                println("WebSocket stream completed")
-            },
-        )
+        val subscription =
+            wsFlux.subscribe(
+                // onNext
+                { message ->
+                    println("Received message: $message")
+                    receivedMessages.add(message)
+                },
+                // onError
+                { error ->
+                    println("❌ WebSocket error: ${error.message}")
+                },
+                // onComplete
+                {
+                    println("WebSocket stream completed")
+                },
+            )
 
         // Wait a bit to ensure the connection is established
         println("Waiting for connection to be established...")
@@ -259,11 +261,12 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
 
             // Verify at least one of our messages was received
             // We won't force all of them to be received since this could be flaky in test environments
-            val foundAnyMessage = messages.any { messageText ->
-                receivedMessages.any { receivedMsg ->
-                    receivedMsg.contains(messageText)
+            val foundAnyMessage =
+                messages.any { messageText ->
+                    receivedMessages.any { receivedMsg ->
+                        receivedMsg.contains(messageText)
+                    }
                 }
-            }
 
             if (foundAnyMessage) {
                 println("✅ Successfully verified at least one published message was received")
@@ -301,21 +304,22 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
         println("Successfully subscribed to WebSocket stream for event message test")
 
         // Subscribe to WebSocket to collect messages
-        val subscription = wsFlux.subscribe(
-            // onNext
-            { message ->
-                println("Received message: $message")
-                receivedMessages.add(message)
-            },
-            // onError
-            { error ->
-                println("❌ WebSocket error: ${error.message}")
-            },
-            // onComplete
-            {
-                println("WebSocket stream completed")
-            },
-        )
+        val subscription =
+            wsFlux.subscribe(
+                // onNext
+                { message ->
+                    println("Received message: $message")
+                    receivedMessages.add(message)
+                },
+                // onError
+                { error ->
+                    println("❌ WebSocket error: ${error.message}")
+                },
+                // onComplete
+                {
+                    println("WebSocket stream completed")
+                },
+            )
 
         // Wait a bit to ensure the connection is established
         println("Waiting for connection to be established...")
@@ -357,9 +361,10 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             }
 
             // Verify the message contains either our event type or message text
-            val eventMessageReceived = receivedMessages.any {
-                it.contains(eventType) || it.contains(messageText)
-            }
+            val eventMessageReceived =
+                receivedMessages.any {
+                    it.contains(eventType) || it.contains(messageText)
+                }
 
             if (eventMessageReceived) {
                 println("✅ Successfully verified event message was received")
@@ -399,37 +404,39 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
         val wsFlux2 = wsClient2.consumeMessages("/api/ws/$channel2")
 
         // Subscribe to WebSockets to collect messages
-        val subscription1 = wsFlux1.subscribe(
-            // onNext
-            { message ->
-                println("Channel 1 received: $message")
-                receivedMessages1.add(message)
-            },
-            // onError
-            { error ->
-                println("❌ Channel 1 WebSocket error: ${error.message}")
-            },
-            // onComplete
-            {
-                println("Channel 1 WebSocket stream completed")
-            },
-        )
+        val subscription1 =
+            wsFlux1.subscribe(
+                // onNext
+                { message ->
+                    println("Channel 1 received: $message")
+                    receivedMessages1.add(message)
+                },
+                // onError
+                { error ->
+                    println("❌ Channel 1 WebSocket error: ${error.message}")
+                },
+                // onComplete
+                {
+                    println("Channel 1 WebSocket stream completed")
+                },
+            )
 
-        val subscription2 = wsFlux2.subscribe(
-            // onNext
-            { message ->
-                println("Channel 2 received: $message")
-                receivedMessages2.add(message)
-            },
-            // onError
-            { error ->
-                println("❌ Channel 2 WebSocket error: ${error.message}")
-            },
-            // onComplete
-            {
-                println("Channel 2 WebSocket stream completed")
-            },
-        )
+        val subscription2 =
+            wsFlux2.subscribe(
+                // onNext
+                { message ->
+                    println("Channel 2 received: $message")
+                    receivedMessages2.add(message)
+                },
+                // onError
+                { error ->
+                    println("❌ Channel 2 WebSocket error: ${error.message}")
+                },
+                // onComplete
+                {
+                    println("Channel 2 WebSocket stream completed")
+                },
+            )
 
         // Wait for connections to be established
         println("Waiting for connections to be established...")
@@ -487,8 +494,9 @@ class ZmqIntegrationTest : PushpinIntegrationTest() {
             val channel2HasCorrectMessage = receivedMessages2.any { it.contains(message2) }
 
             // Verify channel isolation - channel 1 should not have message 2 content and vice versa
-            val channelsIsolated = !receivedMessages1.any { it.contains(message2) } &&
-                !receivedMessages2.any { it.contains(message1) }
+            val channelsIsolated =
+                !receivedMessages1.any { it.contains(message2) } &&
+                    !receivedMessages2.any { it.contains(message1) }
 
             if (channel1HasCorrectMessage && channel2HasCorrectMessage && channelsIsolated) {
                 println("✅ Successfully verified channel isolation - each channel received only its own messages")

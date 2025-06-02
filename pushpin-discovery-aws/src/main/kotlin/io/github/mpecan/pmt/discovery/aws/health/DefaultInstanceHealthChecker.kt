@@ -16,7 +16,10 @@ open class DefaultInstanceHealthChecker(
 ) : InstanceHealthChecker {
     private val logger = LoggerFactory.getLogger(DefaultInstanceHealthChecker::class.java)
 
-    override fun isHealthy(instance: Instance, properties: AwsDiscoveryProperties): Boolean {
+    override fun isHealthy(
+        instance: Instance,
+        properties: AwsDiscoveryProperties,
+    ): Boolean {
         // Check if instance is in running state
         val isRunning = instance.state().name() == InstanceStateName.RUNNING
 
@@ -29,12 +32,14 @@ open class DefaultInstanceHealthChecker(
         if (isRunning) {
             try {
                 val ec2Client = ec2ClientProvider.getClient(properties)
-                val statusResponse = ec2Client.describeInstanceStatus(
-                    DescribeInstanceStatusRequest.builder()
-                        .instanceIds(instance.instanceId())
-                        .includeAllInstances(true)
-                        .build(),
-                )
+                val statusResponse =
+                    ec2Client.describeInstanceStatus(
+                        DescribeInstanceStatusRequest
+                            .builder()
+                            .instanceIds(instance.instanceId())
+                            .includeAllInstances(true)
+                            .build(),
+                    )
 
                 val instanceStatus = statusResponse.instanceStatuses().firstOrNull()
                 if (instanceStatus != null) {

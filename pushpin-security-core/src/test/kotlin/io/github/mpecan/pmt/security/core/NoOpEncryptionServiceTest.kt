@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class NoOpEncryptionServiceTest {
-
     private lateinit var encryptionService: NoOpEncryptionService
 
     @BeforeEach
@@ -58,7 +57,9 @@ class NoOpEncryptionServiceTest {
 
         // Verify it's valid Base64
         assertDoesNotThrow {
-            java.util.Base64.getDecoder().decode(key)
+            java.util.Base64
+                .getDecoder()
+                .decode(key)
         }
     }
 

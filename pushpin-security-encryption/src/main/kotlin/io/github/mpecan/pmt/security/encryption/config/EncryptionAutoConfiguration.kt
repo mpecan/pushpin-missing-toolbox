@@ -20,10 +20,7 @@ import org.springframework.context.annotation.Bean
     havingValue = "true",
 )
 class EncryptionAutoConfiguration {
-
     @Bean
     @ConditionalOnMissingBean(EncryptionService::class)
-    fun encryptionService(properties: EncryptionProperties): EncryptionService {
-        return DefaultEncryptionService(properties)
-    }
+    fun encryptionService(properties: EncryptionProperties): EncryptionService = DefaultEncryptionService(properties)
 }

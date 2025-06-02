@@ -25,27 +25,24 @@ import java.time.Duration
     havingValue = "true",
 )
 class RemoteAuthorizationAutoConfiguration {
-
     @Bean
     @ConditionalOnMissingBean
     fun remoteAuthorizationRestTemplate(
         properties: RemoteAuthorizationProperties,
         builder: RestTemplateBuilder,
-    ): RestTemplate {
-        return builder
+    ): RestTemplate =
+        builder
             .connectTimeout(Duration.ofMillis(properties.timeout))
             .readTimeout(Duration.ofMillis(properties.timeout))
             .build()
-    }
 
     @Bean
     @ConditionalOnMissingBean
-    fun subscriptionAuthorizationCache(properties: RemoteAuthorizationProperties): SubscriptionAuthorizationCache {
-        return SubscriptionAuthorizationCache(
+    fun subscriptionAuthorizationCache(properties: RemoteAuthorizationProperties): SubscriptionAuthorizationCache =
+        SubscriptionAuthorizationCache(
             cacheMaxSize = properties.cache.maxSize,
             cacheTtl = properties.cache.ttl,
         )
-    }
 
     @Bean
     @ConditionalOnMissingBean(RemoteAuthorizationClient::class)
@@ -54,7 +51,5 @@ class RemoteAuthorizationAutoConfiguration {
         cache: SubscriptionAuthorizationCache,
         restTemplate: RestTemplate,
         auditService: AuditService,
-    ): RemoteAuthorizationClient {
-        return HttpRemoteSubscriptionClient(properties, cache, restTemplate, auditService)
-    }
+    ): RemoteAuthorizationClient = HttpRemoteSubscriptionClient(properties, cache, restTemplate, auditService)
 }

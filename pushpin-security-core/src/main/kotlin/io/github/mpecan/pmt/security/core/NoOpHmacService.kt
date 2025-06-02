@@ -6,9 +6,16 @@ package io.github.mpecan.pmt.security.core
 class NoOpHmacService : HmacService {
     override fun generateSignature(data: String): String = ""
 
-    override fun verifySignature(data: String, signature: String): Boolean = true
+    override fun verifySignature(
+        data: String,
+        signature: String,
+    ): Boolean = true
 
-    override fun generateRequestSignature(body: String, timestamp: Long, path: String): String = ""
+    override fun generateRequestSignature(
+        body: String,
+        timestamp: Long,
+        path: String,
+    ): String = ""
 
     override fun verifyRequestSignature(
         body: String,

@@ -39,37 +39,40 @@ class KubernetesClientProvider {
     private fun createApiClient(properties: KubernetesDiscoveryProperties): ApiClient {
         logger.debug("Creating Kubernetes ApiClient")
 
-        val apiClient = when {
-            // If a specific kubeconfig path is provided
-            properties.kubeConfigPath != null && Files.exists(Paths.get(properties.kubeConfigPath)) -> {
-                logger.debug("Using kubeconfig from: ${properties.kubeConfigPath}")
-                val inputStream = FileInputStream(properties.kubeConfigPath)
-                Config.fromConfig(inputStream)
-            }
+        val apiClient =
+            when {
+                // If a specific kubeconfig path is provided
+                properties.kubeConfigPath != null && Files.exists(Paths.get(properties.kubeConfigPath)) -> {
+                    logger.debug("Using kubeconfig from: ${properties.kubeConfigPath}")
+                    val inputStream = FileInputStream(properties.kubeConfigPath)
+                    Config.fromConfig(inputStream)
+                }
 
-            // If we can find the default kubeconfig
-            Files.exists(Paths.get(System.getProperty("user.home"), ".kube", "config")) -> {
-                logger.debug("Using default kubeconfig from ~/.kube/config")
-                Config.defaultClient()
-            }
-
-            // Otherwise, assume we're running in a cluster
-            else -> {
-                logger.debug("Using in-cluster configuration")
-                try {
-                    Config.fromCluster()
-                } catch (e: Exception) {
-                    logger.warn("Failed to load in-cluster config, falling back to default: ${e.message}")
+                // If we can find the default kubeconfig
+                Files.exists(Paths.get(System.getProperty("user.home"), ".kube", "config")) -> {
+                    logger.debug("Using default kubeconfig from ~/.kube/config")
                     Config.defaultClient()
                 }
+
+                // Otherwise, assume we're running in a cluster
+                else -> {
+                    logger.debug("Using in-cluster configuration")
+                    try {
+                        Config.fromCluster()
+                    } catch (e: Exception) {
+                        logger.warn("Failed to load in-cluster config, falling back to default: ${e.message}")
+                        Config.defaultClient()
+                    }
+                }
             }
-        }
 
         // Configure timeouts
-        apiClient.httpClient = apiClient.httpClient.newBuilder()
-            .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-            .connectTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
-            .build()
+        apiClient.httpClient =
+            apiClient.httpClient
+                .newBuilder()
+                .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .connectTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
+                .build()
 
         return apiClient
     }

@@ -6,7 +6,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class MessageTest {
-
     @Test
     fun `simple creates message with channel and data only`() {
         val message = Message.simple("test-channel", "Hello, World!")
@@ -113,15 +112,16 @@ class MessageTest {
     fun `custom creates fully customized message`() {
         val meta = mapOf("key" to "value")
         val transports = listOf(Transport.WebSocket, Transport.HttpStream)
-        val message = Message.custom(
-            channel = "test-channel",
-            data = "Hello, World!",
-            eventType = "test-event",
-            meta = meta,
-            id = "msg-123",
-            prevId = "msg-122",
-            transports = transports,
-        )
+        val message =
+            Message.custom(
+                channel = "test-channel",
+                data = "Hello, World!",
+                eventType = "test-event",
+                meta = meta,
+                id = "msg-123",
+                prevId = "msg-122",
+                transports = transports,
+            )
 
         assertEquals("test-channel", message.channel)
         assertEquals("Hello, World!", message.data)
@@ -134,11 +134,12 @@ class MessageTest {
 
     @Test
     fun `custom uses default transports when null is provided`() {
-        val message = Message.custom(
-            channel = "test-channel",
-            data = "Hello, World!",
-            transports = null,
-        )
+        val message =
+            Message.custom(
+                channel = "test-channel",
+                data = "Hello, World!",
+                transports = null,
+            )
 
         assertTrue(message.transports.contains(Transport.WebSocket))
         assertTrue(message.transports.contains(Transport.HttpStreamSSE))

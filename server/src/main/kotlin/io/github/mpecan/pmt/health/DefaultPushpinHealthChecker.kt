@@ -73,11 +73,12 @@ class DefaultPushpinHealthChecker(
     /**
      * Gets the appropriate health checker based on the configured transport type.
      */
-    private fun getHealthChecker(): TransportHealthChecker? = healthCheckerMap[defaultTransportType] ?: run {
-        logger.warn("No health checker found for transport type: $defaultTransportType")
-        // Fallback to first available health checker
-        transportHealthCheckers.firstOrNull()
-    }
+    private fun getHealthChecker(): TransportHealthChecker? =
+        healthCheckerMap[defaultTransportType] ?: run {
+            logger.warn("No health checker found for transport type: $defaultTransportType")
+            // Fallback to first available health checker
+            transportHealthCheckers.firstOrNull()
+        }
 
     /**
      * Performs health checks on all servers.

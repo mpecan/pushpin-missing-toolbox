@@ -7,16 +7,16 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class DefaultJwtDecoderServiceTest {
-
     @Test
     fun `should return correct configuration values`() {
-        val properties = JwtProperties(
-            enabled = true,
-            provider = "symmetric",
-            secret = "test-secret-key-32-characters-long",
-            issuer = "test-issuer",
-            audience = "test-audience",
-        )
+        val properties =
+            JwtProperties(
+                enabled = true,
+                provider = "symmetric",
+                secret = "test-secret-key-32-characters-long",
+                issuer = "test-issuer",
+                audience = "test-audience",
+            )
 
         val service = DefaultJwtDecoderService(properties)
 
@@ -28,11 +28,12 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     fun `should create symmetric decoder with valid secret`() {
-        val properties = JwtProperties(
-            enabled = true,
-            provider = "symmetric",
-            secret = "test-secret-key-32-characters-long",
-        )
+        val properties =
+            JwtProperties(
+                enabled = true,
+                provider = "symmetric",
+                secret = "test-secret-key-32-characters-long",
+            )
 
         val service = DefaultJwtDecoderService(properties)
         val decoder = service.getDecoder()
@@ -42,11 +43,12 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     fun `should throw exception for symmetric decoder with short secret`() {
-        val properties = JwtProperties(
-            enabled = true,
-            provider = "symmetric",
-            secret = "short",
-        )
+        val properties =
+            JwtProperties(
+                enabled = true,
+                provider = "symmetric",
+                secret = "short",
+            )
 
         val service = DefaultJwtDecoderService(properties)
 
@@ -57,11 +59,12 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     fun `should throw exception for oauth2 provider without jwks uri`() {
-        val properties = JwtProperties(
-            enabled = true,
-            provider = "oauth2",
-            jwksUri = "",
-        )
+        val properties =
+            JwtProperties(
+                enabled = true,
+                provider = "oauth2",
+                jwksUri = "",
+            )
 
         val service = DefaultJwtDecoderService(properties)
 
@@ -72,10 +75,11 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     fun `should throw exception for unknown provider`() {
-        val properties = JwtProperties(
-            enabled = true,
-            provider = "unknown",
-        )
+        val properties =
+            JwtProperties(
+                enabled = true,
+                provider = "unknown",
+            )
 
         val service = DefaultJwtDecoderService(properties)
 

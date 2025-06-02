@@ -22,9 +22,11 @@ class AutoScalingClientProvider(
         val region = Region.of(properties.region)
         val credentials = credentialsProvider.getCredentials(properties)
 
-        val builder = clientBuilderSupplier.get()
-            .region(region)
-            .credentialsProvider(credentials)
+        val builder =
+            clientBuilderSupplier
+                .get()
+                .region(region)
+                .credentialsProvider(credentials)
 
         // Add custom endpoint if configured (useful for testing with localstack)
         if (!properties.endpoint.isNullOrBlank()) {

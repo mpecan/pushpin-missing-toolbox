@@ -21,31 +21,32 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class DefaultKubernetesPodProviderTest {
-
     private val clientProvider: KubernetesClientProvider = mock()
     private val coreApi: CoreV1Api = mock()
     private val apiListNamespacedPodRequest: CoreV1Api.APIlistNamespacedPodRequest = mock()
     private val apiListPodForAllNamespacesRequest: CoreV1Api.APIlistPodForAllNamespacesRequest = mock()
     private val apiReadNamespacedServiceRequest: CoreV1Api.APIreadNamespacedServiceRequest = mock()
 
-    private val properties = KubernetesDiscoveryProperties(
-        enabled = true,
-        namespace = "test-namespace",
-        labelSelector = "app=pushpin",
-        fieldSelector = "status.phase=Running",
-    )
+    private val properties =
+        KubernetesDiscoveryProperties(
+            enabled = true,
+            namespace = "test-namespace",
+            labelSelector = "app=pushpin",
+            fieldSelector = "status.phase=Running",
+        )
 
     private val podProvider = DefaultKubernetesPodProvider(clientProvider)
 
     @Test
     fun `should get pods directly with namespace specified`() {
         // Given
-        val podList = V1PodList().items(
-            listOf(
-                createPod("pod-1", "192.168.1.1"),
-                createPod("pod-2", "192.168.1.2"),
-            ),
-        )
+        val podList =
+            V1PodList().items(
+                listOf(
+                    createPod("pod-1", "192.168.1.1"),
+                    createPod("pod-2", "192.168.1.2"),
+                ),
+            )
 
         whenever(clientProvider.getCoreApi(properties)).thenReturn(coreApi)
         whenever(coreApi.listNamespacedPod(eq("test-namespace"))).thenReturn(apiListNamespacedPodRequest)
@@ -75,19 +76,21 @@ class DefaultKubernetesPodProviderTest {
     @Test
     fun `should get pods directly from all namespaces when namespace not specified`() {
         // Given
-        val propertiesWithoutNamespace = KubernetesDiscoveryProperties(
-            enabled = true,
-            namespace = null,
-            labelSelector = "app=pushpin",
-            fieldSelector = "status.phase=Running",
-        )
+        val propertiesWithoutNamespace =
+            KubernetesDiscoveryProperties(
+                enabled = true,
+                namespace = null,
+                labelSelector = "app=pushpin",
+                fieldSelector = "status.phase=Running",
+            )
 
-        val podList = V1PodList().items(
-            listOf(
-                createPod("pod-1", "192.168.1.1"),
-                createPod("pod-2", "192.168.1.2"),
-            ),
-        )
+        val podList =
+            V1PodList().items(
+                listOf(
+                    createPod("pod-1", "192.168.1.1"),
+                    createPod("pod-2", "192.168.1.2"),
+                ),
+            )
 
         whenever(clientProvider.getCoreApi(propertiesWithoutNamespace)).thenReturn(coreApi)
         whenever(coreApi.listPodForAllNamespaces()).thenReturn(apiListPodForAllNamespacesRequest)
@@ -117,23 +120,25 @@ class DefaultKubernetesPodProviderTest {
     @Test
     fun `should get pods from service using service selector`() {
         // Given
-        val serviceProperties = KubernetesDiscoveryProperties(
-            enabled = true,
-            namespace = "test-namespace",
-            useService = true,
-            serviceName = "pushpin-service",
-        )
+        val serviceProperties =
+            KubernetesDiscoveryProperties(
+                enabled = true,
+                namespace = "test-namespace",
+                useService = true,
+                serviceName = "pushpin-service",
+            )
 
         val selector = mapOf("app" to "pushpin", "environment" to "test")
         val serviceSpec = V1ServiceSpec().selector(selector)
         val service = V1Service().spec(serviceSpec)
 
-        val podList = V1PodList().items(
-            listOf(
-                createPod("pod-1", "192.168.1.1"),
-                createPod("pod-2", "192.168.1.2"),
-            ),
-        )
+        val podList =
+            V1PodList().items(
+                listOf(
+                    createPod("pod-1", "192.168.1.1"),
+                    createPod("pod-2", "192.168.1.2"),
+                ),
+            )
 
         whenever(clientProvider.getCoreApi(serviceProperties)).thenReturn(coreApi)
         whenever(coreApi.readNamespacedService(eq("pushpin-service"), eq("test-namespace"))).thenReturn(
@@ -167,12 +172,13 @@ class DefaultKubernetesPodProviderTest {
     @Test
     fun `should handle service without selectors`() {
         // Given
-        val serviceProperties = KubernetesDiscoveryProperties(
-            enabled = true,
-            namespace = "test-namespace",
-            useService = true,
-            serviceName = "pushpin-service",
-        )
+        val serviceProperties =
+            KubernetesDiscoveryProperties(
+                enabled = true,
+                namespace = "test-namespace",
+                useService = true,
+                serviceName = "pushpin-service",
+            )
 
         val serviceSpec = V1ServiceSpec() // No selectors
         val service = V1Service().spec(serviceSpec)
@@ -214,12 +220,13 @@ class DefaultKubernetesPodProviderTest {
     @Test
     fun `should handle API exception when getting service`() {
         // Given
-        val serviceProperties = KubernetesDiscoveryProperties(
-            enabled = true,
-            namespace = "test-namespace",
-            useService = true,
-            serviceName = "pushpin-service",
-        )
+        val serviceProperties =
+            KubernetesDiscoveryProperties(
+                enabled = true,
+                namespace = "test-namespace",
+                useService = true,
+                serviceName = "pushpin-service",
+            )
 
         whenever(clientProvider.getCoreApi(serviceProperties)).thenReturn(coreApi)
         whenever(coreApi.readNamespacedService(any(), any())).thenReturn(apiReadNamespacedServiceRequest)
@@ -232,9 +239,11 @@ class DefaultKubernetesPodProviderTest {
         assertTrue(result.isEmpty())
     }
 
-    private fun createPod(name: String, podIp: String): V1Pod {
-        return V1Pod()
+    private fun createPod(
+        name: String,
+        podIp: String,
+    ): V1Pod =
+        V1Pod()
             .metadata(V1ObjectMeta().name(name))
             .status(V1PodStatus().podIP(podIp))
-    }
 }

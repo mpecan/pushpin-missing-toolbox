@@ -12,7 +12,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.testcontainers.junit.jupiter.Container
-import java.util.*
+import java.util.UUID
 
 /**
  * Integration tests for PushpinController.
@@ -50,57 +50,72 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
     @Test
     fun `should get all servers`() {
         // When/Then
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri("/api/pushpin/servers")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectBody()
-            .jsonPath("$[0].id").isEqualTo("pushpin-test")
-            .jsonPath("$[0].host").isEqualTo("localhost")
+            .jsonPath("$[0].id")
+            .isEqualTo("pushpin-test")
+            .jsonPath("$[0].host")
+            .isEqualTo("localhost")
     }
 
     @Test
     fun `should get server by id`() {
         // When/Then
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri("/api/pushpin/servers/pushpin-test")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectBody()
-            .jsonPath("$.id").isEqualTo("pushpin-test")
-            .jsonPath("$.host").isEqualTo("localhost")
+            .jsonPath("$.id")
+            .isEqualTo("pushpin-test")
+            .jsonPath("$.host")
+            .isEqualTo("localhost")
     }
 
     @Test
     fun `should return 404 for non-existent server`() {
         // When/Then
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri("/api/pushpin/servers/non-existent")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus()
+            .isNotFound
     }
 
     @Test
     fun `should publish message`() {
         // Given
-        val message = Message.simple(
-            "test-channel-${UUID.randomUUID()}",
-            mapOf("text" to "Hello from integration test!"),
-        )
+        val message =
+            Message.simple(
+                "test-channel-${UUID.randomUUID()}",
+                mapOf("text" to "Hello from integration test!"),
+            )
 
         // When/Then
-        webTestClient.post()
+        webTestClient
+            .post()
             .uri("/api/pushpin/publish")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(message)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectBody()
-            .jsonPath("$.success").isEqualTo(true)
-            .jsonPath("$.message").isEqualTo("Message published successfully")
+            .jsonPath("$.success")
+            .isEqualTo(true)
+            .jsonPath("$.message")
+            .isEqualTo("Message published successfully")
     }
 
     @Test
@@ -110,15 +125,19 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
         val data = mapOf("text" to "Hello from integration test!")
 
         // When/Then
-        webTestClient.post()
+        webTestClient
+            .post()
             .uri("/api/pushpin/publish/$channel")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(data)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectBody()
-            .jsonPath("$.success").isEqualTo(true)
-            .jsonPath("$.message").isEqualTo("Message published successfully")
+            .jsonPath("$.success")
+            .isEqualTo(true)
+            .jsonPath("$.message")
+            .isEqualTo("Message published successfully")
     }
 
     @Test
@@ -129,15 +148,19 @@ class PushpinControllerIntegrationTest : PushpinIntegrationTest() {
         val data = mapOf("text" to "Hello from integration test!")
 
         // When/Then
-        webTestClient.post()
+        webTestClient
+            .post()
             .uri("/api/pushpin/publish/$channel?event=$event")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(data)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectBody()
-            .jsonPath("$.success").isEqualTo(true)
-            .jsonPath("$.message").isEqualTo("Message published successfully")
+            .jsonPath("$.success")
+            .isEqualTo(true)
+            .jsonPath("$.message")
+            .isEqualTo("Message published successfully")
     }
 
     // SSE tests have been moved to SseIntegrationTest

@@ -25,7 +25,6 @@ package io.github.mpecan.pmt.testcontainers
  * @see PushpinContainerBuilder
  */
 object PushpinPresets {
-
     /**
      * Minimal configuration for basic HTTP testing.
      * - HTTP only (no HTTPS)
@@ -33,11 +32,12 @@ object PushpinPresets {
      * - Debug mode enabled
      * - Verbose logging
      */
-    fun minimal(): PushpinConfiguration = PushpinConfiguration(
-        debug = true,
-        logLevel = 5,
-        updatesCheck = "off",
-    )
+    fun minimal(): PushpinConfiguration =
+        PushpinConfiguration(
+            debug = true,
+            logLevel = 5,
+            updatesCheck = "off",
+        )
 
     /**
      * Configuration for testing WebSocket functionality.
@@ -45,15 +45,16 @@ object PushpinPresets {
      * - Longer subscription linger time
      * - Debug mode enabled
      */
-    fun webSocket(): PushpinConfiguration = PushpinConfiguration(
-        debug = true,
-        logLevel = 5,
-        messageRate = 5000,
-        messageHwm = 50000,
-        subscriptionLinger = 120,
-        connectionSubscriptionMax = 50,
-        updatesCheck = "off",
-    )
+    fun webSocket(): PushpinConfiguration =
+        PushpinConfiguration(
+            debug = true,
+            logLevel = 5,
+            messageRate = 5000,
+            messageHwm = 50000,
+            subscriptionLinger = 120,
+            connectionSubscriptionMax = 50,
+            updatesCheck = "off",
+        )
 
     /**
      * Configuration for testing Server-Sent Events (SSE).
@@ -61,14 +62,15 @@ object PushpinPresets {
      * - Longer timeouts
      * - Debug mode enabled
      */
-    fun serverSentEvents(): PushpinConfiguration = PushpinConfiguration(
-        debug = true,
-        logLevel = 5,
-        messageWait = 10000,
-        subscriptionLinger = 300,
-        statsConnectionTtl = 300,
-        updatesCheck = "off",
-    )
+    fun serverSentEvents(): PushpinConfiguration =
+        PushpinConfiguration(
+            debug = true,
+            logLevel = 5,
+            messageWait = 10000,
+            subscriptionLinger = 300,
+            statsConnectionTtl = 300,
+            updatesCheck = "off",
+        )
 
     /**
      * Configuration for high-throughput testing.
@@ -76,16 +78,17 @@ object PushpinPresets {
      * - Large buffers
      * - Maximum connections
      */
-    fun highThroughput(): PushpinConfiguration = PushpinConfiguration(
-        debug = false,
-        logLevel = 2,
-        messageRate = 10000,
-        messageHwm = 100000,
-        clientMaxConn = 100000,
-        clientBufferSize = 16384,
-        connectionSubscriptionMax = 100,
-        updatesCheck = "off",
-    )
+    fun highThroughput(): PushpinConfiguration =
+        PushpinConfiguration(
+            debug = false,
+            logLevel = 2,
+            messageRate = 10000,
+            messageHwm = 100000,
+            clientMaxConn = 100000,
+            clientBufferSize = 16384,
+            connectionSubscriptionMax = 100,
+            updatesCheck = "off",
+        )
 
     /**
      * Configuration with authentication enabled.
@@ -93,15 +96,16 @@ object PushpinPresets {
      * - CORS enabled
      * - Debug mode for troubleshooting
      */
-    fun authenticated(): PushpinConfiguration = PushpinConfiguration(
-        debug = true,
-        logLevel = 5,
-        autoCrossOrigin = true,
-        sigKey = "test-secret-key",
-        sigIss = "test-issuer",
-        acceptXForwardedProtocol = true,
-        updatesCheck = "off",
-    )
+    fun authenticated(): PushpinConfiguration =
+        PushpinConfiguration(
+            debug = true,
+            logLevel = 5,
+            autoCrossOrigin = true,
+            sigKey = "test-secret-key",
+            sigIss = "test-issuer",
+            acceptXForwardedProtocol = true,
+            updatesCheck = "off",
+        )
 
     /**
      * Configuration for production-like testing.
@@ -110,18 +114,19 @@ object PushpinPresets {
      * - Standard logging
      * - Security headers
      */
-    fun productionLike(): PushpinConfiguration = PushpinConfiguration(
-        httpsPort = 8443,
-        debug = false,
-        logLevel = 2,
-        allowCompression = true,
-        acceptXForwardedProtocol = true,
-        setXForwardedProtocol = "append",
-        xForwardedFor = "truncate:0,append",
-        logFrom = true,
-        logUserAgent = true,
-        updatesCheck = "off",
-    )
+    fun productionLike(): PushpinConfiguration =
+        PushpinConfiguration(
+            httpsPort = 8443,
+            debug = false,
+            logLevel = 2,
+            allowCompression = true,
+            acceptXForwardedProtocol = true,
+            setXForwardedProtocol = "append",
+            xForwardedFor = "truncate:0,append",
+            logFrom = true,
+            logUserAgent = true,
+            updatesCheck = "off",
+        )
 
     /**
      * Configuration for development/debugging.
@@ -129,12 +134,13 @@ object PushpinPresets {
      * - All logging enabled
      * - Debug responses
      */
-    fun development(): PushpinConfiguration = PushpinConfiguration(
-        debug = true,
-        logLevel = 10,
-        logFrom = true,
-        logUserAgent = true,
-        statsConnectionSend = true,
-        updatesCheck = "off",
-    )
+    fun development(): PushpinConfiguration =
+        PushpinConfiguration(
+            debug = true,
+            logLevel = 10,
+            logFrom = true,
+            logUserAgent = true,
+            statsConnectionSend = true,
+            updatesCheck = "off",
+        )
 }

@@ -59,23 +59,24 @@ class DefaultKubernetesPodProvider(
         val pods = mutableListOf<V1Pod>()
 
         try {
-            val podList = if (properties.namespace != null) {
-                // Get pods in specific namespace using builder pattern
-                coreApi.listNamespacedPod(properties.namespace)
-                    .apply {
-                        properties.fieldSelector?.let { fieldSelector(it) }
-                        properties.labelSelector?.let { labelSelector(it) }
-                    }
-                    .execute()
-            } else {
-                // Get pods across all namespaces using builder pattern
-                coreApi.listPodForAllNamespaces()
-                    .apply {
-                        properties.fieldSelector?.let { fieldSelector(it) }
-                        properties.labelSelector?.let { labelSelector(it) }
-                    }
-                    .execute()
-            }
+            val podList =
+                if (properties.namespace != null) {
+                    // Get pods in specific namespace using builder pattern
+                    coreApi
+                        .listNamespacedPod(properties.namespace)
+                        .apply {
+                            properties.fieldSelector?.let { fieldSelector(it) }
+                            properties.labelSelector?.let { labelSelector(it) }
+                        }.execute()
+                } else {
+                    // Get pods across all namespaces using builder pattern
+                    coreApi
+                        .listPodForAllNamespaces()
+                        .apply {
+                            properties.fieldSelector?.let { fieldSelector(it) }
+                            properties.labelSelector?.let { labelSelector(it) }
+                        }.execute()
+                }
 
             // Add all items from the pod list to our result list
             podList.items?.let { pods.addAll(it) }
@@ -100,8 +101,10 @@ class DefaultKubernetesPodProvider(
             val namespace = properties.namespace ?: "default"
 
             // Get the service using builder pattern
-            val service = coreApi.readNamespacedService(properties.serviceName, namespace)
-                .execute()
+            val service =
+                coreApi
+                    .readNamespacedService(properties.serviceName, namespace)
+                    .execute()
 
             // Extract the selector from the service
             val selector = service.spec?.selector
@@ -111,12 +114,13 @@ class DefaultKubernetesPodProvider(
                 val labelSelector = selector.entries.joinToString(",") { "${it.key}=${it.value}" }
 
                 // Get pods that match the service selector using builder pattern
-                val podList = coreApi.listNamespacedPod(namespace)
-                    .apply {
-                        properties.fieldSelector?.let { fieldSelector(it) }
-                        labelSelector(labelSelector)
-                    }
-                    .execute()
+                val podList =
+                    coreApi
+                        .listNamespacedPod(namespace)
+                        .apply {
+                            properties.fieldSelector?.let { fieldSelector(it) }
+                            labelSelector(labelSelector)
+                        }.execute()
 
                 podList.items?.let { pods.addAll(it) }
             } else {

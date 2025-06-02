@@ -14,14 +14,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class WebSocketFormat(
     val content: String? = null,
-
     @get:JsonProperty("content-bin")
     val contentBin: String? = null,
-
     val type: String = "text",
-
     val action: String = "send",
-
     val code: Int? = null,
 ) : PushpinFormat {
     companion object {
@@ -35,33 +31,30 @@ data class WebSocketFormat(
         /**
          * Creates a WebSocket format for sending text data.
          */
-        fun sendText(content: String): WebSocketFormat {
-            return WebSocketFormat(
+        fun sendText(content: String): WebSocketFormat =
+            WebSocketFormat(
                 content = content,
                 type = TYPE_TEXT,
                 action = ACTION_SEND,
             )
-        }
 
         /**
          * Creates a WebSocket format for sending binary data.
          */
-        fun sendBinary(contentBin: String): WebSocketFormat {
-            return WebSocketFormat(
+        fun sendBinary(contentBin: String): WebSocketFormat =
+            WebSocketFormat(
                 contentBin = contentBin,
                 type = TYPE_BINARY,
                 action = ACTION_SEND,
             )
-        }
 
         /**
          * Creates a WebSocket format for closing the connection.
          */
-        fun close(code: Int? = null): WebSocketFormat {
-            return WebSocketFormat(
+        fun close(code: Int? = null): WebSocketFormat =
+            WebSocketFormat(
                 action = ACTION_CLOSE,
                 code = code,
             )
-        }
     }
 }

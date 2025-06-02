@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 class DefaultAuditLogService(
     private val properties: AuditProperties,
 ) : AuditService {
-
     private val logger = LoggerFactory.getLogger("audit")
 
     /**
@@ -69,7 +68,11 @@ class DefaultAuditLogService(
     /**
      * Log an authentication success event.
      */
-    override fun logAuthSuccess(username: String, ipAddress: String, details: String) {
+    override fun logAuthSuccess(
+        username: String,
+        ipAddress: String,
+        details: String,
+    ) {
         log(
             AuditEvent(
                 type = AuditEventType.AUTHENTICATION_SUCCESS,
@@ -83,7 +86,11 @@ class DefaultAuditLogService(
     /**
      * Log an authentication failure event.
      */
-    override fun logAuthFailure(username: String, ipAddress: String, details: String) {
+    override fun logAuthFailure(
+        username: String,
+        ipAddress: String,
+        details: String,
+    ) {
         log(
             AuditEvent(
                 type = AuditEventType.AUTHENTICATION_FAILURE,
@@ -97,7 +104,12 @@ class DefaultAuditLogService(
     /**
      * Log an authorization failure event.
      */
-    override fun logAuthorizationFailure(username: String, ipAddress: String, resource: String, permission: String) {
+    override fun logAuthorizationFailure(
+        username: String,
+        ipAddress: String,
+        resource: String,
+        permission: String,
+    ) {
         log(
             AuditEvent(
                 type = AuditEventType.AUTHORIZATION_FAILURE,
@@ -111,7 +123,12 @@ class DefaultAuditLogService(
     /**
      * Log a channel access event.
      */
-    override fun logChannelAccess(username: String, ipAddress: String, channelId: String, action: String) {
+    override fun logChannelAccess(
+        username: String,
+        ipAddress: String,
+        channelId: String,
+        action: String,
+    ) {
         log(
             AuditEvent(
                 type = AuditEventType.CHANNEL_ACCESS,
@@ -125,7 +142,10 @@ class DefaultAuditLogService(
     /**
      * Log a rate limit exceeded event.
      */
-    override fun logRateLimitExceeded(username: String?, ipAddress: String) {
+    override fun logRateLimitExceeded(
+        username: String?,
+        ipAddress: String,
+    ) {
         log(
             AuditEvent(
                 type = AuditEventType.RATE_LIMIT_EXCEEDED,
@@ -139,7 +159,11 @@ class DefaultAuditLogService(
     /**
      * Log a security configuration change event.
      */
-    override fun logSecurityConfigChange(username: String, ipAddress: String, details: String) {
+    override fun logSecurityConfigChange(
+        username: String,
+        ipAddress: String,
+        details: String,
+    ) {
         log(
             AuditEvent(
                 type = AuditEventType.SECURITY_CONFIG_CHANGE,
@@ -176,7 +200,12 @@ class DefaultAuditLogService(
     /**
      * Log a remote authorization error event.
      */
-    override fun logRemoteAuthorizationError(username: String, ipAddress: String, channelId: String?, error: String) {
+    override fun logRemoteAuthorizationError(
+        username: String,
+        ipAddress: String,
+        channelId: String?,
+        error: String,
+    ) {
         val channelInfo = channelId?.let { " for channel '$it'" } ?: ""
         log(
             AuditEvent(

@@ -13,7 +13,6 @@ import org.mockito.kotlin.whenever
 import reactor.test.StepVerifier
 
 class ZmqTransportTest {
-
     private lateinit var zmqTransportProperties: ZmqTransportProperties
     private lateinit var messageSerializer: MessageSerializer
     private lateinit var messageSerializationService: MessageSerializationService
@@ -22,24 +21,26 @@ class ZmqTransportTest {
 
     @BeforeEach
     fun setup() {
-        zmqTransportProperties = ZmqTransportProperties(
-            connectionPoolEnabled = false, // Disable for easier testing
-            hwm = 1000,
-            linger = 1000,
-            sendTimeout = 1000,
-            reconnectIvl = 100,
-            reconnectIvlMax = 0,
-        )
+        zmqTransportProperties =
+            ZmqTransportProperties(
+                connectionPoolEnabled = false, // Disable for easier testing
+                hwm = 1000,
+                linger = 1000,
+                sendTimeout = 1000,
+                reconnectIvl = 100,
+                reconnectIvlMax = 0,
+            )
         messageSerializer = mock()
         messageSerializationService = mock()
         discoveryManager = mock()
 
-        zmqTransport = ZmqTransport(
-            zmqTransportProperties,
-            messageSerializer,
-            messageSerializationService,
-            discoveryManager,
-        )
+        zmqTransport =
+            ZmqTransport(
+                zmqTransportProperties,
+                messageSerializer,
+                messageSerializationService,
+                discoveryManager,
+            )
     }
 
     @Test
@@ -52,7 +53,8 @@ class ZmqTransportTest {
         whenever(discoveryManager.getAllServers()).thenReturn(emptyList())
 
         // When & Then
-        StepVerifier.create(zmqTransport.publish(message))
+        StepVerifier
+            .create(zmqTransport.publish(message))
             .expectNext(false)
             .verifyComplete()
     }
@@ -71,7 +73,8 @@ class ZmqTransportTest {
         whenever(discoveryManager.getAllServers()).thenReturn(listOf(server))
 
         // When & Then
-        StepVerifier.create(zmqTransport.publish(message))
+        StepVerifier
+            .create(zmqTransport.publish(message))
             .expectNext(true)
             .verifyComplete()
     }

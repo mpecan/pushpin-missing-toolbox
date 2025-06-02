@@ -14,10 +14,11 @@ class DefaultLongPollingMessageFormatter(
 ) : LongPollingMessageFormatter {
     override fun format(message: Message): HttpResponseFormat {
         // For long-polling, we need to include the channel in the response
-        val responseData = mapOf(
-            "channel" to message.channel,
-            "message" to "${message.data}",
-        )
+        val responseData =
+            mapOf(
+                "channel" to message.channel,
+                "message" to "${message.data}",
+            )
 
         return HttpResponseFormat(
             body = serializationService.serialize(responseData) + "\n",

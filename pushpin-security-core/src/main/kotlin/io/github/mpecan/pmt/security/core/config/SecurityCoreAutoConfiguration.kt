@@ -14,16 +14,13 @@ import org.springframework.context.annotation.Bean
  */
 @AutoConfiguration
 class SecurityCoreAutoConfiguration {
-
     /**
      * Provides a no-op AuditService when no other implementation is available.
      * This ensures that code using AuditService will not fail if no audit module is included.
      */
     @Bean
     @ConditionalOnMissingBean(AuditService::class)
-    fun defaultAuditService(): AuditService {
-        return NoOpAuditService()
-    }
+    fun defaultAuditService(): AuditService = NoOpAuditService()
 
     /**
      * Provides a no-op EncryptionService when no other implementation is available.
@@ -31,7 +28,5 @@ class SecurityCoreAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(EncryptionService::class)
-    fun defaultEncryptionService(): EncryptionService {
-        return NoOpEncryptionService()
-    }
+    fun defaultEncryptionService(): EncryptionService = NoOpEncryptionService()
 }

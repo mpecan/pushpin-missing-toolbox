@@ -6,7 +6,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sts.StsClient
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest
-import java.util.*
+import java.util.UUID
 
 /**
  * Provider for AWS credentials.
@@ -24,17 +24,22 @@ class AwsCredentialsProvider {
         if (!properties.assumeRoleArn.isNullOrBlank()) {
             val roleSessionName = "pushpin-discovery-${UUID.randomUUID()}"
 
-            val stsClient = StsClient.builder()
-                .region(Region.of(properties.region))
-                .credentialsProvider(defaultCredentialsProvider)
-                .build()
+            val stsClient =
+                StsClient
+                    .builder()
+                    .region(Region.of(properties.region))
+                    .credentialsProvider(defaultCredentialsProvider)
+                    .build()
 
-            val assumeRoleRequest = AssumeRoleRequest.builder()
-                .roleArn(properties.assumeRoleArn)
-                .roleSessionName(roleSessionName)
-                .build()
+            val assumeRoleRequest =
+                AssumeRoleRequest
+                    .builder()
+                    .roleArn(properties.assumeRoleArn)
+                    .roleSessionName(roleSessionName)
+                    .build()
 
-            return StsAssumeRoleCredentialsProvider.builder()
+            return StsAssumeRoleCredentialsProvider
+                .builder()
                 .stsClient(stsClient)
                 .refreshRequest(assumeRoleRequest)
                 .build()

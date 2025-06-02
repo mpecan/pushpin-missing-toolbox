@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration
  */
 @AutoConfiguration
 class MetricsAutoConfiguration {
-
     private val logger = LoggerFactory.getLogger(MetricsAutoConfiguration::class.java)
 
     /**
@@ -27,11 +26,11 @@ class MetricsAutoConfiguration {
     @Configuration
     @ConditionalOnClass(MeterRegistry::class)
     class MicrometerConfiguration {
-
         @Bean
         @ConditionalOnMissingBean
         fun metricsService(meterRegistry: MeterRegistry): MetricsService {
-            LoggerFactory.getLogger(MicrometerConfiguration::class.java)
+            LoggerFactory
+                .getLogger(MicrometerConfiguration::class.java)
                 .info("Configuring MicrometerMetricsService - metrics collection enabled")
             return MicrometerMetricsService(meterRegistry)
         }
@@ -43,11 +42,11 @@ class MetricsAutoConfiguration {
     @Configuration
     @ConditionalOnMissingClass("io.micrometer.core.instrument.MeterRegistry")
     class NoOpConfiguration {
-
         @Bean
         @ConditionalOnMissingBean
         fun metricsService(): MetricsService {
-            LoggerFactory.getLogger(NoOpConfiguration::class.java)
+            LoggerFactory
+                .getLogger(NoOpConfiguration::class.java)
                 .info("Configuring NoOpMetricsService - metrics collection disabled (Micrometer not found)")
             return NoOpMetricsService()
         }

@@ -5,7 +5,6 @@ package io.github.mpecan.pmt.grip
  */
 @Suppress("unused")
 object GripConstants {
-
     // GRIP Headers
     const val HEADER_GRIP_SIG = "Grip-Sig"
     const val HEADER_GRIP_HOLD = "Grip-Hold"

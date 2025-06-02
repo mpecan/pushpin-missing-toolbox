@@ -8,15 +8,14 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class JsonPathClaimExtractorServiceTest {
-
     private val extractor = JsonPathClaimExtractorService()
 
-    private fun createTestJwt(claims: Map<String, Any>): Jwt {
-        return Jwt.withTokenValue("test-token")
+    private fun createTestJwt(claims: Map<String, Any>): Jwt =
+        Jwt
+            .withTokenValue("test-token")
             .headers { it.put("typ", "JWT") }
             .claims { it.putAll(claims) }
             .build()
-    }
 
     @Test
     fun `should extract string claim`() {

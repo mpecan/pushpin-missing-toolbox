@@ -18,10 +18,7 @@ import org.springframework.context.annotation.Bean
     matchIfMissing = true,
 )
 class NoOpRemoteAuthorizationAutoConfiguration {
-
     @Bean
     @ConditionalOnMissingBean(RemoteAuthorizationClient::class)
-    fun noopRemoteAuthorizationClient(): RemoteAuthorizationClient {
-        return NoopRemoteAuthorizationClient()
-    }
+    fun noopRemoteAuthorizationClient(): RemoteAuthorizationClient = NoopRemoteAuthorizationClient()
 }

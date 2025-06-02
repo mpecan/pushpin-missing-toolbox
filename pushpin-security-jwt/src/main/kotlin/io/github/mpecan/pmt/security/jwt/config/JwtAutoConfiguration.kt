@@ -26,22 +26,17 @@ import org.springframework.security.oauth2.jwt.Jwt
 @Configuration
 @EnableConfigurationProperties(JwtProperties::class)
 class JwtAutoConfiguration {
-
     @Bean
     @ConditionalOnProperty(
         prefix = "pushpin.security.jwt",
         name = ["enabled"],
         havingValue = "true",
     )
-    fun jwtDecoderService(properties: JwtProperties): JwtDecoderService {
-        return DefaultJwtDecoderService(properties)
-    }
+    fun jwtDecoderService(properties: JwtProperties): JwtDecoderService = DefaultJwtDecoderService(properties)
 
     @Bean
     @ConditionalOnMissingBean(JwtDecoderService::class)
-    fun noOpJwtDecoderService(): JwtDecoderService {
-        return NoOpJwtDecoderService()
-    }
+    fun noOpJwtDecoderService(): JwtDecoderService = NoOpJwtDecoderService()
 
     @Bean
     @ConditionalOnProperty(
@@ -49,15 +44,11 @@ class JwtAutoConfiguration {
         name = ["enabled"],
         havingValue = "true",
     )
-    fun claimExtractorService(): ClaimExtractorService {
-        return JsonPathClaimExtractorService()
-    }
+    fun claimExtractorService(): ClaimExtractorService = JsonPathClaimExtractorService()
 
     @Bean
     @ConditionalOnMissingBean(ClaimExtractorService::class)
-    fun noOpClaimExtractorService(): ClaimExtractorService {
-        return NoOpClaimExtractorService()
-    }
+    fun noOpClaimExtractorService(): ClaimExtractorService = NoOpClaimExtractorService()
 
     @Bean
     @ConditionalOnProperty(
@@ -68,15 +59,13 @@ class JwtAutoConfiguration {
     fun channelSubscriptionExtractorService(
         claimExtractorService: ClaimExtractorService,
         properties: JwtProperties,
-    ): ChannelSubscriptionExtractorService {
-        return DefaultChannelSubscriptionExtractorService(claimExtractorService, properties)
-    }
+    ): ChannelSubscriptionExtractorService =
+        DefaultChannelSubscriptionExtractorService(claimExtractorService, properties)
 
     @Bean
     @ConditionalOnMissingBean(ChannelSubscriptionExtractorService::class)
-    fun noOpChannelSubscriptionExtractorService(): ChannelSubscriptionExtractorService {
-        return NoOpChannelSubscriptionExtractorService()
-    }
+    fun noOpChannelSubscriptionExtractorService(): ChannelSubscriptionExtractorService =
+        NoOpChannelSubscriptionExtractorService()
 
     @Bean
     @ConditionalOnProperty(
@@ -84,7 +73,6 @@ class JwtAutoConfiguration {
         name = ["enabled"],
         havingValue = "true",
     )
-    fun jwtAuthenticationConverter(properties: JwtProperties): Converter<Jwt, AbstractAuthenticationToken> {
-        return JwtAuthenticationConverterFactory(properties).createAuthenticationConverter()
-    }
+    fun jwtAuthenticationConverter(properties: JwtProperties): Converter<Jwt, AbstractAuthenticationToken> =
+        JwtAuthenticationConverterFactory(properties).createAuthenticationConverter()
 }

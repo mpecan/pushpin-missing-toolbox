@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono
 @RestController
 @RequestMapping("/api/long-polling")
 class LongPollingController {
-
     /**
      * Subscribes to a channel using the GRIP protocol with long-polling.
      * * This endpoint keeps the connection open for a specified timeout period
@@ -26,18 +25,22 @@ class LongPollingController {
      * @return A Mono that completes after the timeout, with GRIP headers
      */
     @GetMapping("/{channel}")
-    fun subscribe(@PathVariable channel: String): ResponseEntity<Mono<Map<String, Any>>> {
+    fun subscribe(
+        @PathVariable channel: String,
+    ): ResponseEntity<Mono<Map<String, Any>>> {
         // Create a response that will be sent after the timeout
-        val response: Mono<Map<String, Any>> = Mono.just(
-            mapOf(
-                "success" to true,
-                "message" to "No messages received within timeout period",
-                "channel" to channel,
-            ),
-        )
+        val response: Mono<Map<String, Any>> =
+            Mono.just(
+                mapOf(
+                    "success" to true,
+                    "message" to "No messages received within timeout period",
+                    "channel" to channel,
+                ),
+            )
 
         // Return the response with GRIP headers using the new API
-        return GripApi.longPollingResponse<Mono<Map<String, Any>>>(channel, timeout = 20)
+        return GripApi
+            .longPollingResponse<Mono<Map<String, Any>>>(channel, timeout = 20)
             .body(response)
     }
 }

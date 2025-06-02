@@ -12,7 +12,10 @@ interface HmacService {
     /**
      * Verify an HMAC signature for the given data.
      */
-    fun verifySignature(data: String, signature: String): Boolean
+    fun verifySignature(
+        data: String,
+        signature: String,
+    ): Boolean
 
     /**
      * Generate a signature for a request body and headers.
@@ -21,7 +24,11 @@ interface HmacService {
      * @param path The request path
      * @return The HMAC signature
      */
-    fun generateRequestSignature(body: String, timestamp: Long, path: String): String
+    fun generateRequestSignature(
+        body: String,
+        timestamp: Long,
+        path: String,
+    ): String
 
     /**
      * Verify a request signature.
@@ -59,4 +66,7 @@ interface HmacService {
 /**
  * Exception thrown when there is an error generating or verifying HMAC signatures.
  */
-class HmacSignatureException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+class HmacSignatureException(
+    message: String,
+    cause: Throwable? = null,
+) : RuntimeException(message, cause)

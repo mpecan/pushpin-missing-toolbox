@@ -17,7 +17,6 @@ open class HmacSignatureFilter(
     private val properties: HmacProperties,
     private val auditService: AuditService,
 ) : OncePerRequestFilter() {
-
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         // Skip HMAC verification if disabled
         if (!hmacService.isHmacEnabled()) {
@@ -64,13 +63,14 @@ open class HmacSignatureFilter(
         val path = cachedBodyRequest.requestURI
 
         // Verify the signature
-        val isValid = hmacService.verifyRequestSignature(
-            body,
-            timestamp,
-            path,
-            signature,
-            properties.maxAgeMs,
-        )
+        val isValid =
+            hmacService.verifyRequestSignature(
+                body,
+                timestamp,
+                path,
+                signature,
+                properties.maxAgeMs,
+            )
 
         if (!isValid) {
             // Invalid signature, log the event

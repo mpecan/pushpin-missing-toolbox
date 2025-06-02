@@ -16,32 +16,57 @@ interface AuditService {
     /**
      * Log an authentication success event.
      */
-    fun logAuthSuccess(username: String, ipAddress: String, details: String = "")
+    fun logAuthSuccess(
+        username: String,
+        ipAddress: String,
+        details: String = "",
+    )
 
     /**
      * Log an authentication failure event.
      */
-    fun logAuthFailure(username: String, ipAddress: String, details: String = "")
+    fun logAuthFailure(
+        username: String,
+        ipAddress: String,
+        details: String = "",
+    )
 
     /**
      * Log an authorization failure event.
      */
-    fun logAuthorizationFailure(username: String, ipAddress: String, resource: String, permission: String)
+    fun logAuthorizationFailure(
+        username: String,
+        ipAddress: String,
+        resource: String,
+        permission: String,
+    )
 
     /**
      * Log a channel access event.
      */
-    fun logChannelAccess(username: String, ipAddress: String, channelId: String, action: String)
+    fun logChannelAccess(
+        username: String,
+        ipAddress: String,
+        channelId: String,
+        action: String,
+    )
 
     /**
      * Log a rate limit exceeded event.
      */
-    fun logRateLimitExceeded(username: String?, ipAddress: String)
+    fun logRateLimitExceeded(
+        username: String?,
+        ipAddress: String,
+    )
 
     /**
      * Log a security configuration change event.
      */
-    fun logSecurityConfigChange(username: String, ipAddress: String, details: String)
+    fun logSecurityConfigChange(
+        username: String,
+        ipAddress: String,
+        details: String,
+    )
 
     /**
      * Log a remote authorization check event.
@@ -58,7 +83,12 @@ interface AuditService {
     /**
      * Log a remote authorization error event.
      */
-    fun logRemoteAuthorizationError(username: String, ipAddress: String, channelId: String?, error: String)
+    fun logRemoteAuthorizationError(
+        username: String,
+        ipAddress: String,
+        channelId: String?,
+        error: String,
+    )
 
     /**
      * Log a channel list retrieval event.

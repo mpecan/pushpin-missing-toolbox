@@ -11,7 +11,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
 import reactor.test.StepVerifier
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 /**
  * Integration tests for HTTP Streaming functionality.
@@ -56,11 +56,13 @@ class HttpStreamingIntegrationTest : PushpinIntegrationTest() {
         val streamFlux = httpStreamingClient.consumeStream("/api/http-stream/$channel")
 
         // Use StepVerifier to test the HTTP stream
-        val stepVerifier = StepVerifier.create(streamFlux)
-            .expectNextMatches { it.startsWith("Successfully subscribed to channel: $channel") }
-            .expectNext(messageText)
-            .thenCancel()
-            .verifyLater()
+        val stepVerifier =
+            StepVerifier
+                .create(streamFlux)
+                .expectNextMatches { it.startsWith("Successfully subscribed to channel: $channel") }
+                .expectNext(messageText)
+                .thenCancel()
+                .verifyLater()
 
         // Wait a bit to ensure the connection is established
         waitForConnection(1000)
@@ -88,13 +90,15 @@ class HttpStreamingIntegrationTest : PushpinIntegrationTest() {
         val streamFlux = httpStreamingClient.consumeStream("/api/http-stream/$channel")
 
         // Use StepVerifier to test the HTTP stream
-        val stepVerifier = StepVerifier.create(streamFlux)
-            .expectNextMatches { it.startsWith("Successfully subscribed to channel: $channel") }
-            .expectNext(message1)
-            .expectNext(message2)
-            .expectNext(message3)
-            .thenCancel()
-            .verifyLater()
+        val stepVerifier =
+            StepVerifier
+                .create(streamFlux)
+                .expectNextMatches { it.startsWith("Successfully subscribed to channel: $channel") }
+                .expectNext(message1)
+                .expectNext(message2)
+                .expectNext(message3)
+                .thenCancel()
+                .verifyLater()
 
         // Wait a bit to ensure the connection is established
         waitForConnection(1000)

@@ -20,7 +20,6 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider as SdkCred
 
 @ExtendWith(MockitoExtension::class)
 class AutoScalingClientProviderTest {
-
     @Test
     fun `should create AutoScaling client with default settings`() {
         // Arrange
@@ -29,9 +28,10 @@ class AutoScalingClientProviderTest {
         val mockAutoScalingClientBuilder = mock<AutoScalingClientBuilder>()
         val mockAutoScalingClient = mock<AutoScalingClient>()
 
-        val properties = AwsDiscoveryProperties(
-            region = "eu-central-1",
-        )
+        val properties =
+            AwsDiscoveryProperties(
+                region = "eu-central-1",
+            )
 
         // Setup mocks for builder pattern
         whenever(mockCredentialsProvider.getCredentials(any())).thenReturn(mockAwsCredentials)
@@ -68,10 +68,11 @@ class AutoScalingClientProviderTest {
         val mockAutoScalingClient = mock<AutoScalingClient>()
 
         val customEndpoint = "http://localhost:4566"
-        val properties = AwsDiscoveryProperties(
-            region = "eu-central-1",
-            endpoint = customEndpoint,
-        )
+        val properties =
+            AwsDiscoveryProperties(
+                region = "eu-central-1",
+                endpoint = customEndpoint,
+            )
 
         // Setup mocks for builder pattern
         whenever(mockCredentialsProvider.getCredentials(any())).thenReturn(mockAwsCredentials)

@@ -20,7 +20,6 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider as SdkCred
 
 @ExtendWith(MockitoExtension::class)
 class Ec2ClientProviderTest {
-
     @Test
     fun `should create EC2 client with default settings`() {
         // Arrange
@@ -29,9 +28,10 @@ class Ec2ClientProviderTest {
         val mockEc2ClientBuilder = mock<Ec2ClientBuilder>()
         val mockEc2Client = mock<Ec2Client>()
 
-        val properties = AwsDiscoveryProperties(
-            region = "us-west-2",
-        )
+        val properties =
+            AwsDiscoveryProperties(
+                region = "us-west-2",
+            )
 
         // Setup mocks for builder pattern
         whenever(mockCredentialsProvider.getCredentials(any())).thenReturn(mockAwsCredentials)
@@ -68,10 +68,11 @@ class Ec2ClientProviderTest {
         val mockEc2Client = mock<Ec2Client>()
 
         val customEndpoint = "http://localhost:4566"
-        val properties = AwsDiscoveryProperties(
-            region = "us-west-2",
-            endpoint = customEndpoint,
-        )
+        val properties =
+            AwsDiscoveryProperties(
+                region = "us-west-2",
+                endpoint = customEndpoint,
+            )
 
         // Setup mocks for builder pattern
         whenever(mockCredentialsProvider.getCredentials(any())).thenReturn(mockAwsCredentials)

@@ -17,9 +17,7 @@ data class ChannelSubscription(
     /**
      * Get metadata value with type safety.
      */
-    inline fun <reified T> getMetadata(key: String): T? {
-        return metadata[key] as? T
-    }
+    inline fun <reified T> getMetadata(key: String): T? = metadata[key] as? T
 }
 
 /**
@@ -44,7 +42,5 @@ data class ChannelSubscriptions(
     /**
      * Get all allowed channel IDs.
      */
-    fun getAllowedChannels(): List<String> {
-        return subscriptions.filter { it.allowed }.map { it.channelId }
-    }
+    fun getAllowedChannels(): List<String> = subscriptions.filter { it.allowed }.map { it.channelId }
 }

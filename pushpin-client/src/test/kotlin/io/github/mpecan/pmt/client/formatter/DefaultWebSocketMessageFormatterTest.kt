@@ -13,7 +13,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 class DefaultWebSocketMessageFormatterTest {
-
     @Mock
     private lateinit var serializationService: MessageSerializationService
 
@@ -72,8 +71,9 @@ class DefaultWebSocketMessageFormatterTest {
         // Given
         val metadata = mapOf("userId" to "123", "timestamp" to 1625097600000)
         val message = Message.withMeta("test-channel", "Hello, World!", metadata)
-        val serializedMessage = """{"channel":"test-channel","data":"Hello, World!",""" +
-            """"meta":{"userId":"123","timestamp":1625097600000}}"""
+        val serializedMessage =
+            """{"channel":"test-channel","data":"Hello, World!",""" +
+                """"meta":{"userId":"123","timestamp":1625097600000}}"""
         `when`(serializationService.serialize(message)).thenReturn(serializedMessage)
 
         // When

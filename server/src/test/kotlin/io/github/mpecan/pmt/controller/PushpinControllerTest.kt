@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @Import(PushpinControllerTest.TestConfig::class)
 class PushpinControllerTest {
-
     @TestConfiguration
     class TestConfig {
         @Bean
@@ -41,7 +40,8 @@ class PushpinControllerTest {
     fun `getServerById should return 404 when server does not exist`() {
         whenever(pushpinService.getServerById("non-existent")).thenReturn(null)
 
-        mockMvc.perform(get("/api/pushpin/servers/non-existent"))
+        mockMvc
+            .perform(get("/api/pushpin/servers/non-existent"))
             .andExpect(status().isNotFound)
     }
 
@@ -51,7 +51,8 @@ class PushpinControllerTest {
         val server = PushpinServer(serverId, "localhost", 7999, active = true)
         whenever(pushpinService.getServerById(serverId)).thenReturn(server)
 
-        mockMvc.perform(get("/api/pushpin/servers/$serverId"))
+        mockMvc
+            .perform(get("/api/pushpin/servers/$serverId"))
             .andExpect(status().isOk)
     }
 
@@ -61,7 +62,8 @@ class PushpinControllerTest {
         val server2 = PushpinServer("server2", "localhost", 8000, active = true)
         whenever(pushpinHealthChecker.getHealthyServers()).thenReturn(mapOf("server1" to server1, "server2" to server2))
 
-        mockMvc.perform(get("/api/pushpin/servers/healthy"))
+        mockMvc
+            .perform(get("/api/pushpin/servers/healthy"))
             .andExpect(status().isOk)
     }
 }

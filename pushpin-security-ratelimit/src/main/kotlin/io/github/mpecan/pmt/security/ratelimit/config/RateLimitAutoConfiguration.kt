@@ -23,13 +23,13 @@ import org.springframework.context.annotation.Bean
 )
 @EnableConfigurationProperties(RateLimitProperties::class)
 class RateLimitAutoConfiguration {
-
     /**
      * Creates a RateLimitFilter bean if one doesn't already exist.
      */
     @Bean
     @ConditionalOnMissingBean
-    fun rateLimitFilter(properties: RateLimitProperties, auditService: AuditService): RateLimitFilter {
-        return RateLimitFilter(properties, auditService)
-    }
+    fun rateLimitFilter(
+        properties: RateLimitProperties,
+        auditService: AuditService,
+    ): RateLimitFilter = RateLimitFilter(properties, auditService)
 }

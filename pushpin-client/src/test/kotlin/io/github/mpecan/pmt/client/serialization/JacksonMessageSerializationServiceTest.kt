@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class JacksonMessageSerializationServiceTest {
-
     private lateinit var objectMapper: ObjectMapper
     private lateinit var serializationService: JacksonMessageSerializationService
 
@@ -55,12 +54,13 @@ class JacksonMessageSerializationServiceTest {
     @Test
     fun `serialize should convert complex object to JSON string`() {
         // Given
-        val data = mapOf(
-            "name" to "John Doe",
-            "age" to 30,
-            "isActive" to true,
-            "hobbies" to listOf("reading", "coding", "hiking"),
-        )
+        val data =
+            mapOf(
+                "name" to "John Doe",
+                "age" to 30,
+                "isActive" to true,
+                "hobbies" to listOf("reading", "coding", "hiking"),
+            )
 
         // When
         val result = serializationService.serialize(data)

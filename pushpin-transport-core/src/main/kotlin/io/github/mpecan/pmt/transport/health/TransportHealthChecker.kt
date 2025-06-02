@@ -27,13 +27,15 @@ interface TransportHealthChecker {
             return Mono.just(emptyMap())
         }
 
-        val healthChecks = servers.map { server ->
-            checkHealth(server)
-                .map { isHealthy -> server.id to isHealthy }
-                .onErrorReturn(server.id to false)
-        }
+        val healthChecks =
+            servers.map { server ->
+                checkHealth(server)
+                    .map { isHealthy -> server.id to isHealthy }
+                    .onErrorReturn(server.id to false)
+            }
 
-        return Flux.merge(healthChecks)
+        return Flux
+            .merge(healthChecks)
             .collectMap({ it.first }, { it.second })
     }
 

@@ -50,7 +50,10 @@ class DefaultEc2InstancesProvider(
     /**
      * Discovers EC2 instances based on tags.
      */
-    private fun getInstancesFromTags(ec2Client: Ec2Client, properties: AwsDiscoveryProperties): List<Instance> {
+    private fun getInstancesFromTags(
+        ec2Client: Ec2Client,
+        properties: AwsDiscoveryProperties,
+    ): List<Instance> {
         val instances = mutableListOf<Instance>()
 
         try {
@@ -58,9 +61,11 @@ class DefaultEc2InstancesProvider(
             val filters = buildTagFilters(properties)
 
             // Describe EC2 instances with the specified filters
-            val request = DescribeInstancesRequest.builder()
-                .filters(filters)
-                .build()
+            val request =
+                DescribeInstancesRequest
+                    .builder()
+                    .filters(filters)
+                    .build()
 
             var response = ec2Client.describeInstances(request)
             var nextToken = response.nextToken()
@@ -74,12 +79,14 @@ class DefaultEc2InstancesProvider(
 
             // Process additional responses if there's pagination
             while (nextToken != null) {
-                response = ec2Client.describeInstances(
-                    DescribeInstancesRequest.builder()
-                        .filters(filters)
-                        .nextToken(nextToken)
-                        .build(),
-                )
+                response =
+                    ec2Client.describeInstances(
+                        DescribeInstancesRequest
+                            .builder()
+                            .filters(filters)
+                            .nextToken(nextToken)
+                            .build(),
+                    )
 
                 response.reservations().forEach { reservation ->
                     reservation.instances().forEach { instance ->
@@ -112,33 +119,36 @@ class DefaultEc2InstancesProvider(
             logger.debug("Discovering instances from Auto Scaling Groups")
 
             // Get all Auto Scaling Groups or filter by names if specified
-            val request = if (properties.autoScalingGroupNames.isNotEmpty()) {
-                DescribeAutoScalingGroupsRequest.builder()
-                    .autoScalingGroupNames(properties.autoScalingGroupNames)
-                    .build()
-            } else {
-                DescribeAutoScalingGroupsRequest.builder().build()
-            }
+            val request =
+                if (properties.autoScalingGroupNames.isNotEmpty()) {
+                    DescribeAutoScalingGroupsRequest
+                        .builder()
+                        .autoScalingGroupNames(properties.autoScalingGroupNames)
+                        .build()
+                } else {
+                    DescribeAutoScalingGroupsRequest.builder().build()
+                }
 
             // Collect all instance IDs from the Auto Scaling Groups
             val instanceIds = mutableSetOf<String>()
             var nextToken: String? = null
 
             do {
-                val response = if (nextToken != null) {
-                    autoScalingClient.describeAutoScalingGroups(
-                        DescribeAutoScalingGroupsRequest.builder()
-                            .nextToken(nextToken)
-                            .apply {
-                                if (properties.autoScalingGroupNames.isNotEmpty()) {
-                                    autoScalingGroupNames(properties.autoScalingGroupNames)
-                                }
-                            }
-                            .build(),
-                    )
-                } else {
-                    autoScalingClient.describeAutoScalingGroups(request)
-                }
+                val response =
+                    if (nextToken != null) {
+                        autoScalingClient.describeAutoScalingGroups(
+                            DescribeAutoScalingGroupsRequest
+                                .builder()
+                                .nextToken(nextToken)
+                                .apply {
+                                    if (properties.autoScalingGroupNames.isNotEmpty()) {
+                                        autoScalingGroupNames(properties.autoScalingGroupNames)
+                                    }
+                                }.build(),
+                        )
+                    } else {
+                        autoScalingClient.describeAutoScalingGroups(request)
+                    }
 
                 response.autoScalingGroups().forEach { asg ->
                     asg.instances().forEach { instance ->
@@ -155,9 +165,11 @@ class DefaultEc2InstancesProvider(
             if (instanceIds.isNotEmpty()) {
                 // Fetch instance details in batches of 100 (AWS API limit)
                 instanceIds.chunked(100).forEach { chunk ->
-                    val describeRequest = DescribeInstancesRequest.builder()
-                        .instanceIds(chunk)
-                        .build()
+                    val describeRequest =
+                        DescribeInstancesRequest
+                            .builder()
+                            .instanceIds(chunk)
+                            .build()
 
                     val describeResponse = ec2Client.describeInstances(describeRequest)
 
@@ -186,7 +198,8 @@ class DefaultEc2InstancesProvider(
         // Add tag filters
         properties.tags.forEach { (key, value) ->
             filters.add(
-                Filter.builder()
+                Filter
+                    .builder()
                     .name("tag:$key")
                     .values(value)
                     .build(),
@@ -195,7 +208,8 @@ class DefaultEc2InstancesProvider(
 
         // Add filter for running instances
         filters.add(
-            Filter.builder()
+            Filter
+                .builder()
                 .name("instance-state-name")
                 .values("running")
                 .build(),
