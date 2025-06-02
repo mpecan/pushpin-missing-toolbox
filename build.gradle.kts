@@ -1,11 +1,12 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 // Get versions from gradle.properties
 val kotlinVersion: String by project
 val springBootVersion: String by project
-val springDependencyManagementVersion: String by project
 
 plugins {
     kotlin("jvm") version "1.9.25"
@@ -43,7 +44,7 @@ mavenPublishing {
         name = "Pushpin Missing Toolbox"
         description = "A comprehensive toolkit for working with Pushpin reverse proxy, " +
             "providing essential features for real-time web applications"
-        inceptionYear = "2024"
+        inceptionYear = "2025"
         url = "https://github.com/mpecan/pushpin-missing-toolbox"
         licenses {
             license {
@@ -86,7 +87,6 @@ subprojects {
     }
 
     // Get all versions from gradle.properties
-    val jacocoVersion: String by project
     val testcontainersVersion: String by project
     val mockitoKotlinVersion: String by project
     val awsSdkVersion: String by project
@@ -101,8 +101,6 @@ subprojects {
     val micrometerVersion: String by project
     val kotlinxCoroutinesVersion: String by project
     val reactorKotlinExtensionsVersion: String by project
-    val jacksonVersion: String by project
-    val reactorVersion: String by project
     val logbackVersion: String by project
     val httpClientVersion: String by project
     val artemisVersion: String by project
@@ -188,7 +186,7 @@ subprojects {
         jvmToolchain(17)
     }
 
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    configure<KtlintExtension> {
         verbose.set(true)
         android.set(false)
         outputToConsole.set(true)
@@ -337,7 +335,7 @@ tasks.register("testWithCoverage") {
     finalizedBy(jacocoAggregatedReport)
 }
 
-tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
     checkForGradleUpdate = true
     outputFormatter = "json"
     outputDir = "build/reports/dependencyUpdates"
