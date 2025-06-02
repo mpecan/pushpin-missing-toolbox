@@ -552,9 +552,9 @@ For more examples, see [docs/Examples.md](docs/Examples.md).
   - `src/main/kotlin/io/github/mpecan/pmt/controller` - REST controllers
   - `src/main/kotlin/io/github/mpecan/pmt/security` - Security components
   - `src/main/kotlin/io/github/mpecan/pmt/health` - Health check components
-- `discovery/` - Core discovery interfaces and configuration-based implementation
-- `discovery-aws/` - AWS EC2 and Auto Scaling Group discovery module
-- `discovery-kubernetes/` - Kubernetes pod and service discovery module
+- `pushpin-discovery/` - Core discovery interfaces and configuration-based implementation
+- `pushpin-discovery-aws/` - AWS EC2 and Auto Scaling Group discovery module
+- `pushpin-discovery-kubernetes/` - Kubernetes pod and service discovery module
 - `pushpin-api/` - GRIP protocol implementation library
 - `pushpin-client/` - Client library for publishing messages to Pushpin
 

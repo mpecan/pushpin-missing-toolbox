@@ -25,16 +25,6 @@ class HttpTransport(
 ) : PushpinTransport {
     private val logger = LoggerFactory.getLogger(HttpTransport::class.java)
 
-    // For testing purposes
-    private var testServers: List<PushpinServer>? = null
-
-    /**
-     * Sets servers for testing purposes.
-     */
-    fun setServersForTesting(servers: List<PushpinServer>) {
-        this.testServers = servers
-    }
-
     /**
      * Publishes a message to a single Pushpin server via HTTP.
      */
@@ -96,7 +86,7 @@ class HttpTransport(
      * Publishes a message to all active Pushpin servers.
      */
     override fun publish(message: Message): Mono<Boolean> {
-        val servers = testServers ?: discoveryManager?.getAllServers() ?: emptyList()
+        val servers = discoveryManager?.getAllServers() ?: emptyList()
         return publishMessage(servers, message)
     }
 }

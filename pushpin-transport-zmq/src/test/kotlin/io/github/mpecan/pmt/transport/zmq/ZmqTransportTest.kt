@@ -3,6 +3,7 @@ package io.github.mpecan.pmt.transport.zmq
 import io.github.mpecan.pmt.client.model.Message
 import io.github.mpecan.pmt.client.serialization.MessageSerializationService
 import io.github.mpecan.pmt.client.serialization.MessageSerializer
+import io.github.mpecan.pmt.discovery.PushpinDiscoveryManager
 import io.github.mpecan.pmt.model.PushpinMessage
 import io.github.mpecan.pmt.model.PushpinServer
 import org.junit.jupiter.api.BeforeEach
@@ -16,6 +17,7 @@ class ZmqTransportTest {
     private lateinit var zmqTransportProperties: ZmqTransportProperties
     private lateinit var messageSerializer: MessageSerializer
     private lateinit var messageSerializationService: MessageSerializationService
+    private lateinit var discoveryManager: PushpinDiscoveryManager
     private lateinit var zmqTransport: ZmqTransport
 
     @BeforeEach
@@ -30,8 +32,14 @@ class ZmqTransportTest {
         )
         messageSerializer = mock()
         messageSerializationService = mock()
+        discoveryManager = mock()
 
-        zmqTransport = ZmqTransport(zmqTransportProperties, messageSerializer, messageSerializationService)
+        zmqTransport = ZmqTransport(
+            zmqTransportProperties,
+            messageSerializer,
+            messageSerializationService,
+            discoveryManager,
+        )
     }
 
     @Test
@@ -41,7 +49,7 @@ class ZmqTransportTest {
         val pushpinMessage = PushpinMessage("test-channel", formats = emptyMap())
 
         whenever(messageSerializer.serialize(message)).thenReturn(pushpinMessage)
-        zmqTransport.setServersForTesting(emptyList())
+        whenever(discoveryManager.getAllServers()).thenReturn(emptyList())
 
         // When & Then
         StepVerifier.create(zmqTransport.publish(message))
@@ -60,7 +68,7 @@ class ZmqTransportTest {
         whenever(messageSerializationService.serialize(pushpinMessage)).thenReturn(
             "{\"channel\":\"test-channel\",\"formats\":[]}",
         )
-        zmqTransport.setServersForTesting(listOf(server))
+        whenever(discoveryManager.getAllServers()).thenReturn(listOf(server))
 
         // When & Then
         StepVerifier.create(zmqTransport.publish(message))

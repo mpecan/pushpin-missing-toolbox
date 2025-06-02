@@ -1,10 +1,4 @@
-plugins {
-    id("org.springframework.boot")
-    id("maven-publish")
-    id("java-library")
-}
-
-// Group and version are inherited from root project
+// All configuration is inherited from root project
 
 dependencies {
     api(project(":pushpin-api"))
@@ -20,57 +14,4 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation(kotlin("test"))
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
-tasks.bootJar {
-    enabled = false
-}
-
-tasks.jar {
-    enabled = true
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-
-            pom {
-                name.set("Pushpin Client")
-                description.set("A client library for interacting with Pushpin servers")
-                url.set("https://github.com/mpecan/pushpin-missing-toolbox")
-
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                    }
-                }
-
-                developers {
-                    developer {
-                        id.set("mpecan")
-                        name.set("Matjaž Pečan")
-                        email.set("matjaz.pecan@gmail.com")
-                    }
-                }
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/mpecan/pushpin-missing-toolbox")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
 }
