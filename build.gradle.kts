@@ -16,7 +16,7 @@ plugins {
     id("jacoco")
     id("jacoco-report-aggregation")
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0-rc.1"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
     id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
