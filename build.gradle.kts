@@ -214,7 +214,8 @@ subprojects {
     }
 
     // Configure publishing for all modules that start with "pushpin-" or are in the discovery modules
-    if (project.name.startsWith("pushpin-") || project.name.startsWith("discovery")) {
+    if (project.name.startsWith("pushpin-")) {
+        apply(plugin = "com.vanniktech.maven.publish")
         mavenPublishing {
             configure(
                 KotlinJvm(
