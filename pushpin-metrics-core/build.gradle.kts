@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     id("com.vanniktech.maven.publish")
+    id("org.springframework.boot")
 }
 
 // Configure publishing for this module

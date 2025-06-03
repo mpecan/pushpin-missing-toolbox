@@ -176,6 +176,7 @@ subprojects {
 // Configure all subprojects to use JaCoCo
 subprojects {
     apply(plugin = "jacoco")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
 
     tasks.withType<JacocoReport> {
         reports {
