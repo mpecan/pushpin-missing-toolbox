@@ -1,7 +1,4 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinJvm
-import com.vanniktech.maven.publish.SonatypeHost
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -10,15 +7,13 @@ val kotlinVersion: String by project
 val springBootVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.21"
-    kotlin("plugin.spring") version "2.1.21"
+    java
     id("org.springframework.boot") version "3.5.0" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
     id("jacoco-report-aggregation")
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0-rc.1"
     id("com.github.ben-manes.versions") version "0.52.0"
-    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
 // Group and version are defined in gradle.properties
@@ -33,41 +28,7 @@ repositories {
     mavenCentral()
 }
 
-// Configure Maven publishing
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    signAllPublications()
-
-    coordinates("io.github.mpecan", "pushpin-missing-toolbox", version.toString())
-
-    pom {
-        name = "Pushpin Missing Toolbox"
-        description = "A comprehensive toolkit for working with Pushpin reverse proxy, " +
-            "providing essential features for real-time web applications"
-        inceptionYear = "2025"
-        url = "https://github.com/mpecan/pushpin-missing-toolbox"
-        licenses {
-            license {
-                name = "MIT License"
-                url = "https://opensource.org/licenses/MIT"
-                distribution = "https://opensource.org/licenses/MIT"
-            }
-        }
-        developers {
-            developer {
-                id = "mpecan"
-                name = "Pushpin Missing Toolbox Team"
-                url = "https://github.com/mpecan/pushpin-missing-toolbox"
-            }
-        }
-        scm {
-            url = "https://github.com/mpecan/pushpin-missing-toolbox"
-            connection = "scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git"
-            developerConnection = "scm:git:ssh://git@github.com/mpecan/pushpin-missing-toolbox.git"
-        }
-    }
-}
+// Publishing configuration moved to individual modules using configurePushpinPublishing function
 
 // Centralized dependency declarations for all subprojects
 allprojects {
@@ -80,8 +41,6 @@ allprojects {
 subprojects {
     // Apply plugins
     apply {
-        plugin("org.jetbrains.kotlin.jvm")
-        plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("io.spring.dependency-management")
         plugin("org.jlleitschuh.gradle.ktlint")
     }
@@ -182,10 +141,6 @@ subprojects {
         useJUnitPlatform()
     }
 
-    kotlin {
-        jvmToolchain(17)
-    }
-
     configure<KtlintExtension> {
         verbose.set(true)
         android.set(false)
@@ -202,53 +157,17 @@ subprojects {
 
     // Configure library modules (all except server)
     if (name != "server") {
-        // Apply Spring Boot plugin for dependency management
-        apply(plugin = "org.springframework.boot")
-        // Disable bootJar and enable regular jar for libraries
-        tasks.named<BootJar>("bootJar") {
-            enabled = false
-        }
-        tasks.named<Jar>("jar") {
-            enabled = true
-        }
-    }
-
-    // Configure publishing for all modules that have it enabled
-    pluginManager.withPlugin("com.vanniktech.maven.publish") {
-        configure<PublishingExtension> {
-            mavenPublishing {
-                configure(
-                    KotlinJvm(
-                        javadocJar = JavadocJar.Javadoc(),
-                        sourcesJar = true,
-                    ),
-                )
-                coordinates("io.github.mpecan", project.name, version.toString())
-
-                pom {
-                    name = project.name
-                    description = "Pushpin Missing Toolbox - ${project.name}"
-                    url = "https://github.com/mpecan/pushpin-missing-toolbox"
-                    licenses {
-                        license {
-                            name = "MIT License"
-                            url = "https://opensource.org/licenses/MIT"
-                            distribution = "https://opensource.org/licenses/MIT"
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = "mpecan"
-                            name = "Pushpin Missing Toolbox Team"
-                            url = "https://github.com/mpecan/pushpin-missing-toolbox"
-                        }
-                    }
-                    scm {
-                        url = "https://github.com/mpecan/pushpin-missing-toolbox"
-                        connection = "scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git"
-                        developerConnection = "scm:git:ssh://git@github.com/mpecan/pushpin-missing-toolbox.git"
-                    }
-                }
+        afterEvaluate {
+            // Apply Spring Boot plugin for dependency management if not already applied
+            if (!plugins.hasPlugin("org.springframework.boot")) {
+                apply(plugin = "org.springframework.boot")
+            }
+            // Disable bootJar and enable regular jar for libraries
+            tasks.findByName("bootJar")?.let { bootJarTask ->
+                (bootJarTask as BootJar).enabled = false
+            }
+            tasks.findByName("jar")?.let { jarTask ->
+                (jarTask as Jar).enabled = true
             }
         }
     }
@@ -257,6 +176,7 @@ subprojects {
 // Configure all subprojects to use JaCoCo
 subprojects {
     apply(plugin = "jacoco")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
 
     tasks.withType<JacocoReport> {
         reports {

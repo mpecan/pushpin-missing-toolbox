@@ -1,8 +1,14 @@
 plugins {
+    kotlin("jvm")
+    kotlin("plugin.spring")
     id("org.springframework.boot")
 }
 
 // Group and version are inherited from root project
+
+kotlin {
+    jvmToolchain(17)
+}
 
 dependencies {
     implementation(project(":pushpin-api"))

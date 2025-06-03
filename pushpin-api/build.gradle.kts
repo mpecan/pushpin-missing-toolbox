@@ -1,7 +1,16 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-api",
+    moduleDescription =
+        "Core API library for Pushpin integration - provides GRIP protocol implementation, " +
+            "WebSocket event handling, and message formatting for real-time communication",
+)
+
 dependencies {
     testImplementation(kotlin("test"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

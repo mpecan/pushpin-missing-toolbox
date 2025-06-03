@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-security-jwt",
+    moduleDescription =
+        "JWT authentication for Pushpin - supports multiple providers and flexible claim " +
+            "extraction for channel authorization",
+)
 
 dependencies {
     api(project(":pushpin-security-core"))

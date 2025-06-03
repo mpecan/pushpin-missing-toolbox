@@ -1,9 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
 
-description = "Testcontainers support for Pushpin server"
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-testcontainers",
+    moduleDescription =
+        "Testcontainers implementation for Pushpin " +
+            "- enables integration testing with containerized Pushpin instances",
+)
 
 dependencies {
     implementation("org.testcontainers:testcontainers")

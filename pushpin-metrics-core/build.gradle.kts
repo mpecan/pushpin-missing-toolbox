@@ -1,7 +1,16 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
+    id("org.springframework.boot")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-metrics-core",
+    moduleDescription =
+        "Metrics collection library for Pushpin - provides automatic Micrometer integration " +
+            "with fallback to no-op implementation",
+)
 
 dependencies {
     // Spring Boot for autoconfiguration

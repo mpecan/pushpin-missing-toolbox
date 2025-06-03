@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-discovery",
+    moduleDescription =
+        "Service discovery framework for Pushpin servers - provides interfaces and " +
+            "implementations for discovering Pushpin servers in various environments",
+)
 
 dependencies {
     implementation(project(":pushpin-api"))

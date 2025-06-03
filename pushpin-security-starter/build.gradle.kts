@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-security-starter",
+    moduleDescription =
+        "Spring Boot starter for Pushpin security - bundles all security modules with " +
+            "auto-configuration for a complete security solution",
+)
 
 dependencies {
     // Include all security modules
