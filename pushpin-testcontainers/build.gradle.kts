@@ -1,3 +1,6 @@
+plugins {
+    id("com.vanniktech.maven.publish")
+}
 // All configuration is inherited from root project
 
 description = "Testcontainers support for Pushpin server"
