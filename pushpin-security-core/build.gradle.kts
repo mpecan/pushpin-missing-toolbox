@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-security-core",
+    moduleDescription =
+        "Core security interfaces and models for Pushpin applications" +
+            " - provides foundational security abstractions",
+)
 
 dependencies {
     // Core dependencies only - minimal footprint

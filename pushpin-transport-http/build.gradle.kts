@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-transport-http",
+    moduleDescription =
+        "HTTP transport for Pushpin - provides HTTP-based message publishing and health " +
+            "checking for Pushpin servers",
+)
 
 dependencies {
     api(project(":pushpin-api"))

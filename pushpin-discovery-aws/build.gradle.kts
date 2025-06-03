@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-discovery-aws",
+    moduleDescription =
+        "AWS-based service discovery for Pushpin servers - discovers EC2 instances by tags " +
+            "and Auto Scaling Groups",
+)
 
 dependencies {
     implementation(project(":pushpin-api"))

@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-security-audit",
+    moduleDescription =
+        "Audit logging for Pushpin security events - tracks authentication, authorization, " +
+            "and administrative actions",
+)
 
 dependencies {
     implementation(project(":pushpin-security-core"))

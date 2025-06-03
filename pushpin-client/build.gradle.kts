@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-client",
+    moduleDescription =
+        "Spring Boot client library for Pushpin - provides message serialization, " +
+            "transport abstraction, and auto-configuration for WebSocket, HTTP Streaming, SSE, and long polling",
+)
 
 dependencies {
     api(project(":pushpin-api"))

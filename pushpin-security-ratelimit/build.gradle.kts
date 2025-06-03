@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-security-ratelimit",
+    moduleDescription =
+        "Rate limiting for Pushpin - implements token bucket algorithm to protect against " +
+            "abuse and ensure fair resource usage",
+)
 
 dependencies {
     // Dependencies from other modules

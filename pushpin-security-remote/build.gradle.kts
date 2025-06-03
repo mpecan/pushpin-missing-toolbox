@@ -1,7 +1,15 @@
 plugins {
+    kotlin("jvm")
     id("com.vanniktech.maven.publish")
 }
-// All configuration is inherited from root project
+
+// Configure publishing for this module
+configurePushpinPublishing(
+    moduleName = "pushpin-security-remote",
+    moduleDescription =
+        "Remote authorization for Pushpin - integrates with external authorization services " +
+            "for channel access control",
+)
 
 dependencies {
     implementation(project(":pushpin-security-core"))
