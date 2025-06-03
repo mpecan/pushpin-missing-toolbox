@@ -3,6 +3,7 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 // Get versions from gradle.properties
 val kotlinVersion: String by project
@@ -83,7 +84,6 @@ subprojects {
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("io.spring.dependency-management")
         plugin("org.jlleitschuh.gradle.ktlint")
-        plugin("com.vanniktech.maven.publish")
     }
 
     // Get all versions from gradle.properties
@@ -201,11 +201,11 @@ subprojects {
     }
 
     // Configure library modules (all except server)
-    if (project.name != "server") {
+    if (name != "server") {
         // Apply Spring Boot plugin for dependency management
         apply(plugin = "org.springframework.boot")
         // Disable bootJar and enable regular jar for libraries
-        tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+        tasks.named<BootJar>("bootJar") {
             enabled = false
         }
         tasks.named<Jar>("jar") {
@@ -213,40 +213,41 @@ subprojects {
         }
     }
 
-    // Configure publishing for all modules that start with "pushpin-" or are in the discovery modules
-    if (project.name.startsWith("pushpin-")) {
-        apply(plugin = "com.vanniktech.maven.publish")
-        mavenPublishing {
-            configure(
-                KotlinJvm(
-                    javadocJar = JavadocJar.Javadoc(),
-                    sourcesJar = true,
-                ),
-            )
-            coordinates("io.github.mpecan", project.name, version.toString())
+    // Configure publishing for all modules that have it enabled
+    pluginManager.withPlugin("com.vanniktech.maven.publish") {
+        configure<PublishingExtension> {
+            mavenPublishing {
+                configure(
+                    KotlinJvm(
+                        javadocJar = JavadocJar.Javadoc(),
+                        sourcesJar = true,
+                    ),
+                )
+                coordinates("io.github.mpecan", project.name, version.toString())
 
-            pom {
-                name = project.name
-                description = "Pushpin Missing Toolbox - ${project.name}"
-                url = "https://github.com/mpecan/pushpin-missing-toolbox"
-                licenses {
-                    license {
-                        name = "MIT License"
-                        url = "https://opensource.org/licenses/MIT"
-                        distribution = "https://opensource.org/licenses/MIT"
-                    }
-                }
-                developers {
-                    developer {
-                        id = "mpecan"
-                        name = "Pushpin Missing Toolbox Team"
-                        url = "https://github.com/mpecan/pushpin-missing-toolbox"
-                    }
-                }
-                scm {
+                pom {
+                    name = project.name
+                    description = "Pushpin Missing Toolbox - ${project.name}"
                     url = "https://github.com/mpecan/pushpin-missing-toolbox"
-                    connection = "scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git"
-                    developerConnection = "scm:git:ssh://git@github.com/mpecan/pushpin-missing-toolbox.git"
+                    licenses {
+                        license {
+                            name = "MIT License"
+                            url = "https://opensource.org/licenses/MIT"
+                            distribution = "https://opensource.org/licenses/MIT"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "mpecan"
+                            name = "Pushpin Missing Toolbox Team"
+                            url = "https://github.com/mpecan/pushpin-missing-toolbox"
+                        }
+                    }
+                    scm {
+                        url = "https://github.com/mpecan/pushpin-missing-toolbox"
+                        connection = "scm:git:git://github.com/mpecan/pushpin-missing-toolbox.git"
+                        developerConnection = "scm:git:ssh://git@github.com/mpecan/pushpin-missing-toolbox.git"
+                    }
                 }
             }
         }

@@ -1,5 +1,7 @@
+plugins {
+    id("com.vanniktech.maven.publish")
+}
 // All configuration is inherited from root project
-
 dependencies {
     testImplementation(kotlin("test"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
