@@ -14,6 +14,7 @@ plugins {
     id("jacoco-report-aggregation")
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0-rc.1"
     id("com.github.ben-manes.versions") version "0.52.0"
+    id("org.sonarqube") version "6.2.0.5505"
 }
 
 // Group and version are defined in gradle.properties
@@ -255,6 +256,14 @@ tasks.register("testWithCoverage") {
     // Make the jacocoAggregatedReport task depend on this task
     // This avoids circular dependency issues
     finalizedBy(jacocoAggregatedReport)
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "mpecan_pushpin-missing-toolbox")
+        property("sonar.organization", "mpecan")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
