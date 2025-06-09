@@ -43,11 +43,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
 
-    // For symmetric key token generation in the AuthController (development/testing only)
-    implementation("io.jsonwebtoken:jjwt-api")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson")
-
     // JsonPath for JWT claim extraction
     implementation("com.jayway.jsonpath:json-path")
 
@@ -57,6 +52,11 @@ dependencies {
     // Micrometer for metrics
     implementation("io.micrometer:micrometer-core")
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // For symmetric key token generation in the AuthController (development/testing only)
+    implementation("io.jsonwebtoken:jjwt-api")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

@@ -14,6 +14,7 @@ plugins {
     id("jacoco-report-aggregation")
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0-rc.1"
     id("com.github.ben-manes.versions") version "0.52.0"
+    id("org.sonarqube") version "6.2.0.5505"
 }
 
 // Group and version are defined in gradle.properties
@@ -183,69 +184,17 @@ subprojects {
         tasks.withType<JacocoReport> {
             executionData(testTask.extensions.getByType<JacocoTaskExtension>().destinationFile!!)
             dependsOn(testTask)
+            testTask.finalizedBy(this)
         }
     }
 }
 
-// Aggregate JaCoCo reports from all subprojects
-val jacocoAggregatedReport by tasks.registering(JacocoReport::class) {
-    group = "verification"
-    description = "Generates aggregated JaCoCo coverage report from all subprojects"
-
-    val allExecutionData = project.objects.fileCollection()
-    val allSourceSets = project.objects.fileCollection()
-    val allClassDirs = project.objects.fileCollection()
-
-    // Collect all the data from subprojects
-    subprojects {
-        val subproject = this
-
-        // Only include projects that have applied the JaCoCo plugin
-        plugins.withId("jacoco") {
-            tasks.withType<Test> {
-                val testTask = this
-
-                // Include execution data from the test task if it exists
-                testTask.extensions.findByType<JacocoTaskExtension>()?.destinationFile?.let { file ->
-                    if (file.exists()) {
-                        allExecutionData.from(file)
-                    }
-                }
-            }
-
-            // Include all source directories
-            subproject.extensions.findByType(SourceSetContainer::class.java)?.let { sourceSets ->
-                allSourceSets.from(sourceSets["main"].allSource.srcDirs)
-                // Include all class directories
-                allClassDirs.from(sourceSets["main"].output.classesDirs)
-            }
-        }
+sonar {
+    properties {
+        property("sonar.projectKey", "mpecan_pushpin-missing-toolbox")
+        property("sonar.organization", "mpecan")
+        property("sonar.host.url", "https://sonarcloud.io")
     }
-
-    // Configure the report
-    executionData.from(allExecutionData)
-    sourceDirectories.from(allSourceSets)
-    classDirectories.from(allClassDirs)
-
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        csv.required.set(false)
-    }
-}
-
-// Add a task to run all tests and the aggregated report
-tasks.register("testWithCoverage") {
-    group = "verification"
-    description = "Runs all tests and generates an aggregated coverage report"
-
-    // First, run all tests
-    val testTasks = subprojects.flatMap { it.tasks.withType<Test>() }
-    dependsOn(testTasks)
-
-    // Make the jacocoAggregatedReport task depend on this task
-    // This avoids circular dependency issues
-    finalizedBy(jacocoAggregatedReport)
 }
 
 tasks.named<DependencyUpdatesTask>("dependencyUpdates") {

@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/mpecan/pushpin-missing-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/mpecan/pushpin-missing-toolbox/actions/workflows/ci.yml)
 [![Maven Central Version](https://img.shields.io/maven-central/v/io.github.mpecan/pushpin-api)](https://search.maven.org/artifact/io.github.mpecan/pushpin-api)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mpecan_pushpin-missing-toolbox&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mpecan_pushpin-missing-toolbox)
 
 A project to make Pushpin easier to use in the Java ecosystem.
 1. A Spring Boot application that simplifies managing multiple [Pushpin](https://pushpin.org/) servers for scalable realtime web applications. It provides load balancing, health monitoring, and a unified API for publishing messages across your Pushpin infrastructure.
