@@ -17,6 +17,10 @@ class MicrometerMetricsService(
     // Connection gauges by transport type
     private val activeConnections = ConcurrentHashMap<String, AtomicLong>()
 
+    companion object {
+        private const val DURATION_OF_OPERATIONS_DESC = "Duration of operations"
+    }
+
     override fun recordMessageSent(
         server: String,
         transport: String,
@@ -69,7 +73,7 @@ class MicrometerMetricsService(
         val timerBuilder =
             Timer
                 .builder(MetricNames.OPERATION_DURATION)
-                .description("Duration of operations")
+                .description(DURATION_OF_OPERATIONS_DESC)
                 .tag(MetricTags.OPERATION, operation)
 
         if (server != null) {
@@ -89,7 +93,7 @@ class MicrometerMetricsService(
         val timerBuilder =
             Timer
                 .builder(MetricNames.OPERATION_DURATION)
-                .description("Duration of operations")
+                .description(DURATION_OF_OPERATIONS_DESC)
                 .tag(MetricTags.OPERATION, operation)
 
         if (server != null) {
@@ -215,7 +219,7 @@ class MicrometerMetricsService(
             val timerBuilder =
                 Timer
                     .builder(MetricNames.OPERATION_DURATION)
-                    .description("Duration of operations")
+                    .description(DURATION_OF_OPERATIONS_DESC)
                     .tag(MetricTags.OPERATION, operation)
 
             if (server != null) {

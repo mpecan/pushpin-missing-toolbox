@@ -19,55 +19,76 @@ object WebSocketEventParser {
         var index = 0
 
         while (index < body.length) {
-            // Find the event type and size
-            val lineEnd = body.indexOf("\r\n", index)
-            if (lineEnd == -1) break
+            val parsedLine = parseEventLine(body, index) ?: break
 
-            val line = body.substring(index, lineEnd)
-            val parts = line.split(" ", limit = 2)
-
-            val eventTypeStr = parts[0]
-            val eventType = WebSocketEventType.fromString(eventTypeStr)
+            val eventType = parseEventType(parsedLine.eventTypeStr)
             if (eventType == null) {
-                // Skip to the next line if we encounter an unknown event type
-                index = lineEnd + 2
+                index = parsedLine.nextIndex
                 continue
             }
 
-            val contentSize =
-                if (parts.size > 1) {
-                    try {
-                        parts[1].toInt(16)
-                    } catch (e: NumberFormatException) {
-                        // Invalid size, skip this event
-                        break
-                    }
-                } else {
-                    0
-                }
+            val contentSize = parseContentSize(parsedLine.parts)
+            if (contentSize == -1) break
 
-            index = lineEnd + 2 // Skip \r\n
+            val contentResult = extractContent(body, parsedLine.nextIndex, contentSize)
+            if (contentResult == null) break
 
-            // Extract content if present
-            val content =
-                if (contentSize > 0) {
-                    val contentEnd = index + contentSize
-                    if (contentEnd <= body.length) {
-                        val contentStr = body.substring(index, contentEnd)
-                        index = contentEnd + 2 // Skip \r\n after content
-                        contentStr
-                    } else {
-                        // Malformed event, skip it
-                        break
-                    }
-                } else {
-                    ""
-                }
-
-            events.add(WebSocketEvent(eventType, content))
+            events.add(WebSocketEvent(eventType, contentResult.content))
+            index = contentResult.nextIndex
         }
 
         return events
+    }
+
+    private data class ParsedLine(
+        val eventTypeStr: String,
+        val parts: List<String>,
+        val nextIndex: Int,
+    )
+
+    private data class ContentResult(
+        val content: String,
+        val nextIndex: Int,
+    )
+
+    private fun parseEventLine(
+        body: String,
+        startIndex: Int,
+    ): ParsedLine? {
+        val lineEnd = body.indexOf("\r\n", startIndex)
+        if (lineEnd == -1) return null
+
+        val line = body.substring(startIndex, lineEnd)
+        val parts = line.split(" ", limit = 2)
+        return ParsedLine(parts[0], parts, lineEnd + 2)
+    }
+
+    private fun parseEventType(eventTypeStr: String): WebSocketEventType? = WebSocketEventType.fromString(eventTypeStr)
+
+    private fun parseContentSize(parts: List<String>): Int {
+        if (parts.size <= 1) return 0
+
+        return try {
+            parts[1].toInt(16)
+        } catch (e: NumberFormatException) {
+            -1
+        }
+    }
+
+    private fun extractContent(
+        body: String,
+        startIndex: Int,
+        contentSize: Int,
+    ): ContentResult? {
+        if (contentSize == 0) {
+            return ContentResult("", startIndex)
+        }
+
+        val contentEnd = startIndex + contentSize
+        if (contentEnd > body.length) return null
+
+        val content = body.substring(startIndex, contentEnd)
+        return ContentResult(content, contentEnd + 2)
     }
 
     /**

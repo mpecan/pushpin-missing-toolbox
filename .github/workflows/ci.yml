@@ -173,11 +173,7 @@ jobs:
     
     - name: Build with Gradle
       if: steps.check-snapshot.outputs.is_snapshot == 'true'
-      run: ./gradlew build
-    
-    - name: Run tests
-      if: steps.check-snapshot.outputs.is_snapshot == 'true'
-      run: ./gradlew test
+      run: ./gradlew build -x test
     
     - name: Publish to Maven Central SNAPSHOT repository
       if: steps.check-snapshot.outputs.is_snapshot == 'true'

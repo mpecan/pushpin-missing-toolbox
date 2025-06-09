@@ -130,6 +130,7 @@ object GripApi {
      */
     fun extractMetaHeaders(headers: HttpHeaders): Map<String, String> =
         headers.entries
+            .asSequence()
             .filter { (key, _) -> key.startsWith(GripConstants.HEADER_META_PREFIX, ignoreCase = true) }
             .associate { (key, values) ->
                 key.removePrefix(GripConstants.HEADER_META_PREFIX) to (values.firstOrNull() ?: "")

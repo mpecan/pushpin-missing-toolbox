@@ -24,6 +24,10 @@ class HttpRemoteSubscriptionClient(
 ) : RemoteAuthorizationClient {
     private val logger = LoggerFactory.getLogger(HttpRemoteSubscriptionClient::class.java)
 
+    companion object {
+        private const val UNKNOWN_ERROR_MESSAGE = "Unknown error"
+    }
+
     override fun canSubscribe(
         request: HttpServletRequest,
         channelId: String,
@@ -89,7 +93,7 @@ class HttpRemoteSubscriptionClient(
                 username = userId,
                 ipAddress = request.remoteAddr,
                 channelId = channelId,
-                error = "${e.javaClass.simpleName}: ${e.message ?: "Unknown error"}",
+                error = "${e.javaClass.simpleName}: ${e.message ?: UNKNOWN_ERROR_MESSAGE}",
             )
             return false
         }
@@ -150,7 +154,9 @@ class HttpRemoteSubscriptionClient(
                 username = userId,
                 ipAddress = request.remoteAddr,
                 channelId = null,
-                error = "Channel list retrieval failed - ${e.javaClass.simpleName}: ${e.message ?: "Unknown error"}",
+                error =
+                    "Channel list retrieval failed - " +
+                        "${e.javaClass.simpleName}: ${e.message ?: UNKNOWN_ERROR_MESSAGE}",
             )
             return emptyList()
         }
@@ -223,7 +229,7 @@ class HttpRemoteSubscriptionClient(
                 channelId = null,
                 error =
                     "Channel list by pattern failed - ${e.javaClass.simpleName}: " +
-                        "${e.message ?: "Unknown error"} (pattern: $pattern)",
+                        "${e.message ?: UNKNOWN_ERROR_MESSAGE} (pattern: $pattern)",
             )
             return emptyList()
         }

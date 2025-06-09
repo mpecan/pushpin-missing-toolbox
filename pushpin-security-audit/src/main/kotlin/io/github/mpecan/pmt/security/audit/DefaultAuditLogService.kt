@@ -41,13 +41,25 @@ class DefaultAuditLogService(
         }
 
         val message = formatEvent(event)
+        val sanitizedMessage = sanitizeLogMessage(message)
 
         when (properties.level.uppercase()) {
-            "DEBUG" -> logger.debug(message)
-            "WARN" -> logger.warn(message)
-            "ERROR" -> logger.error(message)
-            else -> logger.info(message)
+            "DEBUG" -> logger.debug(sanitizedMessage)
+            "WARN" -> logger.warn(sanitizedMessage)
+            "ERROR" -> logger.error(sanitizedMessage)
+            else -> logger.info(sanitizedMessage)
         }
+    }
+
+    /**
+     * Sanitize log message to prevent log injection attacks.
+     */
+    private fun sanitizeLogMessage(message: String): String {
+        return message
+            .replace("\r", "")
+            .replace("\n", " ")
+            .replace("\t", " ")
+            .take(1000) // Limit message length
     }
 
     /**
