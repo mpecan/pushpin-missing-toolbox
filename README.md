@@ -1,5 +1,8 @@
 # Pushpin Missing Toolbox
 
+[![CI](https://github.com/mpecan/pushpin-missing-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/mpecan/pushpin-missing-toolbox/actions/workflows/ci.yml)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.mpecan/pushpin-api)](https://search.maven.org/artifact/io.github.mpecan/pushpin-api)
+
 A project to make Pushpin easier to use in the Java ecosystem.
 1. A Spring Boot application that simplifies managing multiple [Pushpin](https://pushpin.org/) servers for scalable realtime web applications. It provides load balancing, health monitoring, and a unified API for publishing messages across your Pushpin infrastructure.
 2. A collection of Spring Boot modules that allow you to assemble a Pushpin server management layer. **[Learn more about the libraries →](README-LIBRARIES.md)**
@@ -140,6 +143,77 @@ All of this can also be easily accomplished directly within your application cod
 - **Horizontal Scaling** - Add more Pushpin servers as needed
 - **Unified API** - Single endpoint for all publishing needs
 - **Service Discovery** - Automatically find Pushpin servers in AWS/Kubernetes
+
+## Including the Libraries
+
+The Pushpin Missing Toolbox libraries are published to Maven Central. You can include them in your project using the following dependencies:
+
+### Latest Version: 0.0.1-SNAPSHOT
+
+### Gradle (Kotlin DSL)
+
+```kotlin
+dependencies {
+    // Core API for GRIP protocol
+    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
+    
+    // Client library for publishing messages
+    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
+    
+    // HTTP transport (most common)
+    implementation("io.github.mpecan:pushpin-transport-http:0.0.1-SNAPSHOT")
+    
+    // Add other modules as needed
+}
+```
+
+### Gradle (Groovy)
+
+```groovy
+dependencies {
+    // Core API for GRIP protocol
+    implementation 'io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT'
+    
+    // Client library for publishing messages
+    implementation 'io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT'
+    
+    // HTTP transport (most common)
+    implementation 'io.github.mpecan:pushpin-transport-http:0.0.1-SNAPSHOT'
+    
+    // Add other modules as needed
+}
+```
+
+### Maven
+
+```xml
+<dependencies>
+    <!-- Core API for GRIP protocol -->
+    <dependency>
+        <groupId>io.github.mpecan</groupId>
+        <artifactId>pushpin-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- Client library for publishing messages -->
+    <dependency>
+        <groupId>io.github.mpecan</groupId>
+        <artifactId>pushpin-client</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- HTTP transport (most common) -->
+    <dependency>
+        <groupId>io.github.mpecan</groupId>
+        <artifactId>pushpin-transport-http</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- Add other modules as needed -->
+</dependencies>
+```
+
+For a complete list of available modules and their use cases, see the [Library Documentation](README-LIBRARIES.md).
 
 ## Quick Start (2 Minutes)
 
