@@ -88,23 +88,28 @@ jobs:
         VERSION_WITHOUT_SNAPSHOT=${VERSION%-SNAPSHOT}
         echo "version=$VERSION_WITHOUT_SNAPSHOT" >> $GITHUB_OUTPUT
     
-    - name: Update README.md
+    - name: Update README files with new version
       run: |
-        VERSION="${{ steps.extract-version.outputs.version }}"
-        sed -i "s/implementation(\"io\.github\.mpecan:pushpin-[^:]*:[^\"]*\")/implementation(\"io.github.mpecan:pushpin-api:$VERSION\")/g" README.md
-        sed -i "s/implementation(\"io\.github\.mpecan:pushpin-[^:]*:[^\"]*\")/implementation(\"io.github.mpecan:pushpin-client:$VERSION\")/g" README.md
+        chmod +x scripts/update-readme-version.sh
+        ./scripts/update-readme-version.sh "${{ steps.extract-version.outputs.version }}"
     
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ steps.generate-token.outputs.token }}
-        commit-message: "docs: update README.md with version ${{ steps.extract-version.outputs.version }}"
-        title: "docs: update README.md with version ${{ steps.extract-version.outputs.version }}"
+        commit-message: "docs: update README files with version ${{ steps.extract-version.outputs.version }}"
+        title: "docs: update README files with version ${{ steps.extract-version.outputs.version }}"
         body: |
-          Updates README.md with the latest version ${{ steps.extract-version.outputs.version }}.
+          Updates README.md and README-LIBRARIES.md with the latest version ${{ steps.extract-version.outputs.version }}.
+          
+          This PR updates:
+          - Version headers in both README files
+          - All dependency examples (Gradle Kotlin DSL, Gradle Groovy, Maven)
+          - All module references to use the new version
           
           This is an automated pull request created after a successful release.
         branch: docs/update-readme-${{ steps.extract-version.outputs.version }}
+        base: main
 
   build-docker:
     needs: [publish]

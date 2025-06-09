@@ -12,6 +12,10 @@
           "type": "generic",
           "path": "gradle.properties"
         }
+      ],
+      "exclude-paths": [
+        "README.md",
+        "README-LIBRARIES.md"
       ]
     }
   }

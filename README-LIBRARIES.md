@@ -228,17 +228,48 @@ Core metrics collection and reporting for Pushpin servers.
 
 ## How to Use the Libraries
 
+### Latest Version: 0.0.1-SNAPSHOT
+
 ### Basic Usage
 
 To use any of the libraries, add the appropriate dependency to your project:
 
+#### Gradle (Kotlin DSL)
+
 ```kotlin
-// Gradle Kotlin DSL
 dependencies {
     implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
     implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
     // Add other modules as needed
 }
+```
+
+#### Gradle (Groovy)
+
+```groovy
+dependencies {
+    implementation 'io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT'
+    implementation 'io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT'
+    // Add other modules as needed
+}
+```
+
+#### Maven
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.github.mpecan</groupId>
+        <artifactId>pushpin-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>io.github.mpecan</groupId>
+        <artifactId>pushpin-client</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <!-- Add other modules as needed -->
+</dependencies>
 ```
 
 ### Spring Boot Integration
