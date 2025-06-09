@@ -672,6 +672,16 @@ docker-compose up -d
 
 Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
+## Development Tools
+
+This project uses [Claude Code](https://claude.ai/code) to assist with development. Claude Code is an AI-powered coding assistant that helps with:
+- Code generation and refactoring
+- Test writing and documentation
+- Bug fixing and code reviews
+- Dependency updates and maintenance tasks
+
+We believe in transparency about our development process and tools. While Claude Code assists in development, all code is reviewed and tested by human maintainers before being merged.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
