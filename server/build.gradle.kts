@@ -63,7 +63,6 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.apache.commons:commons-compress")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("javax.servlet:javax.servlet-api")
     testImplementation("org.mockito.kotlin:mockito-kotlin")

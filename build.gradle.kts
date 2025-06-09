@@ -49,7 +49,6 @@ subprojects {
     val testcontainersVersion: String by project
     val mockitoKotlinVersion: String by project
     val awsSdkVersion: String by project
-    val commonsCompressVersion: String by project
     val servletApiVersion: String by project
     val kubernetesClientVersion: String by project
     val jjwtVersion: String by project
@@ -61,10 +60,7 @@ subprojects {
     val kotlinxCoroutinesVersion: String by project
     val reactorKotlinExtensionsVersion: String by project
     val logbackVersion: String by project
-    val httpClientVersion: String by project
-    val artemisVersion: String by project
     val tomcatVersion: String by project
-    val okioVersion: String by project
 
     // Apply dependency management
     dependencyManagement {
@@ -88,7 +84,6 @@ subprojects {
 
             // Test dependencies
             dependency("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
-            dependency("org.apache.commons:commons-compress:$commonsCompressVersion")
             dependency("javax.servlet:javax.servlet-api:$servletApiVersion")
 
             // AWS SDK dependencies
@@ -119,13 +114,9 @@ subprojects {
             // Override vulnerable versions
             dependency("ch.qos.logback:logback-classic:$logbackVersion")
             dependency("ch.qos.logback:logback-core:$logbackVersion")
-            dependency("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
-            dependency("org.apache.activemq:artemis-project:$artemisVersion")
             dependency("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
             dependency("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
             dependency("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
-            dependency("com.squareup.okio:okio:$okioVersion")
-            dependency("com.squareup.okio:okio-jvm:$okioVersion")
         }
     }
 
