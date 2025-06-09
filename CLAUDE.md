@@ -8,6 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run single test: `./gradlew test --tests io.github.mpecan.pmt.controller.PushpinControllerTest`
 - Run application: `./gradlew bootRun`
 
+## Commit style
+- Conventional commits for all commits with an optional context
+- All PRs should also follow conventional commits
+
 ## Code Style
 - Kotlin with Spring Boot
 - Java 17 toolchain

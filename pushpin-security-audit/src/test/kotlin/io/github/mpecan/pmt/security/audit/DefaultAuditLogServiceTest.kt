@@ -229,4 +229,31 @@ class DefaultAuditLogServiceTest {
         assertTrue(!message.contains("User: null"))
         assertTrue(message.contains("IP: 192.168.1.1"))
     }
+
+    @Test
+    fun `should log remote authorization check`() {
+        auditService.logRemoteAuthorizationCheck("testuser", "192.168.1.1", "channel1", true, "remote")
+
+        val logEvents = listAppender.list
+        assertEquals(1, logEvents.size)
+        assertTrue(logEvents[0].message.contains("AUTHORIZATION_FAILURE"))
+    }
+
+    @Test
+    fun `should log remote authorization error`() {
+        auditService.logRemoteAuthorizationError("testuser", "192.168.1.1", "channel1", "Error occurred")
+
+        val logEvents = listAppender.list
+        assertEquals(1, logEvents.size)
+        assertTrue(logEvents[0].message.contains("AUTHORIZATION_FAILURE"))
+    }
+
+    @Test
+    fun `should log channel list retrieval`() {
+        auditService.logChannelListRetrieval("testuser", "192.168.1.1", 5, "remote")
+
+        val logEvents = listAppender.list
+        assertEquals(1, logEvents.size)
+        assertTrue(logEvents[0].message.contains("CHANNEL_ACCESS"))
+    }
 }
