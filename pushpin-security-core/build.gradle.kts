@@ -35,6 +35,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito.kotlin:mockito-kotlin")
     testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework.security:spring-security-oauth2-jose")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

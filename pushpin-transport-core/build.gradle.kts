@@ -16,4 +16,11 @@ dependencies {
     api(project(":pushpin-client"))
     api(project(":pushpin-discovery"))
     implementation("org.springframework:spring-webflux")
+
+    // Testing
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
+    testImplementation("io.projectreactor:reactor-test")
+    testImplementation(kotlin("test"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
