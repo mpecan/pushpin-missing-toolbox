@@ -29,6 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use primary constructors with default values for dependencies where appropriate
 - For external services (like AWS), inject clients or factories to allow mocking in tests
 - For testing, use mockito-kotlin library with constructor injection instead of subclassing
+- Dependencies have to be grouped by target (i.e. `implementation` together etc.)
 
 ## Testing
 - JUnit 5 with Spring Boot Test

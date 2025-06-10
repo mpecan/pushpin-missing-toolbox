@@ -43,6 +43,8 @@ import org.springframework.http.ResponseEntity
  */
 @Suppress("unused")
 object GripApi {
+    private const val META_PREFIX_LENGTH = GripConstants.HEADER_META_PREFIX.length
+
     /**
      * Creates a new GRIP header builder.
      */
@@ -133,7 +135,8 @@ object GripApi {
             .asSequence()
             .filter { (key, _) -> key.startsWith(GripConstants.HEADER_META_PREFIX, ignoreCase = true) }
             .associate { (key, values) ->
-                key.removePrefix(GripConstants.HEADER_META_PREFIX) to (values.firstOrNull() ?: "")
+                // Remove the "Meta-" prefix case-insensitively
+                key.substring(META_PREFIX_LENGTH) to (values.firstOrNull() ?: "")
             }
 
     /**
@@ -142,6 +145,7 @@ object GripApi {
      * @param metaHeaders The meta headers to apply
      * @return The response builder with meta headers applied
      */
+    @Suppress("UastIncorrectHttpHeaderInspection", "InjectedReferences")
     fun applyMetaHeaders(
         builder: ResponseEntity.BodyBuilder,
         metaHeaders: Map<String, String>,

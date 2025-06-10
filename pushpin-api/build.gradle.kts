@@ -21,4 +21,5 @@ dependencies {
 
     // Spring framework for ResponseEntity
     compileOnly("org.springframework:spring-web")
+    testImplementation("org.springframework:spring-web")
 }
