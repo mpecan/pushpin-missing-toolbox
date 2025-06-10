@@ -130,6 +130,7 @@ object GripApi {
      * * @param headers The request headers
      * @return Map of meta headers without the "Meta-" prefix
      */
+    @Suppress("kotlin:S6524")
     fun extractMetaHeaders(headers: HttpHeaders): Map<String, String> =
         headers.entries
             .asSequence()

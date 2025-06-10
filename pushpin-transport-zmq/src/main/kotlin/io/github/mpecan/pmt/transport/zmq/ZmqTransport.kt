@@ -201,7 +201,7 @@ class ZmqTransport(
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
                 executor.shutdownNow()
             }
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             executor.shutdownNow()
             Thread.currentThread().interrupt()
         }
@@ -236,7 +236,7 @@ class ZmqTransport(
      * Publishes a message to all active Pushpin servers.
      */
     override fun publish(message: Message): Mono<Boolean> {
-        val servers = discoveryManager?.getAllServers() ?: emptyList()
+        val servers = discoveryManager.getAllServers()
         return publishToServers(servers, message)
     }
 }

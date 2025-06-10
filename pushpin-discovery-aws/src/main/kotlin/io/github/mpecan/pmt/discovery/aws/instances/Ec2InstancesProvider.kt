@@ -6,7 +6,7 @@ import software.amazon.awssdk.services.ec2.model.Instance
 /**
  * Interface for providing EC2 instances.
  */
-interface Ec2InstancesProvider {
+fun interface Ec2InstancesProvider {
     /**
      * Returns a list of EC2 instances based on the provided properties.
      */

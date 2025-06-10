@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 /**
  * Interface for providing Kubernetes pods.
  */
-interface KubernetesPodProvider {
+fun interface KubernetesPodProvider {
     /**
      * Get Kubernetes pods based on the provided properties.
      *
@@ -109,7 +109,7 @@ class DefaultKubernetesPodProvider(
             // Extract the selector from the service
             val selector = service.spec?.selector
 
-            if (selector != null && selector.isNotEmpty()) {
+            if (!selector.isNullOrEmpty()) {
                 // Convert selector map to label selector string
                 val labelSelector = selector.entries.joinToString(",") { "${it.key}=${it.value}" }
 

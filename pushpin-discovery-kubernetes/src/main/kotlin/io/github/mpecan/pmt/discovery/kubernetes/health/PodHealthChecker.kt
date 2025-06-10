@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 /**
  * Interface for checking the health of Kubernetes pods.
  */
-interface PodHealthChecker {
+fun interface PodHealthChecker {
     /**
      * Check if a Kubernetes pod is healthy.
      *

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 /**
  * Interface for serializing message data to string.
  */
-interface MessageSerializationService {
+fun interface MessageSerializationService {
     /**
      * Serializes data to string.
      *
@@ -20,7 +20,7 @@ interface MessageSerializationService {
  * Implementation of MessageSerializationService using Jackson ObjectMapper.
  */
 class JacksonMessageSerializationService(
-    private val objectMapper: ObjectMapper,
+    objectMapper: ObjectMapper,
 ) : MessageSerializationService {
     // Create a dedicated ObjectMapper configured for compact JSON output
     private val compactMapper =

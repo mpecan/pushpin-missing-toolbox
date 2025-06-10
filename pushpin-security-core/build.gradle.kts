@@ -15,6 +15,8 @@ dependencies {
     // Core dependencies only - minimal footprint
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    // Logging
+    implementation("org.slf4j:slf4j-api")
 
     // Spring Context for annotations (optional dependency)
     compileOnly("org.springframework:spring-context")
@@ -27,9 +29,6 @@ dependencies {
 
     // Spring Security OAuth2 for JWT support (optional)
     compileOnly("org.springframework.security:spring-security-oauth2-jose")
-
-    // Logging
-    implementation("org.slf4j:slf4j-api")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter")

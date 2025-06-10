@@ -6,7 +6,7 @@ import software.amazon.awssdk.services.ec2.model.Instance
 /**
  * Interface for checking if an EC2 instance is healthy.
  */
-interface InstanceHealthChecker {
+fun interface InstanceHealthChecker {
     /**
      * Checks if an EC2 instance is healthy.
      */

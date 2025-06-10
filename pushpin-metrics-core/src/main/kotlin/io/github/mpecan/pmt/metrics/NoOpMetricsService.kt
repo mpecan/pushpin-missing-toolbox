@@ -110,12 +110,5 @@ class NoOpMetricsService : MetricsService {
         // No-op
     }
 
-    private object NoOpTimerSample : MetricsService.TimerSample {
-        override fun stop(
-            operation: String,
-            server: String?,
-        ) {
-            // No-op
-        }
-    }
+    private object NoOpTimerSample : MetricsService.TimerSample
 }
