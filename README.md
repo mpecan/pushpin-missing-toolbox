@@ -149,20 +149,20 @@ All of this can also be easily accomplished directly within your application cod
 
 The Pushpin Missing Toolbox libraries are published to Maven Central. You can include them in your project using the following dependencies:
 
-### Latest Version: 0.0.2
+### Latest Version: 0.0.3
 
 ### Gradle (Kotlin DSL)
 
 ```kotlin
 dependencies {
     // Core API for GRIP protocol
-    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-api:0.0.3")
     
     // Client library for publishing messages
-    implementation("io.github.mpecan:pushpin-client:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.3")
     
     // HTTP transport (most common)
-    implementation("io.github.mpecan:pushpin-transport-http:0.0.2")
+    implementation("io.github.mpecan:pushpin-transport-http:0.0.3")
     
     // Add other modules as needed
 }
@@ -173,13 +173,13 @@ dependencies {
 ```groovy
 dependencies {
     // Core API for GRIP protocol
-    implementation 'io.github.mpecan:pushpin-api:0.0.2'
+    implementation 'io.github.mpecan:pushpin-api:0.0.3'
     
     // Client library for publishing messages
-    implementation 'io.github.mpecan:pushpin-client:0.0.2'
+    implementation 'io.github.mpecan:pushpin-client:0.0.3'
     
     // HTTP transport (most common)
-    implementation 'io.github.mpecan:pushpin-transport-http:0.0.2'
+    implementation 'io.github.mpecan:pushpin-transport-http:0.0.3'
     
     // Add other modules as needed
 }
@@ -193,21 +193,21 @@ dependencies {
     <dependency>
         <groupId>io.github.mpecan</groupId>
         <artifactId>pushpin-api</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
     </dependency>
     
     <!-- Client library for publishing messages -->
     <dependency>
         <groupId>io.github.mpecan</groupId>
         <artifactId>pushpin-client</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
     </dependency>
     
     <!-- HTTP transport (most common) -->
     <dependency>
         <groupId>io.github.mpecan</groupId>
         <artifactId>pushpin-transport-http</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
     </dependency>
     
     <!-- Add other modules as needed -->
