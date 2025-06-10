@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.0.2](https://github.com/mpecan/pushpin-missing-toolbox/compare/v0.0.1...v0.0.2) (2025-06-10)
+
+
+### Features
+
+* improve README with badges and dependency examples ([#84](https://github.com/mpecan/pushpin-missing-toolbox/issues/84)) ([e93970a](https://github.com/mpecan/pushpin-missing-toolbox/commit/e93970abcff8df82c26a117315cd6dbd00f1c8c1))
+* integrate SonarQube for code quality analysis in build process ([#88](https://github.com/mpecan/pushpin-missing-toolbox/issues/88)) ([0bb6977](https://github.com/mpecan/pushpin-missing-toolbox/commit/0bb6977f029b9e3d03b6f04b2ec9fe47253d3dfd))
+* remove unused dependencies to reduce dependency footprint ([#87](https://github.com/mpecan/pushpin-missing-toolbox/issues/87)) ([39bb76d](https://github.com/mpecan/pushpin-missing-toolbox/commit/39bb76decd6ff083ee560a336db9c11b69942de8))
+
+
+### Bug Fixes
+
+* cleanup last issue reported by sonarqube ([#94](https://github.com/mpecan/pushpin-missing-toolbox/issues/94)) ([6f1c1ff](https://github.com/mpecan/pushpin-missing-toolbox/commit/6f1c1ff5c0f92a056ca651b915c45de078214bf2))
+* **deps:** update aws-java-sdk-v2 monorepo to v2.31.59 ([#80](https://github.com/mpecan/pushpin-missing-toolbox/issues/80)) ([9c444a8](https://github.com/mpecan/pushpin-missing-toolbox/commit/9c444a8b099df6279c7e89d767745032745a48de))
+* **deps:** update aws-java-sdk-v2 monorepo to v2.31.60 ([#91](https://github.com/mpecan/pushpin-missing-toolbox/issues/91)) ([7b84df6](https://github.com/mpecan/pushpin-missing-toolbox/commit/7b84df6b49665900456b8e510a483b5cd27e8147))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.1 ([#83](https://github.com/mpecan/pushpin-missing-toolbox/issues/83)) ([e0a4027](https://github.com/mpecan/pushpin-missing-toolbox/commit/e0a402720252f6df71205e25796b07de9b47087c))
+* **deps:** update kubernetesclientversion to v24 (major) ([#71](https://github.com/mpecan/pushpin-missing-toolbox/issues/71)) ([806e9b4](https://github.com/mpecan/pushpin-missing-toolbox/commit/806e9b48072aa572d0409a0f18316d9568d0adc9))
+* **deps:** update micrometer to v1.15.1 ([#92](https://github.com/mpecan/pushpin-missing-toolbox/issues/92)) ([41d7bd7](https://github.com/mpecan/pushpin-missing-toolbox/commit/41d7bd7fcca10123c99a5d7e565a4f4add55b2a6))
+* **deps:** update tomcatversion to v11.0.8 ([#85](https://github.com/mpecan/pushpin-missing-toolbox/issues/85)) ([e98104c](https://github.com/mpecan/pushpin-missing-toolbox/commit/e98104c5f552ffceb548af5f4549f2ffc258a335))
+* **deps:** update tomcatversion to v11.0.8 ([#89](https://github.com/mpecan/pushpin-missing-toolbox/issues/89)) ([993861a](https://github.com/mpecan/pushpin-missing-toolbox/commit/993861a63cd3f8ab5e152898d966c81793dbd3c3))
+* Fix issues reported by SonarQube ([#93](https://github.com/mpecan/pushpin-missing-toolbox/issues/93)) ([5cfc08d](https://github.com/mpecan/pushpin-missing-toolbox/commit/5cfc08d30d84b07b4f1e1e8c5880e9eec764a90e))
+* SonarQube code quality issues ([#90](https://github.com/mpecan/pushpin-missing-toolbox/issues/90)) ([a8bdd0d](https://github.com/mpecan/pushpin-missing-toolbox/commit/a8bdd0d6f2dad181a51f4b1309efe2441096b4bc))
+
 ## [0.0.1](https://github.com/mpecan/pushpin-missing-toolbox/compare/v0.0.1-SNAPSHOT...v0.0.1) (2025-06-04)
 
 
