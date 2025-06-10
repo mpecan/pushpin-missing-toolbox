@@ -7,7 +7,7 @@ import io.github.mpecan.pmt.model.PushpinMessage
 /**
  * Interface for serializing messages to Pushpin format.
  */
-interface MessageSerializer {
+fun interface MessageSerializer {
     /**
      * Converts a Message to a PushpinMessage.
      *
