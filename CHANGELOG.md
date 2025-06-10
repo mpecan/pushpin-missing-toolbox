@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3](https://github.com/mpecan/pushpin-missing-toolbox/compare/v0.0.2...v0.0.3) (2025-06-10)
+
+
+### Features
+
+* comprehensive test coverage improvements ([#97](https://github.com/mpecan/pushpin-missing-toolbox/issues/97)) ([58f13f8](https://github.com/mpecan/pushpin-missing-toolbox/commit/58f13f8154b970c21b8825017efdfd5a02179b35))
+
+
+### Documentation
+
+* update README files with version 0.0.2 ([#96](https://github.com/mpecan/pushpin-missing-toolbox/issues/96)) ([0d39cff](https://github.com/mpecan/pushpin-missing-toolbox/commit/0d39cff0318d61c3874e7de717396418c3bc1bbc))
+
 ## [0.0.2](https://github.com/mpecan/pushpin-missing-toolbox/compare/v0.0.1...v0.0.2) (2025-06-10)
 
 
