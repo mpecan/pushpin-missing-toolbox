@@ -110,6 +110,7 @@ jobs:
           This is an automated pull request created after a successful release.
         branch: docs/update-readme-${{ steps.extract-version.outputs.version }}
         base: main
+        sign-commits: 'true'
 
   build-docker:
     needs: [publish]
