@@ -28,8 +28,8 @@ class DefaultJwtDecoderService(
         val jwtDecoder =
             when (properties.provider.lowercase()) {
                 "keycloak", "auth0", "okta", "oauth2" -> {
-                    if (properties.jwksUri.isBlank()) {
-                        throw IllegalStateException("JWKS URI must be provided for provider: ${properties.provider}")
+                    check(!properties.jwksUri.isBlank()) {
+                        "JWKS URI must be provided for provider: ${properties.provider}"
                     }
 
                     logger.info("Configuring JWT decoder with JWKS URI: ${properties.jwksUri}")
@@ -39,8 +39,8 @@ class DefaultJwtDecoderService(
                         .build()
                 }
                 "symmetric" -> {
-                    if (properties.secret.length < 32) {
-                        throw IllegalStateException("Secret key must be at least 32 characters long")
+                    check(properties.secret.length >= 32) {
+                        "Secret key must be at least 32 characters long"
                     }
 
                     logger.info("Configuring JWT decoder with symmetric key")
@@ -56,7 +56,7 @@ class DefaultJwtDecoderService(
                         .build()
                 }
                 else -> {
-                    throw IllegalStateException("Unknown JWT provider: ${properties.provider}")
+                    error("Unknown JWT provider: ${properties.provider}")
                 }
             }
 

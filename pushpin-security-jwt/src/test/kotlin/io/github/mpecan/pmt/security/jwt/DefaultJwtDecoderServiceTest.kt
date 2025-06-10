@@ -32,7 +32,7 @@ class DefaultJwtDecoderServiceTest {
             JwtProperties(
                 enabled = true,
                 provider = "symmetric",
-                secret = "test-secret-key-32-characters-long",
+                secret = "test-secret-key-32-characters-long-1",
             )
 
         val service = DefaultJwtDecoderService(properties)

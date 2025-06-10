@@ -132,12 +132,7 @@ interface MetricsService {
     /**
      * Timer sample interface for manual timing.
      */
-    interface TimerSample {
-        fun stop(
-            operation: String,
-            server: String? = null,
-        )
-    }
+    interface TimerSample
 }
 
 /**

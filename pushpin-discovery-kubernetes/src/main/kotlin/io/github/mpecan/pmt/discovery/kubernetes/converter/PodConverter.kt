@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 /**
  * Interface for converting Kubernetes pods to PushpinServer instances.
  */
-interface PodConverter {
+fun interface PodConverter {
     /**
      * Convert a Kubernetes pod to a PushpinServer instance.
      *

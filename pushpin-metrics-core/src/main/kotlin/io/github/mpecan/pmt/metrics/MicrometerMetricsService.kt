@@ -232,13 +232,5 @@ class MicrometerMetricsService(
 
     private class MicrometerTimerSample(
         val micrometerSample: Timer.Sample,
-    ) : MetricsService.TimerSample {
-        override fun stop(
-            operation: String,
-            server: String?,
-        ) {
-            // Delegate to the parent stopTimer method
-            throw UnsupportedOperationException("Use MetricsService.stopTimer instead")
-        }
-    }
+    ) : MetricsService.TimerSample
 }

@@ -7,7 +7,7 @@ import software.amazon.awssdk.services.ec2.model.Instance
 /**
  * Interface for converting EC2 instances to PushpinServer objects.
  */
-interface InstanceConverter {
+fun interface InstanceConverter {
     /**
      * Converts an EC2 instance to a PushpinServer.
      */
