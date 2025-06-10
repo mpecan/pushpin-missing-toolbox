@@ -134,7 +134,11 @@ class ZmqTransport(
             return Mono.just(false)
         }
 
-        logger.debug("Publishing message to channel: ${message.channel} on ${servers.size} servers")
+        logger.debug(
+            "Publishing message to channel: {} on {} servers",
+            sanitizeChannelName(message.channel),
+            servers.size,
+        )
 
         val pushpinMessage = messageSerializer.serialize(message)
         val dataString = "J${messageSerializationService.serialize(pushpinMessage)}"
@@ -214,6 +218,17 @@ class ZmqTransport(
         }
 
         context.close()
+    }
+
+    /**
+     * Sanitize channel name for safe logging.
+     */
+    private fun sanitizeChannelName(channelName: String): String {
+        return channelName
+            .replace("\r", "")
+            .replace("\n", " ")
+            .replace("\t", " ")
+            .take(100) // Limit channel name length for logging
     }
 
     /**

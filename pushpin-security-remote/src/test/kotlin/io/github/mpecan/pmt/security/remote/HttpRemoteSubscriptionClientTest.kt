@@ -419,5 +419,42 @@ class HttpRemoteSubscriptionClientTest {
 
             assertEquals(channels, result)
         }
+
+        @Test
+        fun `should call auditService when user is not present`() {
+            SecurityContextHolder.clearContext()
+            val pattern = "user.*.messages"
+
+            val channelsByPattern =
+                httpRemoteSubscriptionClient.getSubscribableChannelsByPattern(mockRequest, pattern)
+
+            verify(
+                mockAuditService,
+            ).logAuthFailure(
+                eq("anonymous"),
+                any<String>(),
+                eq("No authenticated user for channel list by pattern: $pattern"),
+            )
+            assertTrue(channelsByPattern.isEmpty())
+        }
+
+        @Test
+        fun `remote exception causes logRemoteAuthorizationError to be called on auditService`() {
+            setupAuthenticatedUser()
+            val pattern = "user.*.messages"
+            whenever(
+                mockRestTemplate.exchange(
+                    any<URI>(),
+                    any(),
+                    any<HttpEntity<*>>(),
+                    eq(HttpRemoteSubscriptionClient.ChannelsResponse::class.java),
+                ),
+            ).thenThrow(RuntimeException("Network error"))
+            val channelsByPattern =
+                httpRemoteSubscriptionClient.getSubscribableChannelsByPattern(mockRequest, pattern)
+
+            verify(mockAuditService).logRemoteAuthorizationError(eq(TEST_USER), any<String>(), eq(null), any())
+            assertTrue(channelsByPattern.isEmpty())
+        }
     }
 }

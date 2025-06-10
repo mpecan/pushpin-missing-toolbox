@@ -13,6 +13,10 @@ import org.springframework.security.oauth2.jwt.Jwt
 class JsonPathClaimExtractorService : ClaimExtractorService {
     private val logger = LoggerFactory.getLogger(JsonPathClaimExtractorService::class.java)
 
+    companion object {
+        private const val PATH_NOT_FOUND_MSG = "Path not found: {}"
+    }
+
     override fun extractStringClaim(
         jwt: Jwt,
         claimPath: String,
@@ -21,7 +25,7 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
         return try {
             context.read<Any>(validatePath(claimPath))?.toString()
         } catch (e: PathNotFoundException) {
-            logger.debug("Path not found: {}", claimPath)
+            logger.debug(PATH_NOT_FOUND_MSG, claimPath)
             null
         } catch (e: Exception) {
             logger.warn("Error extracting claim: {}", e.message)
@@ -43,7 +47,7 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
                 else -> listOf(result.toString())
             }
         } catch (e: PathNotFoundException) {
-            logger.debug("Path not found: {}", claimPath)
+            logger.debug(PATH_NOT_FOUND_MSG, claimPath)
             emptyList()
         } catch (e: Exception) {
             logger.warn("Error extracting list claim: {}", e.message)
@@ -67,7 +71,7 @@ class JsonPathClaimExtractorService : ClaimExtractorService {
                 else -> emptyMap()
             }
         } catch (e: PathNotFoundException) {
-            logger.debug("Path not found: {}", claimPath)
+            logger.debug(PATH_NOT_FOUND_MSG, claimPath)
             emptyMap()
         } catch (e: Exception) {
             logger.warn("Error extracting map claim: {}", e.message)

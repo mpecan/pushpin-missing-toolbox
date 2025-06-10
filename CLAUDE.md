@@ -8,6 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run single test: `./gradlew test --tests io.github.mpecan.pmt.controller.PushpinControllerTest`
 - Run application: `./gradlew bootRun`
 
+## Commit style
+- Conventional commits for all commits with an optional context
+- All PRs should also follow conventional commits
+
 ## Code Style
 - Kotlin with Spring Boot
 - Java 17 toolchain
@@ -16,6 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Functions: camelCase (getBaseUrl())
 - Properties: camelCase (controlPort)
 - Test methods: use backticks with descriptive names
+- No Wildcard imports: only use specific imports and do not use wildcard imports
 
 ## Dependency Management
 - All dependency versions must be defined in the root gradle.properties file
@@ -25,6 +30,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use primary constructors with default values for dependencies where appropriate
 - For external services (like AWS), inject clients or factories to allow mocking in tests
 - For testing, use mockito-kotlin library with constructor injection instead of subclassing
+- Dependencies have to be grouped by target (i.e. `implementation` together etc.)
 
 ## Testing
 - JUnit 5 with Spring Boot Test

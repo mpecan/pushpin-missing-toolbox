@@ -20,6 +20,10 @@ import reactor.core.publisher.Flux
 class HttpStreamingController(
     private val metricsService: MetricsService,
 ) {
+    companion object {
+        private const val TRANSPORT_TYPE = "http-stream"
+    }
+
     /**
      * Subscribes to a channel using the GRIP protocol with HTTP streaming.
      * * This endpoint keeps the connection open and adds the necessary GRIP headers
@@ -32,28 +36,14 @@ class HttpStreamingController(
     fun subscribe(
         @PathVariable channel: String,
     ): ResponseEntity<Flux<String>> {
-        val timer = metricsService.startTimer()
-
         // Record SSE connection
-        metricsService.recordConnectionEvent("http-stream", "opened")
-        metricsService.incrementActiveConnections("http-stream")
+        metricsService.recordConnectionEvent(TRANSPORT_TYPE, "opened")
+        metricsService.incrementActiveConnections(TRANSPORT_TYPE)
 
         // Create a Flux that never completes to keep the connection open
         val flux =
             Flux
                 .just<String>("Successfully subscribed to channel: $channel\n")
-                .doOnCancel {
-                    // Record disconnection when client cancels
-                    metricsService.recordConnectionEvent("http-stream", "closed")
-                    metricsService.decrementActiveConnections("http-stream")
-                    metricsService.stopTimer(timer, "http-stream-subscribe")
-                }.doOnError { error ->
-                    // Record error
-                    metricsService.recordConnectionEvent("http-stream", "error")
-                    metricsService.decrementActiveConnections("http-stream")
-                    metricsService.recordMessageError("pushpin", "http-stream", error.javaClass.simpleName)
-                    metricsService.stopTimer(timer, "http-stream-subscribe")
-                }
 
         // Return the response with GRIP headers using the new API
         return GripApi
