@@ -228,7 +228,7 @@ Core metrics collection and reporting for Pushpin servers.
 
 ## How to Use the Libraries
 
-### Latest Version: 0.0.1-SNAPSHOT
+### Latest Version: 0.0.2
 
 ### Basic Usage
 
@@ -238,8 +238,8 @@ To use any of the libraries, add the appropriate dependency to your project:
 
 ```kotlin
 dependencies {
-    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
+    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.2")
     // Add other modules as needed
 }
 ```
@@ -248,8 +248,8 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT'
-    implementation 'io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT'
+    implementation 'io.github.mpecan:pushpin-api:0.0.2'
+    implementation 'io.github.mpecan:pushpin-client:0.0.2'
     // Add other modules as needed
 }
 ```
@@ -261,12 +261,12 @@ dependencies {
     <dependency>
         <groupId>io.github.mpecan</groupId>
         <artifactId>pushpin-api</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2</version>
     </dependency>
     <dependency>
         <groupId>io.github.mpecan</groupId>
         <artifactId>pushpin-client</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2</version>
     </dependency>
     <!-- Add other modules as needed -->
 </dependencies>
@@ -308,9 +308,9 @@ For basic integration with Pushpin, you typically need:
 
 ```kotlin
 dependencies {
-    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-transport-http:0.0.1-SNAPSHOT")
+    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.2")
+    implementation("io.github.mpecan:pushpin-transport-http:0.0.2")
 }
 ```
 
@@ -320,11 +320,11 @@ For secure integration with authentication and encryption:
 
 ```kotlin
 dependencies {
-    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-transport-http:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-security-jwt:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-security-encryption:0.0.1-SNAPSHOT")
+    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.2")
+    implementation("io.github.mpecan:pushpin-transport-http:0.0.2")
+    implementation("io.github.mpecan:pushpin-security-jwt:0.0.2")
+    implementation("io.github.mpecan:pushpin-security-encryption:0.0.2")
 }
 ```
 
@@ -334,10 +334,10 @@ For deployment in AWS with automatic discovery:
 
 ```kotlin
 dependencies {
-    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-transport-http:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-discovery-aws:0.0.1-SNAPSHOT")
+    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.2")
+    implementation("io.github.mpecan:pushpin-transport-http:0.0.2")
+    implementation("io.github.mpecan:pushpin-discovery-aws:0.0.2")
 }
 ```
 
@@ -347,10 +347,10 @@ For deployment in Kubernetes with automatic discovery:
 
 ```kotlin
 dependencies {
-    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-transport-http:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-discovery-kubernetes:0.0.1-SNAPSHOT")
+    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.2")
+    implementation("io.github.mpecan:pushpin-transport-http:0.0.2")
+    implementation("io.github.mpecan:pushpin-discovery-kubernetes:0.0.2")
 }
 ```
 
@@ -360,9 +360,9 @@ For high-performance deployments with ZeroMQ transport:
 
 ```kotlin
 dependencies {
-    implementation("io.github.mpecan:pushpin-api:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-client:0.0.1-SNAPSHOT")
-    implementation("io.github.mpecan:pushpin-transport-zmq:0.0.1-SNAPSHOT")
+    implementation("io.github.mpecan:pushpin-api:0.0.2")
+    implementation("io.github.mpecan:pushpin-client:0.0.2")
+    implementation("io.github.mpecan:pushpin-transport-zmq:0.0.2")
 }
 ```
 
