@@ -36,8 +36,6 @@ class HttpStreamingController(
     fun subscribe(
         @PathVariable channel: String,
     ): ResponseEntity<Flux<String>> {
-        val timer = metricsService.startTimer()
-
         // Record SSE connection
         metricsService.recordConnectionEvent(TRANSPORT_TYPE, "opened")
         metricsService.incrementActiveConnections(TRANSPORT_TYPE)
@@ -46,18 +44,6 @@ class HttpStreamingController(
         val flux =
             Flux
                 .just<String>("Successfully subscribed to channel: $channel\n")
-                .doOnCancel {
-                    // Record disconnection when client cancels
-                    metricsService.recordConnectionEvent(TRANSPORT_TYPE, "closed")
-                    metricsService.decrementActiveConnections(TRANSPORT_TYPE)
-                    metricsService.stopTimer(timer, "$TRANSPORT_TYPE-subscribe")
-                }.doOnError { error ->
-                    // Record error
-                    metricsService.recordConnectionEvent(TRANSPORT_TYPE, "error")
-                    metricsService.decrementActiveConnections(TRANSPORT_TYPE)
-                    metricsService.recordMessageError("pushpin", TRANSPORT_TYPE, error.javaClass.simpleName)
-                    metricsService.stopTimer(timer, "$TRANSPORT_TYPE-subscribe")
-                }
 
         // Return the response with GRIP headers using the new API
         return GripApi

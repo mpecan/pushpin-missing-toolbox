@@ -20,6 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Functions: camelCase (getBaseUrl())
 - Properties: camelCase (controlPort)
 - Test methods: use backticks with descriptive names
+- No Wildcard imports: only use specific imports and do not use wildcard imports
 
 ## Dependency Management
 - All dependency versions must be defined in the root gradle.properties file
