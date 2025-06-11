@@ -2,5 +2,23 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "config:recommended"
-    ]
+    ],
+    "platformAutomerge": true,
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "squash",
+    "packageRules": [
+        {
+            "description": "Auto-merge minor and patch updates",
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true
+        },
+        {
+            "description": "Require manual review for major updates",
+            "matchUpdateTypes": ["major"],
+            "automerge": false
+        }
+    ],
+    "prConcurrentLimit": 5,
+    "branchConcurrentLimit": 10
 }
