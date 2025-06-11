@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.4](https://github.com/mpecan/pushpin-missing-toolbox/compare/v0.0.3...v0.0.4) (2025-06-11)
+
+
+### Bug Fixes
+
+* **deps:** update aws-java-sdk-v2 monorepo to v2.31.61 ([#101](https://github.com/mpecan/pushpin-missing-toolbox/issues/101)) ([9b1035e](https://github.com/mpecan/pushpin-missing-toolbox/commit/9b1035e01187c41c89064363e00fcc1d9a268689))
+
+
+### Documentation
+
+* update README files with version 0.0.3 ([#100](https://github.com/mpecan/pushpin-missing-toolbox/issues/100)) ([d624ec6](https://github.com/mpecan/pushpin-missing-toolbox/commit/d624ec6ff61544ed908d15981cfb1293f42f7229))
+
 ## [0.0.3](https://github.com/mpecan/pushpin-missing-toolbox/compare/v0.0.2...v0.0.3) (2025-06-10)
 
 
