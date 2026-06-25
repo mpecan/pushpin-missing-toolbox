@@ -8,7 +8,7 @@ val springBootVersion: String by project
 
 plugins {
     java
-    id("org.springframework.boot") version "3.5.0" apply false
+    id("org.springframework.boot") version "3.5.16" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
     id("jacoco-report-aggregation")
